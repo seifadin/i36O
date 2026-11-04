@@ -35,6 +35,8 @@ import { checkInlineScripts } from './check-scripts.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
+// The browsers the pages are written for — the same list as the app's (build-targets.json).
+const { targets: TARGETS } = JSON.parse(read('build-targets.json'));
 const pkgVersion = (name) => JSON.parse(read(`node_modules/${name}/package.json`)).version;
 
 // The shared theme site: theme.css, the fonts (and the hosted copy of the loader).
@@ -61,6 +63,7 @@ async function bundle(entry, { banner = '', plugins = [] } = {}) {
     bundle: true,
     write: false,
     format: 'iife',
+    target: TARGETS,
     charset: 'utf8',              // Arabic stays as it is, not \u escapes
     legalComments: 'none',        // the notices go in the banner, once
     define: { 'import.meta.url': JSON.stringify(`${THEME_ORIGIN}/theme-loader.js`) },

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-o4m9VEZ9q582BZWSf3vlbvjZe1yphMnN1pDDoltccbk=' 'sha256-iTLJyfwaZAuCA6DYigm2VCxR5P5i5WHgkrsRwba5pK0='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-iTLJyfwaZAuCA6DYigm2VCxR5P5i5WHgkrsRwba5pK0='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -142,31 +142,34 @@
 
 // A browser too old for these pages: the page's own code never runs there and the page would stay
 // blank. Instead: a note, in place of the page. "Too old": no JavaScript modules (Firefox before 60,
-// Chrome before 61, Safari before 11), or older than what the builds write for — Vite's default,
-// browsers of late 2022 (Firefox 104, Chrome 107, Safari 16). A script can't test the newer syntax
-// itself (the pages' security policy forbids eval), so an API of that time stands in for it:
-// structuredClone (Firefox 94, Chrome 98, Safari 15.4) — a browser just short of the build's target
-// may get no note and still not run the page, but every older one gets it. Its link: i360dbc's SmartAppLink (one link that opens the right store, or the support
-// site on a computer), put here by the app's build in place of '/' (vite.config.ts); on the hub
-// pages it stays '/', the app's home, whose note has it.
+// Chrome before 61, Safari before 11), or older than what the builds write for (hub/build-targets.json:
+// Firefox 104, Chrome 107, Safari 15 — late 2022). A script can't test syntax itself (the pages'
+// security policy forbids eval), so an API of that time stands in for it: structuredClone (Firefox 94,
+// Chrome 98, Safari 15.4 — also where Safari's dvh unit, which the app's layout needs, arrived). The
+// Reader's Markdown library (marked) uses lookbehind (Safari 16.4) only where the browser has it, with
+// a fallback otherwise, so it needs nothing more.
+// The note's link: i360dbc's Support (the support site), put here by the app's build in place of '/'
+// (vite.config.ts); on the hub pages it stays '/', the app's home, whose note has it.
 (function () {
   if ('noModule' in document.createElement('script') && typeof window.structuredClone === 'function') return;
-  var SMART_APP_LINK = '/';
-  var TEXT = 'متصفحك قديم ولا يدعم الموسوعة؛ يُرجى استخدام متصفح أحدث أو ';
-  var LINK_TEXT = 'تطبيق الموسوعة على الهاتف';
+  var SUPPORT_LINK = '/';
   var hide = document.createElement('style');
   hide.textContent = 'body > * { display: none !important; } body > #i360-old-browser { display: block !important; }';
   document.head.appendChild(hide);
   function show() {
-    var note = document.createElement('p'), link = document.createElement('a');
+    var note = document.createElement('p'), name = document.createElement('bdi'), link = document.createElement('a');
     note.id = 'i360-old-browser';
     note.dir = 'rtl';
     note.style.cssText = 'margin: 0; padding: 3rem 1.5rem; text-align: center; font-family: var(--i360-font, serif); font-size: 1.35rem; line-height: 2;'
       + ' color: var(--i360-text, #0010CF); background: var(--i360-bg, #FAF7F2); min-height: 100vh; box-sizing: border-box;';
-    link.href = SMART_APP_LINK;
-    link.textContent = LINK_TEXT;
+    name.dir = 'ltr';                          // «i360إ» in place with any surrounding text (as the CSE's title)
+    name.textContent = 'i360‎إ';
+    link.href = SUPPORT_LINK;
+    link.textContent = 'للمزيد';
     link.style.cssText = 'color: var(--i360-link, #2E8B57); font-weight: 700;';
-    note.appendChild(document.createTextNode(TEXT));
+    note.appendChild(document.createTextNode('متصفحك قديم ولا يدعم الموسوعة الإسلامية '));
+    note.appendChild(name);
+    note.appendChild(document.createTextNode('؛ يُرجى استخدام متصفح أحدث. '));
     note.appendChild(link);
     document.body.insertBefore(note, document.body.firstChild);
   }

@@ -1,0 +1,4 @@
+{
+  "comment": "The browsers every i360 build writes for: the app (vite.config.ts) and the hub pages (hub/scripts/build.js). Late 2022, and Safari 15 for iPhones that stop at iOS 15 (the App Store minimum, Capacitor 8). Keep hub/theme/early.js's old-browser test in step. claude/i360-instructions.md §15aj.",
+  "targets": ["chrome107", "edge107", "firefox104", "safari15"]
+}
