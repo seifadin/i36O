@@ -1,5 +1,5 @@
 /// <reference types="vitest/config" />
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, type Plugin, type ResolvedConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 import { readFileSync } from 'node:fs'
@@ -40,19 +40,57 @@ const CSP_SOURCES: Record<string, string> = {
 //   - early.js (the saved theme and saved theme.css copy, applied before anything
 //     is drawn: no flash) is built into index.html's <head> as an inline script,
 //     after the theme.css link so the saved copy wins; the policy above hashes it.
+//     Its note for browsers too old for the app links to i360dbc's SmartAppLink:
+//     read once per build (it changes rarely; the next release carries a new value)
+//     and put in place of the file's default, '/'. Without an answer (Baserow down,
+//     no settings), the build goes on and the note keeps '/'.
 const THEME_DIR = fileURLToPath(new URL('./hub/theme/', import.meta.url))
 const THEME_LOADER = `${THEME_DIR}site/theme-loader.js`
 const THEME_SITE_LOADER = 'https://theme.i36o.workers.dev/theme-loader.js'
 
+const EARLY_LINK_DEFAULT = "var SMART_APP_LINK = '/';"
+
+async function readSmartAppLink(env: Record<string, string>): Promise<string | null> {
+  const { VITE_BASEROW_URL: url, VITE_BASEROW_KEY: key, VITE_BASEROW_TABLE_RESOURCES: table } = env
+  if (!url || !key || !table) throw new Error('no Baserow settings (VITE_BASEROW_* in .env)')
+  const res = await fetch(`${url}${table}/?user_field_names=true&include=SmartAppLink`, {
+    headers: { Authorization: `Token ${key}` },
+    signal: AbortSignal.timeout(10000),
+  })
+  if (!res.ok) throw new Error(`Baserow ${res.status}`)
+  const data = (await res.json()) as { results?: { SmartAppLink?: unknown }[] }
+  const link = data.results?.map((row) => row.SmartAppLink).find((v) => typeof v === 'string' && v.trim())
+  if (typeof link !== 'string') return null
+  const parsed = new URL(link.trim())
+  if (parsed.protocol !== 'https:') throw new Error(`not an https address: ${link}`)
+  return parsed.href
+}
+
 function sharedTheme(): Plugin {
+  let config: ResolvedConfig
+  let smartAppLink: string | null = null
   return {
     name: 'i360-shared-theme',
+    configResolved(resolved) {
+      config = resolved
+    },
+    async buildStart() {
+      if (config.command !== 'build') return
+      try {
+        smartAppLink = await readSmartAppLink(config.env)
+        if (!smartAppLink) this.warn("i360dbc has no SmartAppLink: the old-browser note links to '/'")
+      } catch (e) {
+        this.warn(`SmartAppLink not read (${e instanceof Error ? e.message : String(e)}): the old-browser note links to '/'`)
+      }
+    },
     transform(code, id) {
       if (id.split('?')[0] !== THEME_LOADER) return null
       return code.replace(/import\.meta\.url/g, JSON.stringify(THEME_SITE_LOADER))
     },
     transformIndexHtml(html) {
-      const early = readFileSync(`${THEME_DIR}early.js`, 'utf-8').trim()
+      let early = readFileSync(`${THEME_DIR}early.js`, 'utf-8').trim()
+      if (early.split(EARLY_LINK_DEFAULT).length !== 2) throw new Error(`hub/theme/early.js: expected ${EARLY_LINK_DEFAULT} once`)
+      if (smartAppLink) early = early.replace(EARLY_LINK_DEFAULT, () => `var SMART_APP_LINK = ${JSON.stringify(smartAppLink)};`)
       // The LAST </head>: the real one, even if a comment above ever mentions the tag.
       const end = html.lastIndexOf('</head>')
       if (end === -1) throw new Error('index.html: no </head> to put the theme script before (see §15t)')
