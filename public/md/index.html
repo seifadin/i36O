@@ -185,7 +185,7 @@
       --page-max: 50rem;            /* widest page: about an A4 sheet at the reader's own font size */
       --page-min: 15rem;            /* narrowest page */
       --text-scale: 1;              /* text size, separate from zoom */
-      --container-gap: clamp(0.75rem, 2vw, 1.5rem);
+      --container-gap: var(--safe-gap);   /* the shared gap (page-chrome.css), also between pages */
     }
 
 
@@ -220,6 +220,31 @@
    base. The app has no such class, so it never gets them. */
 :where(.i360-page), :where(.i360-page) * { box-sizing: border-box; margin: 0; padding: 0; }
 :where(.i360-page) [hidden] { display: none !important; }
+
+/* ---------- Clear of the screen's edges (every i360 page, the app's included) ---------- */
+/* Content keeps out of the parts of the screen the system uses — the status bar, the home indicator, a
+   camera notch in landscape, the iPhone Duo's status-bar strip down one side — by each side's inset, as
+   the device reports it (env(), 0 where there is none), plus one gap, the same on every page, from the
+   room there is: closer on a phone, wider on a big screen. Padding inside a control is not this gap
+   (it follows the text: .toolbar-btn, the pages' own fields).
+     safe-area          a page's content area: all four sides
+     safe-area-top-bar  …with a toolbar above it, which already clears the top (.toolbar)
+     safe-sides         a full-width row whose background reaches the edges: its content clears the
+                        sides; --safe-level (1 by default) multiplies the gap, for indented levels
+     safe-edges         a page made of such rows (the app's home): clears only the top and bottom
+   A page that takes one of these sets none of those paddings itself (its own rules come later and
+   would replace them). */
+:root { --safe-gap: clamp(0.75rem, 2vw, 1.5rem); }
+.safe-area {
+  padding: calc(var(--safe-gap) + env(safe-area-inset-top)) calc(var(--safe-gap) + env(safe-area-inset-right))
+           calc(var(--safe-gap) + env(safe-area-inset-bottom)) calc(var(--safe-gap) + env(safe-area-inset-left));
+}
+.safe-area-top-bar { padding-top: var(--safe-gap); }
+.safe-sides {
+  padding-left: calc(var(--safe-gap) * var(--safe-level, 1) + env(safe-area-inset-left));
+  padding-right: calc(var(--safe-gap) * var(--safe-level, 1) + env(safe-area-inset-right));
+}
+.safe-edges { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
 
 :root {
   /* The theme's values, with the light ones built in for when theme.css hasn't arrived (the pages
@@ -448,7 +473,8 @@ svg[data-lucide] {
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      padding: 0.3rem calc(0.75rem + env(safe-area-inset-right)) 0.3rem calc(0.75rem + env(safe-area-inset-left));
+      padding-top: 0.3rem;          /* its sides: .safe-sides */
+      padding-bottom: 0.3rem;
       background: var(--i360-toolbar);
       border-bottom: 1px solid var(--i360-border);
       font-size: 0.8rem;
@@ -522,10 +548,7 @@ svg[data-lucide] {
     .viewer-container {
       flex: 1;
       overflow: auto;
-      padding: var(--container-gap);
-      padding-left: calc(var(--container-gap) + env(safe-area-inset-left));
-      padding-right: calc(var(--container-gap) + env(safe-area-inset-right));
-      padding-bottom: calc(var(--container-gap) + env(safe-area-inset-bottom));
+      /* padding: .safe-area .safe-area-top-bar (page-chrome.css) */
       width: 100%;
       overscroll-behavior: contain;
     }
@@ -1031,7 +1054,7 @@ svg[data-lucide] {
 
   <!-- Progress while a book downloads and while its pages are built: a row of its own
        under the toolbar, so it never covers the book. -->
-  <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" hidden>
+  <div class="progress safe-sides" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" hidden>
     <span class="progress-text" id="progress-text"></span>
     <span class="progress-track"><span class="progress-fill" id="progress-fill"></span></span>
   </div>
@@ -1081,7 +1104,7 @@ svg[data-lucide] {
 
   <input type="file" id="file-input" accept=".md,.markdown,.txt,text/markdown,text/plain">
 
-  <main class="viewer-container" id="viewer-container" tabindex="-1">
+  <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
     <div class="missing-pages-banner" id="missing-pages-banner" role="status">
       <svg data-lucide="triangle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>

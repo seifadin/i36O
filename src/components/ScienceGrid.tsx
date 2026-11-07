@@ -51,17 +51,19 @@ function DynamicIcon({ name, size = 15 }: { name: string; size?: number }) {
 
 // Extracted after the intermediate-nested minor button and the direct
 // minor button (rendered when a science has no intermediate parent) were
-// found to be identical except for indent depth (px-12 vs px-8). Defined
+// found to be identical except for indent depth (3 gaps vs 2). Defined
 // at module scope, not nested inside ScienceGrid, with onTap passed as a
 // prop rather than closed over — a component defined inside another
 // component's render body gets a fresh function identity every render,
 // which React treats as a brand-new component type and remounts instead
 // of reconciling.
 
-// Class strings kept byte-identical to the two hand-written rows they replace.
+// Every row reaches the screen's edges (its highlight and dividers); its content keeps the
+// shared gap from them, clear of any safe-area inset (safe-sides, page-chrome.css), one gap
+// more per level down.
 const BUTTON = {
-  major: 'flex w-full items-center justify-between px-4 py-2 text-right text-lg font-bold text-brand-blue hover:bg-brand-highlight focus:outline-none',
-  intermediate: 'flex w-full items-center justify-between px-8 py-1.5 text-right text-base font-normal text-brand-blue hover:bg-brand-highlight focus:outline-none',
+  major: 'flex w-full items-center justify-between safe-sides py-2 text-right text-lg font-bold text-brand-blue hover:bg-brand-highlight focus:outline-none',
+  intermediate: 'flex w-full items-center justify-between safe-sides [--safe-level:2] py-1.5 text-right text-base font-normal text-brand-blue hover:bg-brand-highlight focus:outline-none',
 }
 const PANEL = { major: 'divide-y divide-brand-divider bg-brand-ivory', intermediate: 'divide-y divide-brand-divider bg-brand-ivory' }
 const SIZE = { major: { chevron: 16, icon: 17 }, intermediate: { chevron: 14, icon: 14 } }
@@ -111,10 +113,12 @@ function MinorButton({
   // Hover is the only tap feedback (CSS). It sits on this wrapper so the whole row,
   // paperclip included, keeps it.
   return (
-    <div className="flex w-full items-center hover:bg-brand-highlight">
+    // The row clears the screen's edges (safe-sides at level 0: the insets alone), its button
+    // keeps the levels' gaps, so the whole indent stays tappable and the paperclip clears the edge too.
+    <div className="flex w-full items-center hover:bg-brand-highlight safe-sides [--safe-level:0]">
       <button
         onClick={() => onTap(science)}
-        className={`flex flex-1 items-center gap-2 ${indent === 'nested' ? 'px-12' : 'px-8'} py-1 text-right text-base focus:outline-none text-brand-blue`}
+        className={`flex flex-1 items-center gap-2 ${indent === 'nested' ? 'px-[calc(var(--safe-gap)*3)]' : 'px-[calc(var(--safe-gap)*2)]'} py-1 text-right text-base focus:outline-none text-brand-blue`}
       >
         {science.ScienceMinorIcon && (
           <span className="text-brand-green">

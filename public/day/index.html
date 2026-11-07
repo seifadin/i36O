@@ -237,6 +237,31 @@
 :where(.i360-page), :where(.i360-page) * { box-sizing: border-box; margin: 0; padding: 0; }
 :where(.i360-page) [hidden] { display: none !important; }
 
+/* ---------- Clear of the screen's edges (every i360 page, the app's included) ---------- */
+/* Content keeps out of the parts of the screen the system uses — the status bar, the home indicator, a
+   camera notch in landscape, the iPhone Duo's status-bar strip down one side — by each side's inset, as
+   the device reports it (env(), 0 where there is none), plus one gap, the same on every page, from the
+   room there is: closer on a phone, wider on a big screen. Padding inside a control is not this gap
+   (it follows the text: .toolbar-btn, the pages' own fields).
+     safe-area          a page's content area: all four sides
+     safe-area-top-bar  …with a toolbar above it, which already clears the top (.toolbar)
+     safe-sides         a full-width row whose background reaches the edges: its content clears the
+                        sides; --safe-level (1 by default) multiplies the gap, for indented levels
+     safe-edges         a page made of such rows (the app's home): clears only the top and bottom
+   A page that takes one of these sets none of those paddings itself (its own rules come later and
+   would replace them). */
+:root { --safe-gap: clamp(0.75rem, 2vw, 1.5rem); }
+.safe-area {
+  padding: calc(var(--safe-gap) + env(safe-area-inset-top)) calc(var(--safe-gap) + env(safe-area-inset-right))
+           calc(var(--safe-gap) + env(safe-area-inset-bottom)) calc(var(--safe-gap) + env(safe-area-inset-left));
+}
+.safe-area-top-bar { padding-top: var(--safe-gap); }
+.safe-sides {
+  padding-left: calc(var(--safe-gap) * var(--safe-level, 1) + env(safe-area-inset-left));
+  padding-right: calc(var(--safe-gap) * var(--safe-level, 1) + env(safe-area-inset-right));
+}
+.safe-edges { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+
 :root {
   /* The theme's values, with the light ones built in for when theme.css hasn't arrived (the pages
      also carry the theme's own copy; the app only these, as with its colours in tailwind.config.ts). */
@@ -409,9 +434,8 @@ svg[data-lucide] {
     .lang-item { border: 0; background: transparent; color: var(--i360-text); text-align: start; padding: 0.5rem 0.75rem; border-radius: 0.75rem; font: 1rem/1.5 var(--i360-font); cursor: pointer; }
     .lang-item:hover { background-color: var(--i360-hover); }
     .lang-item.active-btn { background-color: var(--i360-accent); }
-    .page { width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;
-        padding: 1rem calc(1rem + env(safe-area-inset-right)) calc(1rem + env(safe-area-inset-bottom)) calc(1rem + env(safe-area-inset-left)); }
-    @media (min-width: 768px) { .page { padding-top: 2rem; padding-bottom: calc(2rem + env(safe-area-inset-bottom)); } }
+    /* Its padding: .safe-area .safe-area-top-bar (page-chrome.css). */
+    .page { width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
     /* The page column (--col, as before) and the cards (Seif 2026-10-26): one column, in this order,
        wherever two don't fit; where two columns of at least --col-min fit, the verse and hadith on
        one side and prayer times above the events on the other. Which one it is follows the space
@@ -452,7 +476,7 @@ svg[data-lucide] {
     <button id="btn-close" type="button" class="toolbar-btn" hidden><svg data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
   </header>
 
-  <div class="page">
+  <div class="page safe-area safe-area-top-bar">
   <div class="layout-stable flex flex-col gap-1 mb-8 text-center">
     <p class="text-custom-secondary text-sm md:text-base font-medium" data-target="current-date"></p>
     <p class="text-accent text-xs md:text-sm font-bold" data-target="hijri-date"></p>

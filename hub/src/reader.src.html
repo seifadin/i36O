@@ -23,7 +23,7 @@
       --page-max: 50rem;            /* widest page: about an A4 sheet at the reader's own font size */
       --page-min: 15rem;            /* narrowest page */
       --text-scale: 1;              /* text size, separate from zoom */
-      --container-gap: clamp(0.75rem, 2vw, 1.5rem);
+      --container-gap: var(--safe-gap);   /* the shared gap (page-chrome.css), also between pages */
     }
 
 
@@ -106,7 +106,8 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      padding: 0.3rem calc(0.75rem + env(safe-area-inset-right)) 0.3rem calc(0.75rem + env(safe-area-inset-left));
+      padding-top: 0.3rem;          /* its sides: .safe-sides */
+      padding-bottom: 0.3rem;
       background: var(--i360-toolbar);
       border-bottom: 1px solid var(--i360-border);
       font-size: 0.8rem;
@@ -180,10 +181,7 @@
     .viewer-container {
       flex: 1;
       overflow: auto;
-      padding: var(--container-gap);
-      padding-left: calc(var(--container-gap) + env(safe-area-inset-left));
-      padding-right: calc(var(--container-gap) + env(safe-area-inset-right));
-      padding-bottom: calc(var(--container-gap) + env(safe-area-inset-bottom));
+      /* padding: .safe-area .safe-area-top-bar (page-chrome.css) */
       width: 100%;
       overscroll-behavior: contain;
     }
@@ -689,7 +687,7 @@
 
   <!-- Progress while a book downloads and while its pages are built: a row of its own
        under the toolbar, so it never covers the book. -->
-  <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" hidden>
+  <div class="progress safe-sides" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" hidden>
     <span class="progress-text" id="progress-text"></span>
     <span class="progress-track"><span class="progress-fill" id="progress-fill"></span></span>
   </div>
@@ -739,7 +737,7 @@
 
   <input type="file" id="file-input" accept=".md,.markdown,.txt,text/markdown,text/plain">
 
-  <main class="viewer-container" id="viewer-container" tabindex="-1">
+  <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
     <div class="missing-pages-banner" id="missing-pages-banner" role="status">
       <svg data-lucide="triangle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>

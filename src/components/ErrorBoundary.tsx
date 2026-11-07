@@ -69,7 +69,7 @@ export default class ErrorBoundary extends Component<Props, State> {
       return (
         <div
           dir="rtl"
-          className="flex h-dvh flex-col items-center justify-center gap-4 bg-brand-ivory p-6 text-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+          className="flex h-dvh flex-col items-center justify-center gap-4 bg-brand-ivory safe-area text-center"
           // Safe-area padding, same as Home.tsx (§14d) — applied defensively to the
           // crash screen for consistency.
         >

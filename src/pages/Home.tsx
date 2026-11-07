@@ -16,11 +16,6 @@ const HEADER_STEPS = [
   { text: 'text-xs', icon: 'h-3.5 w-3.5', px: 12 }, // true floor of Tailwind's standard scale (2026-08-31) — stopping at text-sm was itself an unjustified arbitrary limit, the same class of mistake this whole investigation exists to remove
 ] as const
 
-// Container's own horizontal padding (px-4 = 16px × 2 sides) — subtracted
-// from viewport width to get the space actually available to the content
-// itself, not the raw viewport.
-const HEADER_CONTAINER_PADDING_PX = 32
-
 const HEADER_TITLE = 'الموسوعة الإسلامية إi360'
 
 // A measurement-imprecision cushion, not a width guess: a real device measured a
@@ -60,15 +55,19 @@ export default function Home() {
   // exactly when recomputing is correct, not a bug.
   const [headerStep, setHeaderStep] = useState<(typeof HEADER_STEPS)[number]>(HEADER_STEPS[0])
   const measureRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
 
   // useLayoutEffect, not useEffect — runs synchronously before the browser
   // paints, so even though headerStep's initial value is the largest step,
   // the user never actually sees that size flash before this corrects it.
   useLayoutEffect(() => {
     function recalculate() {
-      if (!measureRef.current) return
+      if (!measureRef.current || !headerRef.current) return
       const naturalWidth = measureRef.current.scrollWidth
-      const availableWidth = currentPortraitWidth() - HEADER_CONTAINER_PADDING_PX
+      // The header's own side padding, as drawn: the shared gap plus each side's
+      // safe-area inset (.safe-sides) — read, not assumed.
+      const cs = getComputedStyle(headerRef.current)
+      const availableWidth = currentPortraitWidth() - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
       setHeaderStep(pickHeaderStep(naturalWidth, availableWidth))
     }
 
@@ -93,9 +92,10 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="flex flex-col h-dvh bg-brand-ivory pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-      {/* Safe-area padding here, not on the header/OSRow individually —
-          one place, applies uniformly top+bottom, and box-sizing:
+    <div className="flex flex-col h-dvh bg-brand-ivory safe-edges">
+      {/* Top and bottom safe-area padding here (safe-edges, page-chrome.css), not
+          on the header/OSRow individually — one place; each full-width row
+          clears the sides itself (safe-sides; OSRow's bar does its own). box-sizing:
           border-box (Tailwind preflight) means it's absorbed within
           h-dvh rather than pushing the layout taller than the viewport.
           bg-brand-ivory already on this element, so the inset itself
@@ -137,7 +137,7 @@ export default function Home() {
           Sizing driven by headerStep (see HEADER_STEPS above), not fixed
           classes — applies to all four elements identically, so the whole
           header stays proportional together at every step. */}
-      <div className="flex items-center justify-center gap-2 bg-brand-ivory px-4 py-3 shadow-sm shrink-0">
+      <div ref={headerRef} className="flex items-center justify-center gap-2 bg-brand-ivory safe-sides py-3 shadow-sm shrink-0">
         <span className={`${headerStep.text} font-bold text-brand-blue`} aria-hidden="true">&#xFD3F;</span>
         <img
           src="/assets/icons/logo-512.png"

@@ -228,7 +228,7 @@ export default function SearchBar() {
   )
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 bg-brand-ivory border-b border-brand-border">
+    <div className="flex items-center gap-2 safe-sides py-2 bg-brand-ivory border-b border-brand-border">
       {/* Visually hidden, announces the transient states above regardless
           of which element currently has focus. role="status" + explicit
           aria-live="polite" together for the broadest, most reliable

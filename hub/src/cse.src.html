@@ -19,7 +19,7 @@
   <style>
     /* Colours: the shared theme's own variables (--i360-…, hub/theme/site/theme.css), used directly;
        the theme is <html data-theme="…">. */
-    :root { --page-w: 50rem; --gap: clamp(0.75rem, 2vw, 1.5rem); }
+    :root { --page-w: 48rem; }   /* the column's text width */
 
 
     body {
@@ -46,7 +46,8 @@
     .toolbar { flex-shrink: 0; z-index: 10; }
 
     /* ---------- Search ---------- */
-    main { width: var(--page-w); max-width: 100%; margin: 0 auto; padding: var(--gap) 1rem calc(var(--gap) + env(safe-area-inset-bottom)); }
+    /* The column, centred in the scrolling area, which keeps it clear of the screen's edges (.safe-area). */
+    main { width: var(--page-w); max-width: 100%; margin: 0 auto; }
 
     .search-form { display: flex; gap: 0.5rem; }
     .search-input {
@@ -184,7 +185,7 @@
     <button class="toolbar-btn" id="btn-close" type="button" aria-label="إغلاق" title="إغلاق" hidden><svg data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
   </header>
 
-  <div class="scroller" id="scroller" tabindex="-1">
+  <div class="scroller safe-area safe-area-top-bar" id="scroller" tabindex="-1">
   <main>
     <form class="search-form" id="search-form" role="search" autocomplete="off">
       <input class="search-input" id="q" type="search" name="q" enterkeyhint="search" spellcheck="false" aria-label="نص البحث" placeholder="ابحث في نصوص الكتب…">

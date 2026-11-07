@@ -181,7 +181,7 @@
   <style>
     /* Colours: the shared theme's own variables (--i360-…, hub/theme/site/theme.css), used directly;
        the theme is <html data-theme="…">. */
-    :root { --page-w: 50rem; --gap: clamp(0.75rem, 2vw, 1.5rem); }
+    :root { --page-w: 48rem; }   /* the column's text width */
 
 
     body {
@@ -222,6 +222,31 @@
    base. The app has no such class, so it never gets them. */
 :where(.i360-page), :where(.i360-page) * { box-sizing: border-box; margin: 0; padding: 0; }
 :where(.i360-page) [hidden] { display: none !important; }
+
+/* ---------- Clear of the screen's edges (every i360 page, the app's included) ---------- */
+/* Content keeps out of the parts of the screen the system uses — the status bar, the home indicator, a
+   camera notch in landscape, the iPhone Duo's status-bar strip down one side — by each side's inset, as
+   the device reports it (env(), 0 where there is none), plus one gap, the same on every page, from the
+   room there is: closer on a phone, wider on a big screen. Padding inside a control is not this gap
+   (it follows the text: .toolbar-btn, the pages' own fields).
+     safe-area          a page's content area: all four sides
+     safe-area-top-bar  …with a toolbar above it, which already clears the top (.toolbar)
+     safe-sides         a full-width row whose background reaches the edges: its content clears the
+                        sides; --safe-level (1 by default) multiplies the gap, for indented levels
+     safe-edges         a page made of such rows (the app's home): clears only the top and bottom
+   A page that takes one of these sets none of those paddings itself (its own rules come later and
+   would replace them). */
+:root { --safe-gap: clamp(0.75rem, 2vw, 1.5rem); }
+.safe-area {
+  padding: calc(var(--safe-gap) + env(safe-area-inset-top)) calc(var(--safe-gap) + env(safe-area-inset-right))
+           calc(var(--safe-gap) + env(safe-area-inset-bottom)) calc(var(--safe-gap) + env(safe-area-inset-left));
+}
+.safe-area-top-bar { padding-top: var(--safe-gap); }
+.safe-sides {
+  padding-left: calc(var(--safe-gap) * var(--safe-level, 1) + env(safe-area-inset-left));
+  padding-right: calc(var(--safe-gap) * var(--safe-level, 1) + env(safe-area-inset-right));
+}
+.safe-edges { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
 
 :root {
   /* The theme's values, with the light ones built in for when theme.css hasn't arrived (the pages
@@ -388,7 +413,8 @@ svg[data-lucide] {
     .toolbar { flex-shrink: 0; z-index: 10; }
 
     /* ---------- Search ---------- */
-    main { width: var(--page-w); max-width: 100%; margin: 0 auto; padding: var(--gap) 1rem calc(var(--gap) + env(safe-area-inset-bottom)); }
+    /* The column, centred in the scrolling area, which keeps it clear of the screen's edges (.safe-area). */
+    main { width: var(--page-w); max-width: 100%; margin: 0 auto; }
 
     .search-form { display: flex; gap: 0.5rem; }
     .search-input {
@@ -526,7 +552,7 @@ svg[data-lucide] {
     <button class="toolbar-btn" id="btn-close" type="button" aria-label="إغلاق" title="إغلاق" hidden><svg data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
   </header>
 
-  <div class="scroller" id="scroller" tabindex="-1">
+  <div class="scroller safe-area safe-area-top-bar" id="scroller" tabindex="-1">
   <main>
     <form class="search-form" id="search-form" role="search" autocomplete="off">
       <input class="search-input" id="q" type="search" name="q" enterkeyhint="search" spellcheck="false" aria-label="نص البحث" placeholder="ابحث في نصوص الكتب…">

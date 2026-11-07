@@ -67,9 +67,8 @@
     .lang-item { border: 0; background: transparent; color: var(--i360-text); text-align: start; padding: 0.5rem 0.75rem; border-radius: 0.75rem; font: 1rem/1.5 var(--i360-font); cursor: pointer; }
     .lang-item:hover { background-color: var(--i360-hover); }
     .lang-item.active-btn { background-color: var(--i360-accent); }
-    .page { width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;
-        padding: 1rem calc(1rem + env(safe-area-inset-right)) calc(1rem + env(safe-area-inset-bottom)) calc(1rem + env(safe-area-inset-left)); }
-    @media (min-width: 768px) { .page { padding-top: 2rem; padding-bottom: calc(2rem + env(safe-area-inset-bottom)); } }
+    /* Its padding: .safe-area .safe-area-top-bar (page-chrome.css). */
+    .page { width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
     /* The page column (--col, as before) and the cards (Seif 2026-10-26): one column, in this order,
        wherever two don't fit; where two columns of at least --col-min fit, the verse and hadith on
        one side and prayer times above the events on the other. Which one it is follows the space
@@ -110,7 +109,7 @@
     <button id="btn-close" type="button" class="toolbar-btn" hidden><svg data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
   </header>
 
-  <div class="page">
+  <div class="page safe-area safe-area-top-bar">
   <div class="layout-stable flex flex-col gap-1 mb-8 text-center">
     <p class="text-custom-secondary text-sm md:text-base font-medium" data-target="current-date"></p>
     <p class="text-accent text-xs md:text-sm font-bold" data-target="hijri-date"></p>
