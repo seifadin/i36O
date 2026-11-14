@@ -22,17 +22,28 @@ test('theme.css: every plain-colour fallback is up to date', () => {
   for (const r of results) assert.ok(r.ok, `${r.selector} ${r.name}: ${r.actual}, should be ${r.expected} — run node theme/fallbacks.js --write`);
 });
 
+// The values set once, in the light block: fonts, sizes, spacing, shapes, motion, layers (§15al).
+const SET_ONCE = /^--i360-(font|toolbar-h$|text-size|line-height|line-width|bar-width|space-|gap$|cell-padding$|radius-|toolbar-shadow$|popup-shadow$|icon-size|content-width$|disabled-opacity$|speed|layer-)/;
+
 test('theme.css: light, sepia and dark set the same colours', () => {
   const blocks = themeBlocks(css);
   const by = Object.fromEntries(blocks.map(b => [b.selector, b.vars]));
   const light = by[':root, [data-theme="light"]'];
   assert.ok(light && by['[data-theme="sepia"]'] && by['[data-theme="dark"]']);
-  // Set once, for every theme (in the light block, which is also :root): the fonts and the toolbars' height.
-  const colours = Object.keys(light).filter(k => !k.startsWith('--i360-font') && k !== '--i360-toolbar-h');
+  // Set once, for every theme (in the light block, which is also :root): the fonts and the sizes.
+  const colours = Object.keys(light).filter(k => !SET_ONCE.test(k));
   for (const sel of ['[data-theme="sepia"]', '[data-theme="dark"]']) {
     assert.deepEqual(Object.keys(by[sel]).sort(), colours.slice().sort(), sel);
   }
   for (const b of blocks) for (const k of Object.keys(b.vars)) assert.match(k, /^--i360-/);
+  // …and only there: sepia and dark never redefine a size.
+  for (const sel of ['[data-theme="sepia"]', '[data-theme="dark"]']) {
+    for (const k of Object.keys(by[sel])) assert.ok(!SET_ONCE.test(k), `${sel} sets ${k}, which is set once`);
+  }
+  // The set-once values are there, each once.
+  for (const k of ['--i360-text-size', '--i360-line-height', '--i360-space-md', '--i360-gap', '--i360-radius-lg', '--i360-line-width', '--i360-toolbar-shadow', '--i360-icon-size', '--i360-content-width', '--i360-speed', '--i360-layer-dialog']) {
+    assert.ok(k in light, `${k} missing from the light block`);
+  }
 });
 
 test('a derived colour is set for its own theme only (never for every theme through a bare :root)', () => {
