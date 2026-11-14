@@ -69,11 +69,11 @@ export default class ErrorBoundary extends Component<Props, State> {
       return (
         <div
           dir="rtl"
-          className="flex h-dvh flex-col items-center justify-center gap-4 bg-brand-ivory safe-area text-center"
+          className="flex h-dvh flex-col items-center justify-center gap-md bg-brand-ivory safe-area text-center"
           // Safe-area padding, same as Home.tsx (§14d) — applied defensively to the
           // crash screen for consistency.
         >
-          <p className="text-xl font-bold text-brand-blue">
+          <p className="text-lg font-bold text-brand-blue">
             حدث خطأ غير متوقع
           </p>
           <p className="text-base text-brand-blue">
@@ -81,13 +81,13 @@ export default class ErrorBoundary extends Component<Props, State> {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="rounded-full bg-brand-blue px-4 py-2 text-base text-brand-on-accent"
+            className="rounded-full bg-brand-blue px-md py-sm text-base text-brand-on-accent"
           >
             إعادة التحميل
           </button>
           <button
             onClick={this.handleReport}
-            className={`rounded-full border px-4 py-2 text-base transition-colors ${
+            className={`rounded-full border px-md py-sm text-base transition-colors ${
               reported
                 ? 'border-brand-green text-brand-green'
                 : 'border-brand-blue text-brand-blue'

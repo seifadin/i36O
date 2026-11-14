@@ -25,6 +25,13 @@
     @apply text-brand-blue;
   }
 
+  /* Every icon (lucide-react draws them as svg.lucide) at the theme's one icon size, whatever
+     size a component asks for (§15al). */
+  svg.lucide {
+    width: var(--i360-icon-size, 1.25rem);
+    height: var(--i360-icon-size, 1.25rem);
+  }
+
   /* No colour variables are declared here: tailwind.config.ts's brand tokens
      are the single source of colours in the app (§7), and they read the
      shared i360 theme's --i360-* variables (index.html's theme.css link),

@@ -16,17 +16,17 @@ import ReportNotice from '@/components/ReportNotice'
 
 // Caches each lazy component so repeated renders of the same icon name don't
 // recreate a new lazy() wrapper (and re-trigger Suspense) every render.
-const iconCache = new Map<string, ComponentType<{ size?: number }>>()
+const iconCache = new Map<string, ComponentType>()
 
 // Visible fallback for a missing/misnamed icon — silently rendering nothing
 // makes a bad icon name indistinguishable from "no icon set," same class of
 // problem as the Keyboard field-mismatch bug (zero visible failure = hard to
 // diagnose). CircleSlash makes a bad name immediately noticeable instead.
-function FallbackIcon({ size }: { size?: number }) {
-  return <CircleSlash size={size} />
+function FallbackIcon() {
+  return <CircleSlash />
 }
 
-function DynamicIcon({ name, size = 15 }: { name: string; size?: number }) {
+function DynamicIcon({ name }: { name: string }) {
   const LazyIcon = useMemo(() => {
     if (!iconCache.has(name)) {
       iconCache.set(
@@ -44,7 +44,7 @@ function DynamicIcon({ name, size = 15 }: { name: string; size?: number }) {
 
   return (
     <Suspense fallback={null}>
-      <LazyIcon size={size} />
+      <LazyIcon />
     </Suspense>
   )
 }
@@ -62,11 +62,10 @@ function DynamicIcon({ name, size = 15 }: { name: string; size?: number }) {
 // shared gap from them, clear of any safe-area inset (safe-sides, page-chrome.css), one gap
 // more per level down.
 const BUTTON = {
-  major: 'flex w-full items-center justify-between safe-sides py-2 text-right text-lg font-bold text-brand-blue hover:bg-brand-highlight focus:outline-none',
-  intermediate: 'flex w-full items-center justify-between safe-sides [--safe-level:2] py-1.5 text-right text-base font-normal text-brand-blue hover:bg-brand-highlight focus:outline-none',
+  major: 'flex w-full items-center justify-between safe-sides py-sm text-right text-lg font-bold text-brand-blue hover:bg-brand-highlight focus:outline-none',
+  intermediate: 'flex w-full items-center justify-between safe-sides [--safe-level:2] py-xs text-right text-base font-normal text-brand-blue hover:bg-brand-highlight focus:outline-none',
 }
 const PANEL = { major: 'divide-y divide-brand-divider bg-brand-ivory', intermediate: 'divide-y divide-brand-divider bg-brand-ivory' }
-const SIZE = { major: { chevron: 16, icon: 17 }, intermediate: { chevron: 14, icon: 14 } }
 
 // One expandable row of the science accordion (major or intermediate level).
 // aria-expanded / aria-controls let screen readers announce what the chevron
@@ -80,15 +79,14 @@ function DisclosureRow({ level, label, icon, expanded, panelId, onToggle, childr
   onToggle: () => void
   children: ReactNode
 }) {
-  const size = SIZE[level]
   return (
     <div>
       <button onClick={onToggle} aria-expanded={expanded} aria-controls={panelId} className={BUTTON[level]}>
-        <div className="flex items-center gap-2">
-          {expanded ? <ChevronDown size={size.chevron} /> : <ChevronLeft size={size.chevron} />}
+        <div className="flex items-center gap-sm">
+          {expanded ? <ChevronDown /> : <ChevronLeft />}
           {icon && (
             <span className="text-brand-green">
-              <DynamicIcon name={icon} size={size.icon} />
+              <DynamicIcon name={icon} />
             </span>
           )}
           <span>{label}</span>
@@ -118,7 +116,7 @@ function MinorButton({
     <div className="flex w-full items-center hover:bg-brand-highlight safe-sides [--safe-level:0]">
       <button
         onClick={() => onTap(science)}
-        className={`flex flex-1 items-center gap-2 ${indent === 'nested' ? 'px-[calc(var(--safe-gap)*3)]' : 'px-[calc(var(--safe-gap)*2)]'} py-1 text-right text-base focus:outline-none text-brand-blue`}
+        className={`flex flex-1 items-center gap-sm ${indent === 'nested' ? 'px-[calc(var(--safe-gap)*3)]' : 'px-[calc(var(--safe-gap)*2)]'} py-xs text-right text-base focus:outline-none text-brand-blue`}
       >
         {science.ScienceMinorIcon && (
           <span className="text-brand-green">
@@ -134,10 +132,10 @@ function MinorButton({
           // "row tap" to prevent — but kept explicit anyway since it costs
           // nothing and removes any doubt for a future reader.
           onClick={e => { e.stopPropagation(); onAppendixTap(science) }}
-          className="px-3 py-1 text-brand-blue"
+          className="px-sm py-xs text-brand-blue"
           aria-label="فتح الملحق"
         >
-          <Paperclip size={15} />
+          <Paperclip />
         </button>
       )}
     </div>
@@ -154,9 +152,9 @@ function StatusPill({ busy, text }: { busy?: boolean; text: string }) {
   return (
     <div
       role="status"
-      className={`fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+7rem)] z-50 mx-auto flex w-fit items-center gap-2 rounded-full ${busy ? 'bg-brand-blue' : 'bg-brand-green'} px-4 py-2 text-sm font-bold text-brand-on-accent shadow-lg`}
+      className={`fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+7rem)] z-toast mx-auto flex w-fit items-center gap-sm rounded-full ${busy ? 'bg-brand-blue' : 'bg-brand-green'} px-md py-sm text-sm font-bold text-brand-on-accent shadow-popup`}
     >
-      {busy ? <LoaderCircle size={16} className="animate-spin" /> : <CircleCheck size={16} />}
+      {busy ? <LoaderCircle className="animate-spin" /> : <CircleCheck />}
       <span>{text}</span>
     </div>
   )
@@ -239,8 +237,8 @@ export default function ScienceGrid() {
     // unchanged from the original behavior. Nothing to report yet, so
     // this deliberately isn't a button at all.
     return (
-      <div className="flex items-center justify-center gap-2 p-4 text-base text-brand-muted">
-        <LoaderCircle size={20} className="animate-spin" />
+      <div className="flex items-center justify-center gap-sm p-md text-base text-brand-muted">
+        <LoaderCircle className="animate-spin" />
         <span>جارٍ التحميل...</span>
       </div>
     )
@@ -260,10 +258,10 @@ export default function ScienceGrid() {
         <button
           type="button"
           onClick={() => setErrorDialogOpen(true)}
-          className="flex w-full items-center justify-center gap-2 p-4 text-center text-base"
+          className="flex w-full items-center justify-center gap-sm p-md text-center text-base"
         >
-          {loading && <LoaderCircle size={20} className="animate-spin text-brand-muted" />}
-          <span className={loading ? 'text-brand-muted' : 'text-red-500 underline'}>
+          {loading && <LoaderCircle className="animate-spin text-brand-muted" />}
+          <span className={loading ? 'text-brand-muted' : 'text-brand-danger underline'}>
             {loading ? (isRetrying ? 'يُعاد المحاولة...' : 'جارٍ التحميل...') : lastFailure.message}
           </span>
         </button>

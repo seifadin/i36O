@@ -77,18 +77,18 @@ export default function Dialog({ open, title, message, onClose, secondaryAction,
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
+    <div className="fixed inset-0 z-dialog flex items-center justify-center bg-brand-overlay px-md">
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${id}-title`}
         aria-describedby={`${id}-message`}
-        className="w-full max-w-sm rounded-2xl bg-brand-ivory p-5 text-right shadow-xl"
+        className="w-full max-w-sm rounded-lg bg-brand-ivory p-md text-right shadow-popup"
       >
-        <h2 id={`${id}-title`} className="mb-2 text-lg font-bold text-brand-blue">
+        <h2 id={`${id}-title`} className="mb-sm text-lg font-bold text-brand-blue">
           {title}
         </h2>
-        <p id={`${id}-message`} className="mb-4 whitespace-pre-line text-base leading-relaxed text-brand-blue">
+        <p id={`${id}-message`} className="mb-md whitespace-pre-line text-base text-brand-blue">
           {message}
         </p>
         {secondaryAction && (
@@ -106,8 +106,8 @@ export default function Dialog({ open, title, message, onClose, secondaryAction,
             // would be hard to see.
             className={
               emphasizeSecondary
-                ? 'mb-2 w-full rounded-full bg-brand-green py-2 text-base font-bold text-brand-on-accent outline-none focus:ring-2 focus:ring-brand-blue'
-                : 'mb-2 w-full rounded-full border-2 border-brand-blue py-2 text-base font-bold text-brand-blue outline-none focus:ring-2 focus:ring-brand-green'
+                ? 'mb-sm w-full rounded-full bg-brand-green py-sm text-base font-bold text-brand-on-accent outline-none focus:ring-2 focus:ring-brand-blue'
+                : 'mb-sm w-full rounded-full border-2 border-brand-blue py-sm text-base font-bold text-brand-blue outline-none focus:ring-2 focus:ring-brand-green'
             }
           >
             {secondaryAction.label}
@@ -121,8 +121,8 @@ export default function Dialog({ open, title, message, onClose, secondaryAction,
           // (§14h). emphasizeSecondary swaps this to the outlined style (see above).
           className={
             emphasizeSecondary
-              ? 'w-full rounded-full border-2 border-brand-blue py-2 text-base font-bold text-brand-blue outline-none focus:ring-2 focus:ring-brand-green'
-              : 'w-full rounded-full bg-brand-blue py-2 text-base font-bold text-brand-on-accent outline-none focus:ring-2 focus:ring-brand-green'
+              ? 'w-full rounded-full border-2 border-brand-blue py-sm text-base font-bold text-brand-blue outline-none focus:ring-2 focus:ring-brand-green'
+              : 'w-full rounded-full bg-brand-blue py-sm text-base font-bold text-brand-on-accent outline-none focus:ring-2 focus:ring-brand-green'
           }
         >
           موافق

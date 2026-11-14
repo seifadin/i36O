@@ -98,7 +98,7 @@ function ToggleItem({
 
   // Toggle switch (rightmost within this item) + icon to its left
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-xs">
       <button
         onClick={handleToggle}
         className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
@@ -138,7 +138,7 @@ function ToggleItem({
         <span className="text-brand-blue" aria-hidden="true">
           {icon}
         </span>
-        <span aria-hidden="true" className={`pointer-events-none absolute -top-7 whitespace-nowrap rounded border border-brand-border bg-brand-ivory px-2 py-1 text-base text-brand-blue shadow-md transition-opacity group-hover:opacity-100 ${
+        <span aria-hidden="true" className={`pointer-events-none absolute -top-7 whitespace-nowrap rounded-lg border border-brand-border bg-brand-ivory px-sm py-xs text-base text-brand-blue shadow-page transition-opacity group-hover:opacity-100 ${
           tooltipAlign === 'left' ? 'left-0' : 'left-1/2 -translate-x-1/2'
         } ${
           showTooltip ? 'opacity-100' : 'opacity-0'
@@ -186,7 +186,7 @@ export default function OSRow() {
   // cycle below ('android' or 'ios' via simIOS).
   const effectiveOS = resolveEffectiveOS(state.useWeb, state.simIOS)
   const osIcon = state.useWeb
-    ? <Globe size={18} />
+    ? <Globe />
     : effectiveOS === 'ios' ? <AppleIcon /> : <AndroidIcon />
   const osAriaLabel = state.useWeb ? 'ويب' : effectiveOS === 'ios' ? 'آبل' : 'أندرويد'
 
@@ -239,7 +239,7 @@ export default function OSRow() {
           className="toolbar-btn"
           aria-label="معلومات الإصدار"
         >
-          <EllipsisVertical size={18} />
+          <EllipsisVertical />
         </button>
         <button
           onClick={() => { i360Theme.cycle() }}
@@ -247,7 +247,7 @@ export default function OSRow() {
           aria-label={i360Theme.themeLabel(choice)}
           title={i360Theme.themeLabel(choice)}
         >
-          <ThemeIcon size={18} />
+          <ThemeIcon />
         </button>
         <button
           onClick={() => { i360Theme.cycleNumerals() }}
@@ -312,7 +312,7 @@ export default function OSRow() {
                     (version, hash, timestamp) embedded in an RTL dialog;
                     explicit direction avoids relying on the bidi
                     algorithm's own default handling for mixed content. */}
-                <span dir="ltr" className="text-xs" data-i360-digits="keep">({otaDisplay})</span>
+                <span dir="ltr" className="text-sm" data-i360-digits="keep">({otaDisplay})</span>
               </>
             )}
           </>

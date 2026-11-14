@@ -4,34 +4,17 @@ import SearchBar from '@/components/SearchBar'
 import ScienceGrid from '@/components/ScienceGrid'
 import OrnamentDivider from '@/components/OrnamentDivider'
 
-// Header sizing (§14i): measure the header's real rendered width and the space
-// available, then pick the largest standard Tailwind step that fits — no
-// device-width thresholds (two threshold-based attempts were miscalibrated).
-const HEADER_STEPS = [
-  { text: 'text-2xl', icon: 'h-8 w-8', px: 24 }, // original fixed size — explicitly agreed not to exceed this even on very wide screens
-  { text: 'text-xl', icon: 'h-7 w-7', px: 20 },
-  { text: 'text-lg', icon: 'h-6 w-6', px: 18 },
-  { text: 'text-base', icon: 'h-5 w-5', px: 16 },
-  { text: 'text-sm', icon: 'h-4 w-4', px: 14 },
-  { text: 'text-xs', icon: 'h-3.5 w-3.5', px: 12 }, // true floor of Tailwind's standard scale (2026-08-31) — stopping at text-sm was itself an unjustified arbitrary limit, the same class of mistake this whole investigation exists to remove
-] as const
+// Header sizing (§14i, §15al): the header is drawn, off-screen, at each of the theme's three text
+// sizes, largest first, and the largest whose real rendered width fits the space available is used —
+// measured, never assumed; no device-width thresholds. The logo is sized in em, so it follows.
+const HEADER_STEPS = ['text-lg', 'text-base', 'text-sm'] as const
+type HeaderStep = (typeof HEADER_STEPS)[number]
 
 const HEADER_TITLE = 'الموسوعة الإسلامية إi360'
 
 // A measurement-imprecision cushion, not a width guess: a real device measured a
 // dead-even 328/328, and a zero-margin tie can tip either way when rendered.
 const SAFETY_MARGIN_PX = 4
-
-function pickHeaderStep(naturalWidthAtReference: number, availableWidth: number) {
-  // naturalWidthAtReference is measured with the header at HEADER_STEPS[0]'s
-  // size (text-2xl) — font-size scaling is linear (assuming no wrapping),
-  // so the ideal size that would exactly fill availableWidth is a direct
-  // ratio from that one reference measurement, no matter what the current
-  // visible step happens to be.
-  const referencePx = HEADER_STEPS[0].px
-  const idealPx = referencePx * ((availableWidth - SAFETY_MARGIN_PX) / naturalWidthAtReference)
-  return HEADER_STEPS.find(step => idealPx >= step.px) ?? HEADER_STEPS[HEADER_STEPS.length - 1] ?? HEADER_STEPS[0]
-}
 
 // Math.min(innerWidth, innerHeight) — always the portrait-equivalent width
 // regardless of current orientation, since rotating just swaps which
@@ -53,8 +36,8 @@ export default function Home() {
   // unchanged device, and the one case a remount could legitimately
   // produce a different answer (the PWA's window was actually resized) is
   // exactly when recomputing is correct, not a bug.
-  const [headerStep, setHeaderStep] = useState<(typeof HEADER_STEPS)[number]>(HEADER_STEPS[0])
-  const measureRef = useRef<HTMLDivElement>(null)
+  const [headerStep, setHeaderStep] = useState<HeaderStep>(HEADER_STEPS[0])
+  const measureRefs = useRef<(HTMLDivElement | null)[]>([])
   const headerRef = useRef<HTMLDivElement>(null)
 
   // useLayoutEffect, not useEffect — runs synchronously before the browser
@@ -62,13 +45,16 @@ export default function Home() {
   // the user never actually sees that size flash before this corrects it.
   useLayoutEffect(() => {
     function recalculate() {
-      if (!measureRef.current || !headerRef.current) return
-      const naturalWidth = measureRef.current.scrollWidth
+      if (!headerRef.current) return
       // The header's own side padding, as drawn: the shared gap plus each side's
       // safe-area inset (.safe-sides) — read, not assumed.
       const cs = getComputedStyle(headerRef.current)
       const availableWidth = currentPortraitWidth() - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
-      setHeaderStep(pickHeaderStep(naturalWidth, availableWidth))
+      const fits = HEADER_STEPS.findIndex((_, i) => {
+        const el = measureRefs.current[i]
+        return el !== null && el !== undefined && el.scrollWidth + SAFETY_MARGIN_PX <= availableWidth
+      })
+      setHeaderStep(HEADER_STEPS[fits === -1 ? HEADER_STEPS.length - 1 : fits] ?? HEADER_STEPS[0])
     }
 
     recalculate()
@@ -105,49 +91,43 @@ export default function Home() {
           both already correct without this, since they reserve that
           space on their own — see index.html's viewport comment. */}
 
-      {/* Hidden reference element, purely for measurement — always at the
-          largest step (text-2xl/h-8), off-screen. Real DOM measurement,
-          not canvas measureText(): canvas text measurement doesn't always
-          precisely match real DOM rendering for complex script shaping,
-          and this header's whole content is Arabic text specifically,
-          where that gap could matter. position:absolute + a large
-          negative offset (not display:none, which reports 0 for every
-          dimension, useless for measurement) keeps it fully out of the
-          visible layout and unreachable to keyboard/screen-reader users
-          via aria-hidden. Real <img>, not a placeholder span (2026-08-31
-          fix) — a real device measured natural===available exactly, a
-          zero-margin tie; even a fixed-size placeholder isn't guaranteed
-          to render byte-identically to the real image element it stands
-          in for, and at zero margin that small a gap can matter. */}
-      <div
-        ref={measureRef}
-        aria-hidden="true"
-        className="absolute -top-[9999px] -left-[9999px] flex items-center gap-2 text-2xl font-bold whitespace-nowrap pointer-events-none"
-      >
-        <span>&#xFD3F;</span>
-        <img src="/assets/icons/logo-512.png" alt="" className="h-8 w-8 object-contain" />
-        <span>{HEADER_TITLE}</span>
-        <span>&#xFD3E;</span>
-      </div>
+      {/* Hidden reference copies of the header, one per text size, purely for measurement,
+          off-screen. Real DOM measurement, not canvas measureText(): canvas text
+          measurement doesn't always match real DOM rendering for complex script shaping,
+          and this header is Arabic. position:absolute + a large negative offset (not
+          display:none, which reports 0 for every dimension) keeps them out of the visible
+          layout; aria-hidden keeps them from screen readers. Real <img>, not a placeholder:
+          a real device measured natural===available exactly (2026-08-31), and at zero
+          margin even a tiny rendering difference matters. */}
+      {HEADER_STEPS.map((step, i) => (
+        <div
+          key={step}
+          ref={el => { measureRefs.current[i] = el }}
+          aria-hidden="true"
+          className={`absolute -top-[9999px] -left-[9999px] flex items-center gap-sm ${step} font-bold whitespace-nowrap pointer-events-none`}
+        >
+          <span>&#xFD3F;</span>
+          <img src="/assets/icons/logo-512.png" alt="" className="h-[1.33em] w-[1.33em] object-contain" />
+          <span>{HEADER_TITLE}</span>
+          <span>&#xFD3E;</span>
+        </div>
+      ))}
 
       {/* App header — framed by classical ornate Arabic parentheses
           (U+FD3F / U+FD3E), not the earlier hand-drawn star flanking —
           those are removed. DOM order for RTL (first = rightmost):
           FD3F, icon, title, FD3E → visual right-to-left: FD3F icon title FD3E
-          Sizing driven by headerStep (see HEADER_STEPS above), not fixed
-          classes — applies to all four elements identically, so the whole
-          header stays proportional together at every step. */}
-      <div ref={headerRef} className="flex items-center justify-center gap-2 bg-brand-ivory safe-sides py-3 shadow-sm shrink-0">
-        <span className={`${headerStep.text} font-bold text-brand-blue`} aria-hidden="true">&#xFD3F;</span>
+          Sized by headerStep (see HEADER_STEPS above) on the row itself; the
+          logo is in em, so the whole header stays proportional at every step. */}
+      <div ref={headerRef} className={`flex items-center justify-center gap-sm bg-brand-ivory safe-sides py-sm shadow-toolbar shrink-0 ${headerStep} font-bold text-brand-blue`}>
+        <span aria-hidden="true">&#xFD3F;</span>
         <img
           src="/assets/icons/logo-512.png"
           alt="i360إ"
-          className={`${headerStep.icon} object-contain shrink-0`}
+          className="h-[1.33em] w-[1.33em] object-contain shrink-0"
         />
-        <span className={`${headerStep.text} font-bold text-brand-blue`}>
-          {HEADER_TITLE}
-        </span>
-        <span className={`${headerStep.text} font-bold text-brand-blue`} aria-hidden="true">&#xFD3E;</span>
+        <span>{HEADER_TITLE}</span>
+        <span aria-hidden="true">&#xFD3E;</span>
       </div>
 
       <OrnamentDivider />

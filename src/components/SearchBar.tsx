@@ -228,7 +228,7 @@ export default function SearchBar() {
   )
 
   return (
-    <div className="flex items-center gap-2 safe-sides py-2 bg-brand-ivory border-b border-brand-border">
+    <div className="flex items-center gap-sm safe-sides py-sm bg-brand-ivory border-b border-brand-border">
       {/* Visually hidden, announces the transient states above regardless
           of which element currently has focus. role="status" + explicit
           aria-live="polite" together for the broadest, most reliable
@@ -236,7 +236,7 @@ export default function SearchBar() {
       <span className="sr-only" role="status" aria-live="polite">{liveMessage}</span>
 
       {/* Search input with SearchIcon (right) + Search-execute icon (left) */}
-      <div className="flex flex-1 min-w-0 items-center rounded-full border border-brand-border bg-brand-input px-3 py-1 gap-2">
+      <div className="flex flex-1 min-w-0 items-center rounded-full border border-brand-border bg-brand-input px-sm py-xs gap-sm focus-within:shadow-[var(--i360-focus-ring,0_0_0_3px_rgba(0,16,207,0.25))]">
         {/* SearchIcon — live 3-state indicator + one-shot override control.
             PencilSparkles: auto-detect, input doesn't match (resting/default,
             including empty input). Tapping while empty flashes CircleAlert.
@@ -249,16 +249,16 @@ export default function SearchBar() {
           className="shrink-0 text-brand-blue"
           aria-label={searchIconLabel}
         >
-          {flash === 'invalid' && <CircleAlert size={17} />}
+          {flash === 'invalid' && <CircleAlert />}
           {flash === 'notfound' && (
-            <CircleQuestionMark size={17} className="-scale-x-100" />
+            <CircleQuestionMark className="-scale-x-100" />
           )}
-          {flash === 'openfailed' && <CircleX size={17} />}
-          {!flash && searchPhase === 'translating' && <Languages size={17} />}
-          {!flash && searchPhase === 'opening' && <BookSearch size={17} />}
-          {!flash && !searchPhase && overrideArmed && <Minimize2 size={17} />}
-          {!flash && !searchPhase && !overrideArmed && isExegesisMatch && <Languages size={17} />}
-          {!flash && !searchPhase && !overrideArmed && !isExegesisMatch && <PencilSparkles size={17} />}
+          {flash === 'openfailed' && <CircleX />}
+          {!flash && searchPhase === 'translating' && <Languages />}
+          {!flash && searchPhase === 'opening' && <BookSearch />}
+          {!flash && !searchPhase && overrideArmed && <Minimize2 />}
+          {!flash && !searchPhase && !overrideArmed && isExegesisMatch && <Languages />}
+          {!flash && !searchPhase && !overrideArmed && !isExegesisMatch && <PencilSparkles />}
         </button>
 
         <input
@@ -281,28 +281,28 @@ export default function SearchBar() {
         />
         {/* Search icon inside input on LEFT (last in RTL flex = leftmost) */}
         <button onClick={handleSubmit} className="shrink-0 text-brand-blue" aria-label="بحث">
-          <Search size={17} />
+          <Search />
         </button>
       </div>
 
       {/* Bot — outside input LEFT */}
       <button
         onClick={handleBot}
-        className={`shrink-0 p-1 ${botUrl ? 'text-brand-blue' : 'text-brand-disabled'}`}
+        className={`shrink-0 p-xs ${botUrl ? 'text-brand-blue' : 'text-brand-disabled'}`}
         disabled={!botUrl}
         aria-label="المساعد الذكي"
       >
-        {botFailed ? <CircleX size={20} /> : <Bot size={20} />}
+        {botFailed ? <CircleX /> : <Bot />}
       </button>
 
       {/* Keyboard — leftmost */}
       <button
         onClick={handleKeyboard}
-        className={`shrink-0 p-1 ${keyboardUrl ? 'text-brand-blue' : 'text-brand-disabled'}`}
+        className={`shrink-0 p-xs ${keyboardUrl ? 'text-brand-blue' : 'text-brand-disabled'}`}
         disabled={!keyboardUrl}
         aria-label="لوحة المفاتيح"
       >
-        {keyboardFailed ? <CircleX size={20} /> : <Keyboard size={20} />}
+        {keyboardFailed ? <CircleX /> : <Keyboard />}
       </button>
     </div>
   )
