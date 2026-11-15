@@ -41,7 +41,7 @@ test('theme.css: light, sepia and dark set the same colours', () => {
     for (const k of Object.keys(by[sel])) assert.ok(!SET_ONCE.test(k), `${sel} sets ${k}, which is set once`);
   }
   // The set-once values are there, each once.
-  for (const k of ['--i360-text-size', '--i360-line-height', '--i360-space-md', '--i360-gap', '--i360-radius-lg', '--i360-line-width', '--i360-toolbar-shadow', '--i360-icon-size', '--i360-content-width', '--i360-speed', '--i360-layer-dialog']) {
+  for (const k of ['--i360-text-size', '--i360-text-size-xl', '--i360-line-height', '--i360-space-md', '--i360-gap', '--i360-radius-lg', '--i360-line-width', '--i360-toolbar-shadow', '--i360-icon-size', '--i360-content-width', '--i360-speed', '--i360-layer-dialog']) {
     assert.ok(k in light, `${k} missing from the light block`);
   }
 });

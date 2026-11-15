@@ -1,13 +1,13 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import OSRow from '@/components/OSRow'
 import SearchBar from '@/components/SearchBar'
 import ScienceGrid from '@/components/ScienceGrid'
 import OrnamentDivider from '@/components/OrnamentDivider'
 
-// Header sizing (§14i, §15al): the header is drawn, off-screen, at each of the theme's three text
+// Header sizing (§14i, §15al): the header is drawn, off-screen, at each of the theme's four text
 // sizes, largest first, and the largest whose real rendered width fits the space available is used —
 // measured, never assumed; no device-width thresholds. The logo is sized in em, so it follows.
-const HEADER_STEPS = ['text-lg', 'text-base', 'text-sm'] as const
+const HEADER_STEPS = ['text-xl', 'text-lg', 'text-base', 'text-sm'] as const
 type HeaderStep = (typeof HEADER_STEPS)[number]
 
 const HEADER_TITLE = 'الموسوعة الإسلامية إi360'
@@ -37,6 +37,8 @@ export default function Home() {
   // produce a different answer (the PWA's window was actually resized) is
   // exactly when recomputing is correct, not a bug.
   const [headerStep, setHeaderStep] = useState<HeaderStep>(HEADER_STEPS[0])
+  // The chosen step's size, as drawn — the science list never goes bigger (--app-title-size).
+  const [titleSize, setTitleSize] = useState<string>()
   const measureRefs = useRef<(HTMLDivElement | null)[]>([])
   const headerRef = useRef<HTMLDivElement>(null)
 
@@ -54,7 +56,10 @@ export default function Home() {
         const el = measureRefs.current[i]
         return el !== null && el !== undefined && el.scrollWidth + SAFETY_MARGIN_PX <= availableWidth
       })
-      setHeaderStep(HEADER_STEPS[fits === -1 ? HEADER_STEPS.length - 1 : fits] ?? HEADER_STEPS[0])
+      const chosen = fits === -1 ? HEADER_STEPS.length - 1 : fits
+      setHeaderStep(HEADER_STEPS[chosen] ?? HEADER_STEPS[0])
+      const chosenEl = measureRefs.current[chosen]
+      if (chosenEl) setTitleSize(getComputedStyle(chosenEl).fontSize)
     }
 
     recalculate()
@@ -78,7 +83,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="flex flex-col h-dvh bg-brand-ivory safe-edges">
+    <div className="flex flex-col h-dvh bg-brand-ivory safe-edges" style={titleSize ? { '--app-title-size': titleSize } as CSSProperties : undefined}>
       {/* Top and bottom safe-area padding here (safe-edges, page-chrome.css), not
           on the header/OSRow individually — one place; each full-width row
           clears the sides itself (safe-sides; OSRow's bar does its own). box-sizing:

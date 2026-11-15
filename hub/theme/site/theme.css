@@ -74,10 +74,12 @@
   --i360-toolbar-h: 2.5rem;      /* every toolbar: the pages' and the app's bottom bar (40 px, Seif, 2026-10-30) */
 
   /* ---- Sizes: set once, the same in every theme (i360-instructions.md §15al) ---- */
-  /* Text: three sizes — secondary, body, headings. Line height: reading text, interface text. */
+  /* Text: four sizes — secondary (the smallest anything tappable goes), body, headings, and the
+     app title alone (xl). Line height: reading text, interface text. */
   --i360-text-size-sm: 0.875rem;
   --i360-text-size: 1rem;
   --i360-text-size-lg: 1.25rem;
+  --i360-text-size-xl: 1.5rem;
   --i360-line-height: 2;
   --i360-line-height-ui: 1.6;
   /* Spacing: inside a group · between items · inside cards and panels · between sections; the gap

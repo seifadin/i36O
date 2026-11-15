@@ -13,6 +13,11 @@ export default {
       sm: ['var(--i360-text-size-sm, 0.875rem)', { lineHeight: 'var(--i360-line-height-ui, 1.6)' }],
       base: ['var(--i360-text-size, 1rem)', { lineHeight: 'var(--i360-line-height-ui, 1.6)' }],
       lg: ['var(--i360-text-size-lg, 1.25rem)', { lineHeight: 'var(--i360-line-height-ui, 1.6)' }],
+      // The app title only (Home.tsx), when it fits.
+      xl: ['var(--i360-text-size-xl, 1.5rem)', { lineHeight: 'var(--i360-line-height-ui, 1.6)' }],
+      // The science list: never bigger than the app title (--app-title-size, set by Home.tsx).
+      'list-lg': ['min(var(--i360-text-size-lg, 1.25rem), var(--app-title-size, var(--i360-text-size-lg, 1.25rem)))', { lineHeight: 'var(--i360-line-height-ui, 1.6)' }],
+      list: ['min(var(--i360-text-size, 1rem), var(--app-title-size, var(--i360-text-size, 1rem)))', { lineHeight: 'var(--i360-line-height-ui, 1.6)' }],
     },
     borderRadius: {
       none: '0',
