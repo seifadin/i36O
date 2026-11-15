@@ -15,7 +15,7 @@
 
    Change VERSION whenever behaviour or labels change: the Worker reports it,
    and a copy that doesn't match is flagged as out of date. */
-const VERSION = 2;                 // 2: the 'provisional' label (2026-10-19)
+const VERSION = 3;                 // 3: toCivil, Hijri → civil (2026-11-15); 2: the 'provisional' label
 const CALENDAR = 'islamic';
 const SOURCES = Object.freeze({ DAR: 'dar', CALC: 'calc' });
 
@@ -31,11 +31,12 @@ const YMD = /^(\d{4})-(\d{2})-(\d{2})$/;
 const DAY_MS = 86400000;
 
 // 'YYYY-MM-DD' -> that civil day as UTC midnight (a Date), or null if not a real date.
+// setUTCFullYear: Date.UTC would read the years 0000–0099 as 1900–1999.
 function parseYMD(s) {
   const m = YMD.exec(String(s));
   if (!m) return null;
-  const t = Date.UTC(+m[1], +m[2] - 1, +m[3]);
-  const dt = new Date(t);
+  const dt = new Date(0);
+  dt.setUTCFullYear(+m[1], +m[2] - 1, +m[3]);
   return (dt.getUTCFullYear() === +m[1] && dt.getUTCMonth() === +m[2] - 1 && dt.getUTCDate() === +m[3]) ? dt : null;
 }
 
@@ -67,12 +68,44 @@ function formatter() {
   return fmt;
 }
 
-// The calculated Hijri date of a civil date, shifted by `offset` days (see offsetFor).
-function fromCivil(ymd, offset) {
-  const dt = new Date(mustParse(ymd).getTime() + (offset || 0) * DAY_MS);
+// The calculated Hijri date of a day counted from 1970-01-01 (UTC); null outside what Date can hold.
+// Years before 1 AH come out as 0 and below (ICU counts on backwards).
+function hijriOfDay(n) {
+  const dt = new Date(n * DAY_MS);
+  if (Number.isNaN(dt.getTime())) return null;
   const parts = formatter().formatToParts(dt);
   const get = (type) => parseInt(parts.find((x) => x.type === type).value, 10);
   return { y: get('year'), m: get('month'), d: get('day') };
+}
+
+// The calculated Hijri date of a civil date, shifted by `offset` days (see offsetFor).
+function fromCivil(ymd, offset) {
+  return hijriOfDay(Math.round(mustParse(ymd).getTime() / DAY_MS) + (offset || 0));
+}
+
+const order = (a, b) => a.y - b.y || a.m - b.m || a.d - b.d;
+
+// The civil date whose calculated Hijri date (shifted by `offset`, as in fromCivil) is h, as
+// 'YYYY-MM-DD'; null when the calculation has no such day (a 30th of a 29-day month), or h is before
+// 1 AH or beyond the dates Date can hold. Searched over days — outward from 1970-01-01, then by
+// halving — so no average month length is assumed: the calendar itself decides.
+function toCivil(h, offset) {
+  if (!h || ![h.y, h.m, h.d].every(Number.isInteger) || h.y < 1 || h.m < 1 || h.m > 12 || h.d < 1 || h.d > 30) return null;
+  const k = offset || 0;
+  const cmpAt = (n) => { const x = hijriOfDay(n + k); return x === null ? null : order(x, h); };
+  const first = cmpAt(0);
+  if (first === null) return null;
+  // Bracket: lo before h, hi at or after it.
+  let lo, hi;
+  if (first < 0) {
+    lo = 0;
+    for (let step = 1; ; step *= 2) { const c = cmpAt(step); if (c === null) return null; if (c >= 0) { hi = step; break; } lo = step; }
+  } else {
+    hi = 0;
+    for (let step = 1; ; step *= 2) { const c = cmpAt(-step); if (c === null) return null; if (c < 0) { lo = -step; break; } hi = -step; }
+  }
+  while (hi - lo > 1) { const mid = Math.floor((lo + hi) / 2); if (cmpAt(mid) < 0) lo = mid; else hi = mid; }
+  return cmpAt(hi) === 0 ? toYMD(new Date(hi * DAY_MS)) : null;
 }
 
 function isHijri(h) {
@@ -109,4 +142,4 @@ function label(source, lang) {
   return set[lang] || set.ar;
 }
 
-export { VERSION, CALENDAR, SOURCES, LABELS, parseYMD, toYMD, addDays, diffDays, todayIn, fromCivil, isHijri, offsetFor, countForward, label };
+export { VERSION, CALENDAR, SOURCES, LABELS, parseYMD, toYMD, addDays, diffDays, todayIn, fromCivil, toCivil, isHijri, offsetFor, countForward, label };

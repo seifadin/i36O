@@ -72,3 +72,38 @@ test('labels: every source and provisional in every language, Arabic as the fall
   }
   assert.equal(HC.label('nope', 'ar'), '');
 });
+
+test('toCivil: back to the civil date, across the whole calendar', () => {
+  assert.equal(HC.toCivil({ y: 1448, m: 5, d: 9 }, -1), '2026-10-20');    // Dar al-Ifta's date that day (offset -1)
+  assert.equal(HC.toCivil({ y: 1, m: 1, d: 1 }), '0622-07-18');            // the calendar's first day
+  for (let y = 1; y <= 1700; y += 13) {
+    for (let m = 1; m <= 12; m++) {
+      for (const d of [1, 29]) {
+        for (const k of [-1, 0, 2]) {
+          const civil = HC.toCivil({ y, m, d }, k);
+          assert.deepEqual(HC.fromCivil(civil, k), { y, m, d }, `${y}-${m}-${d} (offset ${k})`);
+        }
+      }
+    }
+  }
+});
+
+test('toCivil: a 30th the calculation does not have, and dates outside the calendar, are null', () => {
+  let thirtieths = 0, missing = 0;
+  for (let m = 1; m <= 12; m++) {
+    const c = HC.toCivil({ y: 1448, m, d: 30 });
+    if (c === null) { missing++; assert.ok(HC.toCivil({ y: 1448, m, d: 29 })); } else { thirtieths++; assert.deepEqual(HC.fromCivil(c), { y: 1448, m, d: 30 }); }
+  }
+  assert.ok(thirtieths > 0 && missing > 0, 'a year has months of both lengths');
+  assert.equal(HC.toCivil({ y: 0, m: 12, d: 29 }), null);                    // before 1 AH
+  assert.equal(HC.toCivil({ y: 1448, m: 13, d: 1 }), null);
+  assert.equal(HC.toCivil({ y: 1448, m: 1, d: 31 }), null);
+  assert.equal(HC.toCivil({ y: 1e7, m: 1, d: 1 }), null);                    // beyond what Date can hold
+  assert.equal(HC.toCivil(null), null);
+});
+
+test('civil years below 100 are read as written (not as 19xx)', () => {
+  assert.equal(HC.toYMD(HC.parseYMD('0050-03-01')), '0050-03-01');
+  assert.equal(HC.fromCivil('0622-07-18').y, 1);
+  assert.ok(HC.fromCivil('0622-07-17').y < 1);
+});

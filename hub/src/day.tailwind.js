@@ -25,6 +25,7 @@ export default {
         hadith: { DEFAULT: v('hadith'), bg: v('hadith-bg') },
         prayer: { DEFAULT: v('prayer'), bg: v('prayer-bg') },
         event: { DEFAULT: v('event'), bg: v('event-bg') },
+        converter: { DEFAULT: v('converter'), bg: v('converter-bg') },
         rule: v('rule'),
         page: v('bg')
       }

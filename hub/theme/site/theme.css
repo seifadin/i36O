@@ -63,12 +63,14 @@
   --i360-code-block-text: #f8fafc;
   --i360-toast: #1e293b;
   --i360-toast-text: #f8fafc;
-  --i360-hadith: #d97706;        /* Daily Reflection's cards: hadith, prayer times, events */
+  --i360-hadith: #d97706;        /* Daily Reflection's cards: hadith, prayer times, events, date converter */
   --i360-hadith-bg: #fef3c7;
   --i360-prayer: #2563eb;
   --i360-prayer-bg: #dbeafe;
   --i360-event: #9333ea;
   --i360-event-bg: #f3e8ff;
+  --i360-converter: #0f766e;
+  --i360-converter-bg: #ccfbf1;
   --i360-font: 'Amiri', 'Traditional Arabic', serif;
   --i360-font-quran: 'Amiri Quran', 'Amiri', serif;
   --i360-toolbar-h: 2.5rem;      /* every toolbar: the pages' and the app's bottom bar (40 px, Seif, 2026-10-30) */
@@ -159,6 +161,8 @@
   --i360-prayer-bg: #dfe6f3;
   --i360-event: #7e22ce;
   --i360-event-bg: #efe2f3;
+  --i360-converter: #115e59;
+  --i360-converter-bg: #d9ebe3;
 }
 
 [data-theme="dark"] {
@@ -205,6 +209,8 @@
   --i360-prayer-bg: rgba(30, 58, 138, 0.3);
   --i360-event: #c084fc;
   --i360-event-bg: rgba(88, 28, 135, 0.3);
+  --i360-converter: #5eead4;
+  --i360-converter-bg: rgba(19, 78, 74, 0.3);
 }
 
 /* ---------- Derived colours ---------- */

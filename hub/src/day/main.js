@@ -8,7 +8,7 @@ import * as i360Theme from '../../theme/site/theme-loader.js';
 import * as HijriCalc from '../../hijri/calc.js';
 import * as HijriClient from '../../hijri/client.js';
 import DAY_CITIES from '../day-cities.json';
-import { setupClose, THEME_ICONS } from '../page-chrome.js';
+import { $, setupClose, THEME_ICONS } from '../page-chrome.js';
 import { oncePerFrame } from '../frame.js';
 import { createStore } from '../storage.js';
 import { fetchJson } from '../net.js';
@@ -28,6 +28,9 @@ const CONFIG = {
   EDITIONS: { quran: { ar: 'ar.jalalayn', en: 'en.sahih', tr: 'tr.ates', id: 'id.indonesian', ur: 'ur.ahmedali' } },
   P_KEYS: ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'],
   P_NEXT_KEYS: ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'],   // Sunrise is shown but is not a prayer
+  // Arabic Gregorian months also by their Levantine names (كانون الثاني …), from the browser's own
+  // data for this locale (Seif 2026-11-15); other languages: their own names only.
+  CONV_SECOND_MONTHS: { ar: 'ar-SY' },
   // The note above the events (the Islamic day runs sunset to sunset) and its source (Seif, 2026-11-15).
   DAY_NOTE_SOURCE: 'https://ar.wikipedia.org/wiki/%D9%88%D9%8A%D9%83%D9%8A%D8%A8%D9%8A%D8%AF%D9%8A%D8%A7:%D9%81%D9%8A_%D9%87%D8%B0%D8%A7_%D8%A7%D9%84%D9%8A%D9%88%D9%85/%D8%A7%D9%84%D9%85%D9%86%D8%A7%D8%B3%D8%A8%D8%A7%D8%AA_%D8%A7%D9%84%D9%87%D8%AC%D8%B1%D9%8A%D8%A9',
   EV: [
@@ -69,6 +72,8 @@ const MAKKAH = { cc: 'SA', lat: 21.4225, lng: 39.8262, tz: 'Asia/Riyadh',
 
 /* ---------- Small helpers ---------- */
 const pad = n => String(n).padStart(2, '0');
+// The comma between two items in the page's language (Arabic and Urdu: «،»).
+const listSep = lang => (lang === 'ar' || lang === 'ur') ? '، ' : ', ';
 const ymdKey = o => `${o.y}-${pad(o.m)}-${pad(o.d)}`;
 const localYMD = (d = new Date()) => ({ y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate() });
 function minutesNowIn(tz) {
@@ -296,7 +301,7 @@ const App = {
     this.day = ymdKey(localYMD());
     this.state.hijri = Hijri.sync();                       // instant offline answer...
     UI.render();
-    Hijri.resolve().then(h => { this.state.hijri = h; UI.renderHijri(); UI.renderEvents(); }).catch(e => console.error('[hijri]', e));   // ...upgraded to Dar al-Ifta when it answers
+    Hijri.resolve().then(h => { this.state.hijri = h; UI.renderHijri(); UI.renderEvents(); Conv.render(); }).catch(e => console.error('[hijri]', e));   // ...upgraded to Dar al-Ifta when it answers
     ['quran', 'hadith', 'prayer'].forEach(n => this.run(n));
   },
   retry(name) { this.run(name); },
@@ -312,7 +317,7 @@ function cityLabel(c, lang) {
   let country = '';
   try { country = new Intl.DisplayNames([lang], { type: 'region' }).of(c.cc) || ''; } catch (e) { /* the city alone */ }
   const city = City.name(c, lang);
-  return country && country !== city ? `${city}${lang === 'ar' || lang === 'ur' ? '، ' : ', '}${country}` : city;
+  return country && country !== city ? `${city}${listSep(lang)}${country}` : city;
 }
 
 /* ---------- The city picker: opened from the prayer card; searches only after typing pauses ---------- */
@@ -360,7 +365,7 @@ const Picker = {
     };
     // First: back to the device time zone's city.
     const rows = [row(L.deviceTz, cityLabel(City.auto(), lang), !City.picked(), () => this.choose(null))];
-    const sep = (lang === 'ar' || lang === 'ur') ? '، ' : ', ';
+    const sep = listSep(lang);
     this.results.forEach(p => rows.push(row(p.name, [p.admin1, p.country].filter(Boolean).join(sep), false,
       () => this.choose({ name: p.name, n: { [lang]: p.name }, lat: p.latitude, lng: p.longitude, tz: p.timezone, cc: p.country_code }))));
     list.replaceChildren(...rows);
@@ -393,8 +398,7 @@ const LangMenu = {
 const Cols = {
   init() {
     this.a = document.getElementById('col-a'); this.b = document.getElementById('col-b');
-    this.prayer = document.getElementById('prayer-card'); this.events = document.getElementById('events-card');
-    this.list = this.events.querySelector('[data-target="events-list"]');
+    this.prayer = document.getElementById('prayer-card');
     this.grid = this.prayer.querySelector('[data-target="prayer-grid"]');
     if (window.ResizeObserver) {
       const ro = new ResizeObserver(() => this.queue());
@@ -412,24 +416,128 @@ const Cols = {
     g.style.gridTemplateColumns = `repeat(${boxes.length}, minmax(0, 1fr))`;
     if (boxes.some(b => b.scrollWidth > b.clientWidth)) g.style.gridTemplateColumns = '';
   },
+  // Two columns or one, as laid out (the events card below widens with it, and the top bar).
   fit() {
     if (!this.a) return;
     this.fitPrayers();
-    const side = this.a.offsetTop === this.b.offsetTop && this.a.offsetLeft !== this.b.offsetLeft;   // as laid out
+    const side = this.a.offsetTop === this.b.offsetTop && this.a.offsetLeft !== this.b.offsetLeft;
     document.body.classList.toggle('two-cols', side);
-    if (!side) { this.b.style.height = ''; return; }
-    // The events card as drawn: down to its third event (the least it gets) and in full.
-    const rows = this.list.children, last = rows[Math.min(2, rows.length - 1)];
-    const box = this.events.getBoundingClientRect(), list = this.list.getBoundingClientRect();
-    const pad = parseFloat(getComputedStyle(this.events).paddingBottom);
-    const minEvents = last ? last.getBoundingClientRect().bottom + this.list.scrollTop - box.top + pad : 0;
-    const fullEvents = list.top - box.top + this.list.scrollHeight + pad;
-    const gap = parseFloat(getComputedStyle(this.b).rowGap) || 0, above = this.prayer.offsetHeight + gap;
-    // As tall as the first column, never taller than its own content, never below three events.
-    const h = Math.max(Math.min(this.a.offsetHeight, above + fullEvents), above + minEvents);
-    this.b.style.height = `${Math.ceil(h)}px`;
   }
 };
+
+/* ---------- The date converter (Seif 2026-11-15; i360-daily-reflection.md) ----------
+   One direction at a time (the swap button), each a day list, a month list and a year box; the
+   answer as the long date (weekday first, its calendar's mark last) and the numeric one (year
+   first). Calculated by the shared calculator, shifted by the offset measured from the Worker's
+   date (k), as the events are; so labelled calculated, with the note that it can be a day or two
+   off. Arabic Gregorian months carry the Levantine name too (CONFIG.CONV_SECOND_MONTHS). */
+const Conv = {
+  dir: 'g2h', d: 0, m: 0, y: '',
+  init() {
+    this.el = { d: $('conv-d'), m: $('conv-m'), y: $('conv-y'), pick: $('conv-pick'), pickBtn: $('conv-pick-btn'), native: $('conv-native') };
+    const t = localYMD();
+    Object.assign(this, { d: t.d, m: t.m, y: String(t.y) });
+    // The browser's date picker can be opened from a button only where it has showPicker (Safari 16+).
+    this.canPick = typeof this.el.native.showPicker === 'function';
+    this.el.d.addEventListener('change', () => { this.d = +this.el.d.value; this.render(); });
+    this.el.m.addEventListener('change', () => { this.m = +this.el.m.value; this.d = Math.min(this.d, this.days()); this.render(); });
+    this.el.y.addEventListener('input', () => { this.y = this.el.y.value; if (this.d) this.d = Math.min(this.d, this.days()); this.render(false); });
+    this.el.y.addEventListener('change', () => this.render());
+    this.el.pickBtn.addEventListener('click', () => {
+      try { this.el.native.showPicker(); } catch (e) { console.warn('[converter] date picker:', e); }
+    });
+    this.el.native.addEventListener('change', () => {
+      const dt = HijriCalc.parseYMD(this.el.native.value); if (!dt) return;
+      Object.assign(this, { d: dt.getUTCDate(), m: dt.getUTCMonth() + 1, y: String(dt.getUTCFullYear()) });
+      this.render();
+    });
+    $('conv-swap').addEventListener('click', () => this.swap());
+  },
+  get k() { return App.state.hijri ? App.state.hijri.k : 0; },
+  get g() { return this.dir === 'g2h'; },
+  year() { const v = i360Theme.toNumerals(this.y, 'western').trim(); return /^\d+$/.test(v) ? parseInt(v, 10) : null; },
+  // Days in the chosen month: Hijri 1–30 (the calculation says which 30ths exist); Gregorian by
+  // month and year — with no year yet, the most that month ever has (a leap year is one of four).
+  days() {
+    if (!this.g) return 30;
+    if (!this.m) return 31;
+    const y = this.year(), last = yy => { const t = new Date(0); t.setUTCFullYear(yy, this.m, 0); return t.getUTCDate(); };
+    if (y !== null && y >= 1) return last(y);
+    const now = new Date().getFullYear();
+    return Math.max(...[0, 1, 2, 3].map(i => last(now + i)));
+  },
+  monthNames(lang) {
+    if (!this.g) return this.L.months;
+    const name = loc => new Intl.DateTimeFormat(`${loc}-u-ca-gregory-nu-latn`, { month: 'long', timeZone: 'UTC' });
+    const main = name(lang), second = CONFIG.CONV_SECOND_MONTHS[lang] ? name(CONFIG.CONV_SECOND_MONTHS[lang]) : null;
+    return Array.from({ length: 12 }, (_, i) => {
+      const at = new Date(0); at.setUTCMonth(i, 15);
+      return second ? `${main.format(at)} (${second.format(at)})` : main.format(at);
+    });
+  },
+  get L() { return UI.L; },
+  // The answer: { alpha, iso, mark } or { error }, and the same date in the other calendar (carry).
+  result(lang) {
+    const L = this.L, y = this.year(), sep = listSep(lang);
+    if (this.y.trim() === '' || !this.d || !this.m) return null;
+    if (y === null || y < 1) return { error: L.convRange };
+    const weekday = dt => new Intl.DateTimeFormat(`${lang}-u-nu-latn`, { weekday: 'long', timeZone: 'UTC' }).format(dt);
+    const iso = (yy, mm, dd) => `${String(yy).padStart(4, '0')}-${pad(mm)}-${pad(dd)}`;
+    if (this.g) {
+      const civil = iso(y, this.m, this.d), dt = HijriCalc.parseYMD(civil);
+      if (!dt) return { error: L.convRange };                       // past the four-digit years
+      const h = HijriCalc.fromCivil(civil, this.k);
+      if (!h || h.y < 1) return { error: L.convRange };             // before 1 AH
+      return { alpha: `${weekday(dt)}${sep}${h.d} ${L.months[h.m - 1]} ${h.y} ${L.markH}`, iso: iso(h.y, h.m, h.d), mark: L.markH, carry: h };
+    }
+    const h = { y, m: this.m, d: this.d }, civil = HijriCalc.toCivil(h, this.k);
+    if (!civil) return { error: this.d === 30 && HijriCalc.toCivil({ ...h, d: 29 }, this.k) ? L.convNoDay : L.convRange };
+    const dt = HijriCalc.parseYMD(civil), second = CONFIG.CONV_SECOND_MONTHS[lang];
+    // The browser's own long date in the page's language; Arabic adds the Levantine month name.
+    const parts = new Intl.DateTimeFormat(`${lang}-u-ca-gregory-nu-latn`, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).formatToParts(dt);
+    const alpha = parts.map(p => (p.type === 'month' && second)
+      ? `${p.value} (${new Intl.DateTimeFormat(`${second}-u-ca-gregory-nu-latn`, { month: 'long', timeZone: 'UTC' }).format(dt)})` : p.value).join('');
+    return { alpha: `${alpha} ${L.markG}`, iso: civil, mark: L.markG, carry: { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() } };
+  },
+  swap() {
+    const r = this.result(App.lang);
+    this.dir = this.g ? 'h2g' : 'g2h';
+    if (r && r.carry) Object.assign(this, { d: r.carry.d, m: r.carry.m, y: String(r.carry.y) });
+    else {   // nothing to carry over: today, in the new calendar
+      const t = localYMD(), h = this.g ? null : HijriCalc.fromCivil(ymdKey(t), this.k);
+      Object.assign(this, this.g ? { d: t.d, m: t.m, y: String(t.y) } : { d: h.d, m: h.m, y: String(h.y) });
+    }
+    this.render();
+  },
+  // fields = false while typing in the year box: its text is left as typed.
+  render(fields = true) {
+    if (!this.el) return;
+    const L = this.L, lang = App.lang, el = this.el, num = i360Theme.getNumerals();
+    UI.set('conv-dir', this.g ? L.convG2H : L.convH2G);
+    const sw = $('conv-swap'); sw.title = L.convSwap; sw.setAttribute('aria-label', `${L.convSwap}: ${this.g ? L.convG2H : L.convH2G}`);
+    $('conv-fields').setAttribute('aria-label', this.g ? L.convG2H : L.convH2G);
+    const option = (value, text, placeholder) => { const o = mk('option', '', text); o.value = value; if (placeholder) { o.disabled = true; } return o; };
+    const days = this.days();
+    if (this.d > days) this.d = days;
+    el.d.replaceChildren(option('', L.convDay, true), ...Array.from({ length: days }, (_, i) => option(i + 1, String(i + 1))));
+    el.d.value = this.d ? String(this.d) : '';
+    el.m.replaceChildren(option('', L.convMonth, true), ...this.monthNames(lang).map((n, i) => option(i + 1, `${i + 1}. ${n}`)));
+    el.m.value = this.m ? String(this.m) : '';
+    el.y.placeholder = i360Theme.toNumerals(this.g ? L.convYearHintG : L.convYearHintH, num);
+    if (fields) el.y.value = i360Theme.toNumerals(this.y, num);
+    el.pick.hidden = !(this.g && this.canPick);
+    el.pickBtn.title = L.convPick; el.pickBtn.setAttribute('aria-label', L.convPick);
+    const r = this.result(lang), isoBox = UI.targets['conv-iso'], err = UI.targets['conv-error'];
+    if (this.g) { const y = this.year(); el.native.value = (r && r.carry && y !== null) ? `${String(y).padStart(4, '0')}-${pad(this.m)}-${pad(this.d)}` : ''; }
+    UI.set('conv-alpha', r && !r.error ? r.alpha : '');
+    // The numeric date left to right (year first) and the mark after it, at the line's end.
+    if (r && !r.error) { const b = mk('bdi', '', r.iso); b.dir = 'ltr'; isoBox.replaceChildren(b, ` ${r.mark}`); } else isoBox.replaceChildren();
+    err.hidden = !(r && r.error); err.textContent = r && r.error ? r.error : '';
+    UI.set('conv-label', HijriCalc.label(HijriCalc.SOURCES.CALC, lang));
+    Cols.queue();
+  }
+};
+
 
 /* ---------- UI ---------- */
 const UI = {
@@ -448,11 +556,12 @@ const UI = {
     document.getElementById('btn-theme').addEventListener('click', () => i360Theme.cycle());
     i360Theme.onChange(() => this.theme());
     document.getElementById('btn-numerals').addEventListener('click', () => i360Theme.cycleNumerals());
-    i360Theme.onNumeralsChange(() => { this.numeralsButton(); });
+    i360Theme.onNumeralsChange(() => { this.numeralsButton(); Conv.render(); });
     i360Theme.watchNumerals(document.body, NUMERALS_SKIP);   // converts the page now and on every change, after the button
     this.theme();
     i360Theme.init();   // fresh theme.css in the background; the saved copy is already shown
     Cols.init();
+    Conv.init();
     App.load();
     setInterval(() => App.tick(), 30000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) App.tick(); });
@@ -480,7 +589,7 @@ const UI = {
   },
   reveal() {
     if (this.shown) return; this.shown = true;
-    ['quran-card', 'hadith-card', 'prayer-card', 'events-card'].forEach((id, i) => setTimeout(() => {
+    ['quran-card', 'hadith-card', 'prayer-card', 'converter-card', 'events-card'].forEach((id, i) => setTimeout(() => {
       const e = document.getElementById(id); if (e) { e.style.opacity = 1; e.style.transform = 'translateY(0)'; }
     }, i * 120));
   },
@@ -502,6 +611,7 @@ const UI = {
     this.renderCredits();
     if (Picker.open) Picker.render();
     this.renderEvents();
+    Conv.render();
     this.reveal();
   },
   // Credits (Open-Meteo and GeoNames: CC BY 4.0; Adhan: MIT), in the page's language, on two lines.

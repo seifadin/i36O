@@ -191,6 +191,7 @@ export const DAY = {
       a3: "12 ذو الحجة: ثالث أيام عيد الأضحى، وهو ثاني أيام التشريق وثالث أيام النحر",
       a4: "13 ذو الحجة: رابع أيام عيد الأضحى، وهو ثالث أيام التشريق ورابع أيام النحر"
     },
+    convLabel:"محوّل التاريخ",convDay:"اليوم",convMonth:"الشهر",convYear:"السنة",convYearHintG:"مثل 2026",convYearHintH:"مثل 1448",convG2H:"ميلادي ← هجري",convH2G:"هجري ← ميلادي",convSwap:"تبديل الاتجاه",convPick:"اختيار من التقويم",convNote:"قد يختلف التاريخ بيوم أو اثنين عن الفعلي.",convNoDay:"لا يوجد هذا اليوم في هذا الشهر حسب الحساب.",convRange:"لا يمكن تحويل هذا التاريخ.",markH:"هـ",markG:"م",
     eventsNote:"اليوم الإسلامي/العربي يمثل الوقت من غروب الشمس إلى غروبها اليوم التالي (أي من أذان المغرب حتى نهاية وقت العصر لليوم التالي)، فالأصل أن الليل يأتي قبل النهار",footer:"يتم التحديث يومياً.",prayers:["الفجر","الشروق","الظهر","العصر","المغرب","العشاء"],
     language: 'اللغة', refsLabel: 'المراجع', loading: 'جارٍ التحميل…', loadError: 'تعذّر تحميل هذا القسم.', retry: 'إعادة المحاولة', gradeLabel: 'الدرجة', sourceLabel: 'المصدر',
     schoolStd: 'الجمهور', schoolHanafi: 'الحنفي',
@@ -224,6 +225,7 @@ export const DAY = {
       a3: "12 Dhu al-Hijjah: 3rd Day of Eid al-Adha, the 2nd Day of Tashreeq and 3rd Day of Sacrifice",
       a4: "13 Dhu al-Hijjah: 4th Day of Eid al-Adha, the 3rd Day of Tashreeq and 4th Day of Sacrifice"
     },
+    convLabel:"Date Converter",convDay:"Day",convMonth:"Month",convYear:"Year",convYearHintG:"e.g. 2026",convYearHintH:"e.g. 1448",convG2H:"Gregorian → Hijri",convH2G:"Hijri → Gregorian",convSwap:"Swap direction",convPick:"Pick from the calendar",convNote:"A date may differ by a day or two from the actual one.",convNoDay:"By calculation, this month has no such day.",convRange:"This date can't be converted.",markH:"AH",markG:"CE",
     eventsNote:"The Islamic (Arabic) day runs from sunset to the next sunset (from the Maghrib call to prayer until the end of the next day's Asr time), since night comes before day",footer:"Updated daily.",prayers:["Fajr","Sunrise","Dhuhr","Asr","Maghrib","Isha"],
     language: 'Language', refsLabel: 'References', loading: 'Loading…', loadError: "Couldn't load this section.", retry: 'Retry', gradeLabel: 'Grade', sourceLabel: 'Source',
     schoolStd: 'Standard', schoolHanafi: 'Hanafi',
@@ -257,6 +259,7 @@ export const DAY = {
       a3: "12 Zilhicce: Kurban Bayramı 3. Gün, Teşrik günlerinin ikincisi ve kurban kesiminin 3. günü",
       a4: "13 Zilhicce: Kurban Bayramı 4. Gün, Teşrik günlerinin üçüncüsü ve kurban kesiminin 4. günü"
     },
+    convLabel:"Tarih Dönüştürücü",convDay:"Gün",convMonth:"Ay",convYear:"Yıl",convYearHintG:"ör. 2026",convYearHintH:"ör. 1448",convG2H:"Miladi → Hicri",convH2G:"Hicri → Miladi",convSwap:"Yönü değiştir",convPick:"Takvimden seç",convNote:"Tarih, gerçek tarihten bir veya iki gün farklı olabilir.",convNoDay:"Hesaba göre bu ayda böyle bir gün yok.",convRange:"Bu tarih dönüştürülemiyor.",markH:"H.",markG:"M.",
     eventsNote:"İslami (Arap) gün, güneşin batışından ertesi günün batışına kadar sürer (akşam ezanından ertesi günün ikindi vaktinin sonuna kadar); çünkü esasen gece gündüzden önce gelir",footer:"Günlük güncellenir.",prayers:["İmsak","Güneş","Öğle","İkindi","Akşam","Yatsı"],
     language: 'Dil', refsLabel: 'Kaynakça', loading: 'Yükleniyor…', loadError: 'Bu bölüm yüklenemedi.', retry: 'Tekrar dene', gradeLabel: 'Derece', sourceLabel: 'Kaynak',
     schoolStd: 'Standart', schoolHanafi: 'Hanefi',
@@ -290,6 +293,7 @@ export const DAY = {
       a3: "12 Dzulhijjah: Hari ketiga Idul Adha, hari Tasyrik kedua dan hari penyembelihan ketiga",
       a4: "13 Dzulhijjah: Hari keempat Idul Adha, hari Tasyrik ketiga dan hari penyembelihan keempat"
     },
+    convLabel:"Konverter Tanggal",convDay:"Hari",convMonth:"Bulan",convYear:"Tahun",convYearHintG:"mis. 2026",convYearHintH:"mis. 1448",convG2H:"Masehi → Hijriah",convH2G:"Hijriah → Masehi",convSwap:"Tukar arah",convPick:"Pilih dari kalender",convNote:"Tanggal bisa berbeda satu atau dua hari dari yang sebenarnya.",convNoDay:"Menurut hitungan, bulan ini tidak memiliki hari tersebut.",convRange:"Tanggal ini tidak dapat dikonversi.",markH:"H",markG:"M",
     eventsNote:"Hari dalam Islam (Arab) berlangsung dari terbenam matahari hingga terbenam berikutnya (dari azan Maghrib sampai akhir waktu Ashar hari berikutnya), karena pada dasarnya malam mendahului siang",footer:"Referensi terpercaya. Diperbarui setiap hari.",prayers:["Subuh", "Terbit", "Dzuhur", "Ashar", "Maghrib", "Isya"],
     language: 'Bahasa', refsLabel: 'Referensi', loading: 'Memuat…', loadError: 'Bagian ini gagal dimuat.', retry: 'Coba lagi', gradeLabel: 'Derajat', sourceLabel: 'Sumber',
     schoolStd: 'Standar', schoolHanafi: 'Hanafi',
@@ -323,6 +327,7 @@ export const DAY = {
       a3: "12 ذوالحجہ: عید الاضحی کا تیسرا دن، ایامِ تشریق کا دوسرا اور قربانی کا تیسرا دن",
       a4: "13 ذوالحجہ: عید الاضحی کا چوتھا دن، ایامِ تشریق کا تیسرا اور قربانی کا چوتھا دن"
     },
+    convLabel:"تاریخ کی تبدیلی",convDay:"دن",convMonth:"مہینہ",convYear:"سال",convYearHintG:"مثلاً 2026",convYearHintH:"مثلاً 1448",convG2H:"عیسوی ← ہجری",convH2G:"ہجری ← عیسوی",convSwap:"سمت بدلیں",convPick:"کیلنڈر سے منتخب کریں",convNote:"تاریخ اصل سے ایک یا دو دن مختلف ہو سکتی ہے۔",convNoDay:"حساب کے مطابق اس مہینے میں یہ دن نہیں ہے۔",convRange:"اس تاریخ کو تبدیل نہیں کیا جا سکتا۔",markH:"ھ",markG:"ء",
     eventsNote:"اسلامی (عربی) دن غروبِ آفتاب سے اگلے غروب تک ہوتا ہے (مغرب کی اذان سے اگلے دن عصر کے وقت کے اختتام تک)، کیونکہ اصل یہ ہے کہ رات دن سے پہلے آتی ہے",footer:"روزانہ اپ ڈیٹ کیا جاتا ہے۔",prayers:["الفجر","طلوع آفتاب","ظهر","عصر","مغرب","عشاء"],
     language: 'زبان', refsLabel: 'حوالہ جات', loading: 'لوڈ ہو رہا ہے…', loadError: 'یہ حصہ لوڈ نہیں ہو سکا۔', retry: 'دوبارہ کوشش کریں', gradeLabel: 'درجہ', sourceLabel: 'ماخذ',
     schoolStd: 'معیاری', schoolHanafi: 'حنفی',
