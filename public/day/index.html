@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-bFQLMQQRqDKwWQMomCoV5miFdd2iYfGvrCjAAwlHP9E='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-GDdMmup7qpagcV2VaYbADlkU1zvjgsqDyY7FvDAOxaQ='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -772,11 +772,14 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     </section>
 
     <section id="converter-card" class="glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
-      <div class="flex items-center gap-sm mb-md">
-        <span class="bg-converter-bg text-converter p-sm rounded-lg"><svg data-lucide="calendar-sync" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 10v4h4"></path><path d="m11 14 1.535-1.605a5 5 0 018 1.5"></path><path d="M16 2v3"></path><path d="m21 18-1.535 1.605a5 5 0 01-8-1.5"></path><path d="M21 22v-4h-4"></path><path d="M21 8.517V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h3.517"></path><path d="M3 9h4"></path><path d="M8 2v3"></path></svg></span>
-        <h2 data-i18n="convLabel" class="text-base font-bold uppercase tracking-widest text-converter">Date Converter</h2>
+      <!-- The card's name, and the direction switch at the other end of the same row (wraps under it if the row is too narrow). -->
+      <div class="flex flex-wrap items-center justify-between gap-sm mb-md">
+        <div class="flex items-center gap-sm">
+          <span class="bg-converter-bg text-converter p-sm rounded-lg"><svg data-lucide="calendar-sync" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 10v4h4"></path><path d="m11 14 1.535-1.605a5 5 0 018 1.5"></path><path d="M16 2v3"></path><path d="m21 18-1.535 1.605a5 5 0 01-8-1.5"></path><path d="M21 22v-4h-4"></path><path d="M21 8.517V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h3.517"></path><path d="M3 9h4"></path><path d="M8 2v3"></path></svg></span>
+          <h2 data-i18n="convLabel" class="text-base font-bold uppercase tracking-widest text-converter">Date Converter</h2>
+        </div>
+        <button type="button" id="conv-swap" class="i360-btn"><svg data-lucide="arrow-left-right" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg><span data-target="conv-dir"></span></button>
       </div>
-      <button type="button" id="conv-swap" class="i360-btn mb-md"><svg data-lucide="arrow-left-right" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg><span data-target="conv-dir"></span></button>
       <div class="i360-inset p-md flex flex-col gap-md">
         <div class="conv-fields" role="group" id="conv-fields">
           <div class="conv-field">
@@ -797,13 +800,12 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
           </span>
         </div>
         <div class="border-t border-rule pt-md flex flex-col gap-xs" aria-live="polite">
-          <p data-target="conv-alpha" class="text-lg font-bold leading-reading"></p>
+          <p data-target="conv-alpha" class="text-base font-bold"></p>
           <p data-target="conv-iso" class="text-base font-bold text-custom-secondary"></p>
           <p data-target="conv-error" class="conv-error text-sm font-bold" hidden></p>
         </div>
       </div>
-      <p data-target="conv-label" class="text-sm font-bold text-custom-secondary mt-md"></p>
-      <p data-i18n="convNote" class="text-sm text-custom-secondary"></p>
+      <p class="text-sm text-custom-secondary mt-md"><span data-target="conv-label" class="font-bold"></span> <span data-i18n="convNote"></span></p>
     </section>
     </div>
     <section id="events-card" class="cards-wide glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
@@ -3369,7 +3371,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       } else isoBox.replaceChildren();
       err.hidden = !(r && r.error);
       err.textContent = r && r.error ? r.error : "";
-      UI.set("conv-label", label(SOURCES.CALC, lang));
+      UI.set("conv-label", `${label(SOURCES.CALC, lang)}${lang === "ur" ? "۔" : "."}`);
       Cols.queue();
     }
   };

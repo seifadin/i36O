@@ -533,7 +533,8 @@ const Conv = {
     // The numeric date left to right (year first) and the mark after it, at the line's end.
     if (r && !r.error) { const b = mk('bdi', '', r.iso); b.dir = 'ltr'; isoBox.replaceChildren(b, ` ${r.mark}`); } else isoBox.replaceChildren();
     err.hidden = !(r && r.error); err.textContent = r && r.error ? r.error : '';
-    UI.set('conv-label', HijriCalc.label(HijriCalc.SOURCES.CALC, lang));
+    // The label and the note on one line: the label ends its sentence (Urdu: «۔»).
+    UI.set('conv-label', `${HijriCalc.label(HijriCalc.SOURCES.CALC, lang)}${lang === 'ur' ? '۔' : '.'}`);
     Cols.queue();
   }
 };
