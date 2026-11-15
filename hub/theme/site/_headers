@@ -11,5 +11,8 @@
 /theme-loader.js
   Cache-Control: no-cache
 
+/botpress.css
+  Cache-Control: no-cache
+
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable

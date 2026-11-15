@@ -94,9 +94,10 @@ test('_headers: CORS everywhere, theme files never cached stale, fonts immutable
   assert.ok(rules['/*'].includes('Access-Control-Allow-Origin: *'));
   assert.ok(rules['/theme.css'].includes('Cache-Control: no-cache'));
   assert.ok(rules['/theme-loader.js'].includes('Cache-Control: no-cache'));
+  assert.ok(rules['/botpress.css'].includes('Cache-Control: no-cache'));
   assert.ok(rules['/fonts/*'].includes('Cache-Control: public, max-age=31536000, immutable'));
   const cc = Object.values(rules).filter(r => r.some(l => l.startsWith('Cache-Control')));
-  assert.equal(cc.length, 3, 'Cache-Control set by one rule per path');
+  assert.equal(cc.length, 4, 'Cache-Control set by one rule per path');
 });
 
 test('early.js and theme-loader.js agree on storage keys and themes', () => {
