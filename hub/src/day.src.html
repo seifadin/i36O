@@ -56,17 +56,20 @@
        of at least --col-min fit, the verse and hadith on one side, prayer times above the date
        converter on the other, and the events across both underneath; elsewhere one column in that
        order. Which one it is follows the space itself (CSS grid, auto-fit; Cols.fit() only notes it).
-       The events lay out in as many columns of at least --col-min as fit, nearest first, row by row —
+       The events lay out in two columns where two of at least --col-min fit, nearest first, row by row —
        the whole year shown, scrolling with the page (no list scrolling inside a card). */
-    :root { --col: var(--i360-content-width); --col-min: calc(var(--i360-content-width) / 2); --col-gap: var(--i360-space-lg); }
+    :root { --col: var(--i360-content-width); --col-min: calc(var(--i360-content-width) / 2); --col-gap: var(--i360-space-lg);
+      /* As many columns of at least --col-min as fit, but never more than two (Seif 2026-11-15): each
+         column is also at least half the row (minus the gap). Used by the cards and by the events. */
+      --two-at-most: repeat(auto-fit, minmax(max(min(100%, var(--col-min)), calc((100% - var(--col-gap)) / 2)), 1fr)); }
     .layout-stable { width: 100%; max-width: var(--col); margin: 0 auto; transition: transform var(--i360-speed) ease; }
     .cards { width: 100%; max-width: calc(2 * var(--col) + var(--col-gap)); margin: 0 auto; display: grid; gap: var(--col-gap);
-         grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--col-min)), 1fr)); align-items: start; }
+         grid-template-columns: var(--two-at-most); align-items: start; }
     .cards-col { width: 100%; max-width: var(--col); justify-self: center; min-width: 0; display: flex; flex-direction: column; gap: var(--col-gap); }
     body.two-cols .toolbar { --toolbar-row-w: calc(2 * var(--col) + var(--col-gap)); }
     .cards-wide { grid-column: 1 / -1; width: 100%; max-width: var(--col); justify-self: center; min-width: 0; box-sizing: border-box; }
     body.two-cols .cards-wide { max-width: calc(2 * var(--col) + var(--col-gap)); }
-    .events-grid { display: grid; gap: var(--i360-space-md); grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--col-min)), 1fr)); }
+    .events-grid { display: grid; gap: var(--i360-space-md); grid-template-columns: var(--two-at-most); }
     /* The date converter (Seif 2026-11-15): one direction at a time, swapped by its button; day and
        month lists and a year box; the calendar button (Gregorian only) opens the browser's own date
        picker through a hidden date box, where the browser can (showPicker). */
