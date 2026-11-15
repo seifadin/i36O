@@ -148,7 +148,7 @@ buildPage({
 {
   const tailwind = execFileSync(process.execPath, [join(root, 'node_modules/tailwindcss/lib/cli.js'), '-c', join(root, 'src/day.tailwind.js'), '--minify'],
     { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-  if (!/\.dark\b/.test(tailwind) || tailwind.length < 5000) throw new Error('src/day.src.html: the Tailwind build looks wrong (no dark: rules, or too small)');
+  if (!/\.text-hadith\b/.test(tailwind) || tailwind.length < 3000) throw new Error('src/day.src.html: the Tailwind build looks wrong (no theme classes, or too small)');
   if (/<\/style/i.test(tailwind)) throw new Error('src/day.src.html: the Tailwind CSS contains </style');
   const table = JSON.parse(read('src/day-cities.json'));
   const zones = Object.fromEntries(Object.entries(table.zones).map(([tz, z]) => [tz, { cc: z.cc, lat: z.lat, lng: z.lng, n: z.n }]));

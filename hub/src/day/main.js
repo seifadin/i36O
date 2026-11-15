@@ -14,8 +14,6 @@ import { createStore } from '../storage.js';
 import { fetchJson } from '../net.js';
 import { DAY as LOCALES } from '../locales.js';
 
-// Tailwind's dark: styles follow the "dark" class (set in the page's <head> from the saved theme).
-i360Theme.onChange((s) => { document.documentElement.classList.toggle('dark', s.theme === 'dark'); });
 
 /* ---------- Config ---------- */
 const CONFIG = {
@@ -84,7 +82,7 @@ function mk(tag, cls, text) {
   return el;
 }
 // Lucide icons shown from script (the hourglass beside a provisional Hijri date).
-const HOURGLASS = '<svg data-lucide="hourglass" class="icon-inline me-1" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>';
+const HOURGLASS = '<svg data-lucide="hourglass" class="icon-inline me-xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>';
 function svgIcon(markup) {
   const t = document.createElement('template');
   t.innerHTML = markup;
@@ -351,9 +349,9 @@ const Picker = {
     this.input.placeholder = L.citySearch; this.input.setAttribute('aria-label', L.citySearch);
     UI.set('city-status', { loading: L.loading, none: L.cityNone, error: L.loadError }[this.state] || '');
     const row = (label, sub, on, pick) => {
-      const b = mk('button', `text-start px-3 py-2 rounded-xl text-sm ${on ? 'active-btn' : 'text-custom-secondary'}`);
+      const b = mk('button', `text-start px-sm py-sm rounded-lg text-base ${on ? 'active-btn' : 'text-custom-secondary'}`);
       b.type = 'button'; b.setAttribute('role', 'option'); b.setAttribute('aria-selected', on);
-      b.append(mk('span', 'font-bold', label)); if (sub) b.append(mk('span', 'text-xs ms-2', sub));
+      b.append(mk('span', 'font-bold', label)); if (sub) b.append(mk('span', 'text-sm ms-sm', sub));
       b.addEventListener('click', pick);
       return b;
     };
@@ -394,6 +392,7 @@ const Cols = {
     this.a = document.getElementById('col-a'); this.b = document.getElementById('col-b');
     this.prayer = document.getElementById('prayer-card'); this.events = document.getElementById('events-card');
     this.list = this.events.querySelector('[data-target="events-list"]');
+    this.grid = this.prayer.querySelector('[data-target="prayer-grid"]');
     if (window.ResizeObserver) {
       const ro = new ResizeObserver(() => this.queue());
       [document.getElementById('cards'), this.a, this.prayer].forEach(e => ro.observe(e));
@@ -402,8 +401,17 @@ const Cols = {
     this.queue();
   },
   queue: oncePerFrame(() => Cols.fit()),
+  // The prayer times: all six in one row where each one's name and time fit in its box, otherwise
+  // three to a row — measured, as drawn, never a width breakpoint.
+  fitPrayers() {
+    const g = this.grid, boxes = [...g.children];
+    if (!boxes.length) return;
+    g.style.gridTemplateColumns = `repeat(${boxes.length}, minmax(0, 1fr))`;
+    if (boxes.some(b => b.scrollWidth > b.clientWidth)) g.style.gridTemplateColumns = '';
+  },
   fit() {
     if (!this.a) return;
+    this.fitPrayers();
     const side = this.a.offsetTop === this.b.offsetTop && this.a.offsetLeft !== this.b.offsetLeft;   // as laid out
     document.body.classList.toggle('two-cols', side);
     if (!side) { this.b.style.height = ''; return; }
@@ -564,11 +572,11 @@ const UI = {
     if (!next) next = 'Fajr';                                 // after Isha the next prayer is tomorrow's Fajr
     grid.replaceChildren(...CONFIG.P_KEYS.map((k, i) => {
       const isNext = k === next, m = /(\d{1,2}):(\d{2})/.exec(t[k] || '');
-      const box = mk('div', `flex flex-col items-center p-3 transition-all ${isNext ? 'next-prayer-highlight' : 'inset-item'}`);
+      const box = mk('div', `flex flex-col items-center p-sm transition-all ${isNext ? 'next-prayer-highlight' : 'inset-item'}`);
       box.append(
-        mk('span', `text-[10px] md:text-xs font-bold ${isNext ? 'text-accent' : 'text-custom-secondary'}`, L.prayers[i]),
-        mk('span', `text-base md:text-xl font-bold mt-1 ${isNext ? 'text-accent' : 'text-custom-secondary'}`, m ? m[0] : '—'));
-      if (isNext) box.append(mk('span', 'text-[8px] mt-1 font-black text-accent animate-pulse', L.next));
+        mk('span', `text-sm font-bold ${isNext ? 'text-accent' : 'text-custom-secondary'}`, L.prayers[i]),
+        mk('span', `text-base font-bold mt-xs ${isNext ? 'text-accent' : 'text-custom-secondary'}`, m ? m[0] : '—'));
+      if (isNext) box.append(mk('span', 'text-sm mt-xs font-bold text-accent animate-pulse', L.next));
       return box;
     }));
     const names = METHOD_NAMES[p.method];
@@ -576,20 +584,21 @@ const UI = {
     let tzText = tz || '—';
     try { const n = new Intl.DateTimeFormat(lang, { timeZone: tz, timeZoneName: 'long' }).formatToParts(new Date()).find(x => x.type === 'timeZoneName'); if (n) tzText = n.value; } catch (e) { /* localized name only; the raw IANA id stays as the fallback */ }
     this.set('meta-timezone', tzText);
+    Cols.queue();
   },
   renderEvents() {
     const L = this.L, lang = App.lang, h = App.state.hijri, list = this.targets['events-list'];
     if (!h || !list) return;
     list.replaceChildren(...Hijri.events(h).map(e => {
-      const row = mk('div', `flex justify-between items-center p-4 transition-all ${e.isT ? 'border-2 border-purple-500 bg-purple-50 dark:bg-purple-900/10 rounded-2xl' : 'inset-item'}`);
-      const left = mk('div', 'flex-1'), title = mk('div', 'flex items-center gap-2');
-      title.append(mk('span', 'text-sm font-bold text-custom-secondary', L.events[e.id]));
-      if (e.isT) title.append(mk('span', 'bg-purple-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full', L.todayLabel));
-      left.append(title, mk('span', 'text-xs text-custom-secondary font-medium', `${e.d} ${L.months[e.m]} ${e.year}`));
-      const right = mk('div', 'text-start md:text-end ms-4');
+      const row = mk('div', `flex justify-between items-center gap-md p-md transition-all ${e.isT ? 'border-2 border-event bg-event-bg rounded-lg' : 'inset-item'}`);
+      const left = mk('div', 'flex-1'), title = mk('div', 'flex items-center gap-sm');
+      title.append(mk('span', 'text-base font-bold text-custom-secondary', L.events[e.id]));
+      if (e.isT) title.append(mk('span', 'bg-event text-page text-sm font-bold px-sm rounded-full', L.todayLabel));
+      left.append(title, mk('span', 'text-sm text-custom-secondary font-bold', `${e.d} ${L.months[e.m]} ${e.year}`));
+      const right = mk('div', 'text-end');
       right.append(
-        mk('span', 'text-[10px] uppercase font-bold text-purple-600 block', L.expected),
-        mk('span', 'text-xs font-medium text-custom-secondary', e.date.toLocaleDateString(lang, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })));
+        mk('span', 'text-sm uppercase font-bold text-event block', L.expected),
+        mk('span', 'text-sm font-bold text-custom-secondary', e.date.toLocaleDateString(lang, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })));
       row.append(left, right);
       return row;
     }));
