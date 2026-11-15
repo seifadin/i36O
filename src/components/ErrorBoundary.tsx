@@ -81,17 +81,13 @@ export default class ErrorBoundary extends Component<Props, State> {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="rounded-full bg-brand-blue px-md py-sm text-base text-brand-on-accent"
+            className="i360-btn i360-btn-primary"
           >
             إعادة التحميل
           </button>
           <button
             onClick={this.handleReport}
-            className={`rounded-full border px-md py-sm text-base transition-colors ${
-              reported
-                ? 'border-brand-green text-brand-green'
-                : 'border-brand-blue text-brand-blue'
-            }`}
+            className={`i360-btn transition-colors${reported ? ' border-brand-green text-brand-green' : ''}`}
           >
             {/* aria-live on this inner span, not the button itself —
                 screen readers handle a live region more reliably when

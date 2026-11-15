@@ -83,7 +83,7 @@ export default function Dialog({ open, title, message, onClose, secondaryAction,
         aria-modal="true"
         aria-labelledby={`${id}-title`}
         aria-describedby={`${id}-message`}
-        className="w-full max-w-sm rounded-lg bg-brand-ivory p-md text-right shadow-popup"
+        className="i360-popup w-full max-w-sm p-md text-right"
       >
         <h2 id={`${id}-title`} className="mb-sm text-lg font-bold text-brand-blue">
           {title}
@@ -91,24 +91,15 @@ export default function Dialog({ open, title, message, onClose, secondaryAction,
         <p id={`${id}-message`} className="mb-md whitespace-pre-line text-base text-brand-blue">
           {message}
         </p>
+        {/* The shared buttons (src/page-chrome.css): outlined by default — deliberately less prominent
+            than the filled one below. secondaryAction exists for a "proceed despite the warning"
+            action, which shouldn't compete with the safer, recommended dismiss; emphasizeSecondary
+            swaps the two when proceeding is the recommended choice (see the prop's comment above). */}
         {secondaryAction && (
           <button
             ref={secondaryButtonRef}
             onClick={secondaryAction.onClick}
-            // Outlined by default — deliberately less prominent than the
-            // primary button below. secondaryAction exists specifically
-            // for a "proceed despite the warning" action, which shouldn't
-            // visually compete with the safer, recommended dismiss action.
-            // emphasizeSecondary swaps this: filled green becomes the
-            // genuinely recommended choice in that specific case (see the
-            // prop's own comment above) — a contrasting blue focus ring,
-            // not the usual green, since a green ring on a green button
-            // would be hard to see.
-            className={
-              emphasizeSecondary
-                ? 'mb-sm w-full rounded-full bg-brand-green py-sm text-base font-bold text-brand-on-accent outline-none focus:ring-2 focus:ring-brand-blue'
-                : 'mb-sm w-full rounded-full border-2 border-brand-blue py-sm text-base font-bold text-brand-blue outline-none focus:ring-2 focus:ring-brand-green'
-            }
+            className={`i360-btn mb-sm w-full${emphasizeSecondary ? ' i360-btn-primary' : ''}`}
           >
             {secondaryAction.label}
           </button>
@@ -116,14 +107,7 @@ export default function Dialog({ open, title, message, onClose, secondaryAction,
         <button
           ref={okButtonRef}
           onClick={onClose}
-          // ring, not outline: outline doesn't follow border-radius in every WebView,
-          // leaving gaps on this pill shape; ring is a box-shadow and clips correctly
-          // (§14h). emphasizeSecondary swaps this to the outlined style (see above).
-          className={
-            emphasizeSecondary
-              ? 'w-full rounded-full border-2 border-brand-blue py-sm text-base font-bold text-brand-blue outline-none focus:ring-2 focus:ring-brand-green'
-              : 'w-full rounded-full bg-brand-blue py-sm text-base font-bold text-brand-on-accent outline-none focus:ring-2 focus:ring-brand-green'
-          }
+          className={`i360-btn w-full${emphasizeSecondary ? '' : ' i360-btn-primary'}`}
         >
           موافق
         </button>

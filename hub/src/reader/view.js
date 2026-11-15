@@ -54,8 +54,8 @@ function applyLocalization() {
   setTitle(btnSearchNext, tr.nextMatch);
   setTitle(btnSearchList, tr.showResults);
   setTitle(btnSearchClose, tr.closeSearch);
-  optDiacritics.textContent = tr.matchDiacritics;
-  optWord.textContent = tr.wholeWord;
+  optDiacritics.querySelector('.chip-label').textContent = tr.matchDiacritics;
+  optWord.querySelector('.chip-label').textContent = tr.wholeWord;
   tabContents.textContent = tr.contentsTab;
   tabBookmarks.textContent = tr.bookmarksTab;
   setTitle(btnCopyLink, tr.copyLink);

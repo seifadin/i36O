@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-M/SY2e4lcmnEmo4MHCpK03PvLKJGN+wQnZEgDXbNPYk='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-8u5Qj/LnQxftPj70Il2qhY67601MCRtm5UrtjKSdtGk='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -264,10 +264,9 @@
        sizes here; their drawing style for every page: src/page-chrome.css. */
     svg.icon { width: var(--i360-icon-size); height: var(--i360-icon-size); display: block; }
     svg.icon-inline { width: var(--i360-icon-size-inline); height: var(--i360-icon-size-inline); display: inline-block; vertical-align: -0.125em; }
-    /* The cards: their padding grows with the screen (twice the shared gap), no width breakpoints. */
-    .glass-card { background-color: var(--i360-bg); border: var(--i360-line-width) solid var(--i360-rule); border-radius: var(--i360-radius-lg); box-shadow: var(--i360-page-shadow); padding: calc(2 * var(--i360-gap)); transition: all var(--i360-speed) ease; }
-    .inset-item { background-color: var(--i360-quote); border: var(--i360-line-width) solid var(--i360-rule); border-radius: var(--i360-radius-lg); }
-    .active-btn { background-color: var(--i360-accent); color: var(--i360-on-accent) !important; }
+    /* The cards (their look: .i360-card, the inner boxes .i360-inset, src/page-chrome.css): their padding
+       grows with the screen (twice the shared gap), no width breakpoints. */
+    .glass-card { padding: calc(2 * var(--i360-gap)); transition: all var(--i360-speed) ease; }
     .next-prayer-highlight { border: var(--i360-line-width-strong) solid var(--i360-accent) !important; background-color: var(--i360-hover); transform: scale(1.05); box-shadow: var(--i360-popup-shadow); border-radius: var(--i360-radius-lg); }
     [dir="ltr"] .arabic-script { direction: rtl; }
     .text-custom-secondary { color: var(--i360-muted); }
@@ -415,9 +414,10 @@
 /* Keyboard focus: one ring, shown only when a control is reached by keyboard — a thin gap in the
    page colour, then the focus colour, so it shows on a filled button too (a ring, not an outline:
    some WebViews draw outlines square on rounded buttons). On every toolbar button, and on every
-   control of the hub pages (<body class="i360-page">; text boxes keep their own focus border).
-   The app's other controls keep their own rings (Tailwind's). */
+   control of the hub pages (<body class="i360-page">) and on the shared components below in the
+   app too (text boxes show the field focus instead). */
 .toolbar-btn:focus-visible,
+:is(.i360-btn, .i360-chip, .i360-list-item):focus-visible,
 .i360-page :is(button, a, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: none;
   box-shadow: 0 0 0 var(--i360-line-width-strong, 2px) var(--i360-bg, #FAF7F2), 0 0 0 calc(2 * var(--i360-line-width-strong, 2px)) var(--toolbar-focus);
@@ -481,17 +481,154 @@ svg[data-lucide] {
 .toolbar-densest { --toolbar-btn-min: 1.6rem; --toolbar-pad: var(--i360-space-xs, 0.25rem); }
 .toolbar-densest .toolbar-btn { padding: 0; }
 .toolbar-densest .tb-start > .divider { display: none; }
+
+/* ---------- Shared components (i360-hub.md §10 "Components") ----------
+   One look for each piece that more than one page has, in the hub pages and the app alike. A page
+   sets only where a piece sits and how big it is (width, height, outer spacing); never its look. */
+
+/* Text box. A search box is a pill (.i360-field-search), as on Android and iOS; other boxes take the
+   usual corners. Focus: the focus colour and the theme's focus glow — on the box itself, or on a box
+   that holds the input (the app's search bar). */
+.i360-field {
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  background: var(--i360-input, #FAF7F2);
+  color: var(--i360-text, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  outline: none;
+}
+.i360-field-search { border-radius: var(--i360-radius-full, 999px); }
+.i360-field::placeholder, .i360-field ::placeholder { color: var(--i360-muted, #5A62C9); }
+.i360-field:focus, .i360-field:focus-within { border-color: var(--i360-focus, #0010CF); box-shadow: var(--i360-focus-ring, 0 0 0 3px rgba(0, 16, 207, 0.25)); }
+
+/* An on/off option (or one of a set): a pill with a tick box, so its state shows by more than colour.
+   [type] alongside: Tailwind's reset (Daily Reflection, the app) clears [type="button"] backgrounds
+   after this file, at the same weight; the attribute keeps ours. */
+.i360-chip, .i360-chip[type] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--i360-space-xs, 0.25rem);
+  padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-full, 999px);
+  background: var(--i360-surface, #FAF7F2);
+  color: var(--i360-text, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  cursor: pointer;
+}
+.i360-chip[aria-pressed="true"] { background: var(--i360-active, #EEF2FF); border-color: var(--i360-focus, #0010CF); color: var(--i360-heading, #0010CF); }
+.i360-chip-box {
+  width: 0.9rem; height: 0.9rem; flex-shrink: 0;
+  border: var(--i360-line-width, 1px) solid currentColor; border-radius: var(--i360-radius-sm, 0.25rem);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; line-height: 1;
+}
+.i360-chip[aria-pressed="true"] .i360-chip-box::after { content: '✓'; }
+
+/* Buttons: pills, as on Android and iOS. Outlined by default; filled (.i360-btn-primary) for the main
+   action; .i360-btn-sm for small ones beside text (retry, more). */
+.i360-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-full, 999px);
+  background: transparent;
+  color: var(--i360-accent, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  font-weight: 700;
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-decoration: none;
+  cursor: pointer;
+}
+.i360-btn:hover:not(:disabled) { background: var(--i360-hover, #EEF2FF); }
+.i360-btn-primary, .i360-btn-primary[type], .i360-btn-primary:hover:not(:disabled) { background: var(--i360-accent, #0010CF); border-color: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
+.i360-btn-sm { padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem); font-size: var(--i360-text-size-sm, 0.875rem); }
+.i360-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
+
+/* A row in a list or menu. Hover (or the keyboard's current row, .active): the hover colour; the chosen
+   one (aria-selected, or Daily Reflection's .active-btn): the accent. */
+.i360-list-item {
+  display: block;
+  width: 100%;
+  text-align: start;
+  background: transparent;
+  border: 0;
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  color: var(--i360-text, #0010CF);
+  padding: var(--i360-space-sm, 0.5rem);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-decoration: none;
+  cursor: pointer;
+}
+.i360-list-item:hover, .i360-list-item.active, .i360-list-item.current { background: var(--i360-hover, #EEF2FF); }
+.i360-list-item[aria-selected="true"], .i360-list-item.active-btn { background: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
+
+/* Floating surfaces: pop-ups, menus, dialogs, tooltips (the toolbar's ⋮ menu above has the same look). */
+.i360-popup {
+  background: var(--i360-surface, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
+  padding: var(--i360-space-sm, 0.5rem);
+}
+
+/* A short message that comes and goes. */
+.i360-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  border-radius: var(--i360-radius-full, 999px);
+  background: var(--i360-toast, #1e293b);
+  color: var(--i360-toast-text, #f8fafc);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
+  z-index: var(--i360-layer-toast, 60);
+}
+
+/* A notice (an error, missing pages). */
+.i360-banner {
+  background: var(--i360-banner-bg, #fef2f2);
+  border: var(--i360-line-width, 1px) solid var(--i360-banner-border, #fecaca);
+  color: var(--i360-banner-text, #991b1b);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+}
+
+/* A box around a section (.i360-card), and a box inside one (.i360-inset). */
+.i360-card {
+  background: var(--i360-bg, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--i360-rule, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  box-shadow: var(--i360-page-shadow, 0 4px 6px -1px rgba(0, 16, 207, 0.08), 0 2px 4px -1px rgba(0, 16, 207, 0.05));
+}
+.i360-inset {
+  background: var(--i360-quote, #F4F0E8);
+  border: var(--i360-line-width, 1px) solid var(--i360-rule, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+}
+
+/* Search matches. */
+mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); color: inherit; border-radius: var(--i360-radius-sm, 0.25rem); }
     .toolbar { --toolbar-row-w: var(--col); z-index: var(--i360-layer-bar); }
     #btn-lang { gap: var(--i360-space-xs); font-weight: 700; line-height: 1; }
     .toolbar-btn .tb-caret { width: 0.875rem; height: 0.875rem; }
     .tb-title { margin: 0; }
     .lang-wrap { position: relative; flex-shrink: 0; }
-    .lang-list { position: absolute; top: calc(100% + var(--i360-space-xs)); inset-inline-start: 0; z-index: var(--i360-layer-menu); min-width: 11rem; padding: var(--i360-space-xs); border-radius: var(--i360-radius-lg);
-           background-color: var(--i360-bg); border: var(--i360-line-width) solid var(--i360-rule); box-shadow: var(--i360-popup-shadow); display: flex; flex-direction: column; gap: var(--i360-space-xs); }
+    /* The language list (its look: .i360-popup; each language: .i360-list-item). */
+    .lang-list { position: absolute; top: calc(100% + var(--i360-space-xs)); inset-inline-start: 0; z-index: var(--i360-layer-menu); min-width: 11rem; display: flex; flex-direction: column; gap: var(--i360-space-xs); }
     .lang-list[hidden] { display: none; }
-    .lang-item { border: 0; background: transparent; color: var(--i360-text); text-align: start; padding: var(--i360-space-sm); border-radius: var(--i360-radius-lg); font: var(--i360-text-size)/var(--i360-line-height-ui) var(--i360-font); cursor: pointer; }
-    .lang-item:hover { background-color: var(--i360-hover); }
-    .lang-item.active-btn { background-color: var(--i360-accent); }
     /* Its padding: .safe-area .safe-area-top-bar (page-chrome.css). */
     .page { width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
     /* The page column (--col, as before) and the cards (Seif 2026-10-26): one column, in this order,
@@ -509,7 +646,7 @@ svg[data-lucide] {
     body.two-cols #events-card { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
     body.two-cols #events-card [data-target="events-list"] { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
   </style>
-  <style id="tailwind">*,::backdrop,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:#3b82f680;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:initial}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:initial;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:initial}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.mx-auto{margin-left:auto;margin-right:auto}.mb-lg{margin-bottom:var(--i360-space-lg)}.mb-md{margin-bottom:var(--i360-space-md)}.me-xs{margin-inline-end:var(--i360-space-xs)}.ms-sm{margin-inline-start:var(--i360-space-sm)}.mt-lg{margin-top:var(--i360-space-lg)}.mt-md{margin-top:var(--i360-space-md)}.mt-sm{margin-top:var(--i360-space-sm)}.mt-xs{margin-top:var(--i360-space-xs)}.block{display:block}.inline{display:inline}.flex{display:flex}.table{display:table}.grid{display:grid}.hidden{display:none}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-\[var\(--col-min\)\]{max-width:var(--col-min)}.flex-1{flex:1 1 0%}.flex-auto{flex:1 1 auto}.flex-shrink{flex-shrink:1}.translate-y-4{--tw-translate-y:1rem}.transform,.translate-y-4{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}.cursor-pointer{cursor:pointer}.resize{resize:both}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-md{gap:var(--i360-space-md)}.gap-sm{gap:var(--i360-space-sm)}.gap-xs{gap:var(--i360-space-xs)}.space-y-md>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-md)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-md)*var(--tw-space-y-reverse))}.space-y-sm>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-sm)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-sm)*var(--tw-space-y-reverse))}.space-y-xs>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-xs)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-xs)*var(--tw-space-y-reverse))}.whitespace-pre-line{white-space:pre-line}.rounded-full{border-radius:var(--i360-radius-full)}.rounded-lg{border-radius:var(--i360-radius-lg)}.border{border-width:var(--i360-line-width)}.border-2{border-width:var(--i360-line-width-strong)}.border-t{border-top-width:var(--i360-line-width)}.border-current{border-color:currentColor}.border-event{border-color:var(--i360-event)}.border-rule{border-color:var(--i360-rule)}.bg-event{background-color:var(--i360-event)}.bg-event-bg{background-color:var(--i360-event-bg)}.bg-hadith-bg{background-color:var(--i360-hadith-bg)}.bg-prayer-bg{background-color:var(--i360-prayer-bg)}.bg-transparent{background-color:initial}.p-md{padding:var(--i360-space-md)}.p-sm{padding:var(--i360-space-sm)}.px-sm{padding-left:var(--i360-space-sm);padding-right:var(--i360-space-sm)}.py-sm{padding-top:var(--i360-space-sm);padding-bottom:var(--i360-space-sm)}.py-xs{padding-top:var(--i360-space-xs);padding-bottom:var(--i360-space-xs)}.pb-lg{padding-bottom:var(--i360-space-lg)}.pt-md{padding-top:var(--i360-space-md)}.text-center{text-align:center}.text-justify{text-align:justify}.text-start{text-align:start}.text-end{text-align:end}.text-base{font-size:var(--i360-text-size)}.text-base,.text-lg{line-height:var(--i360-line-height-ui)}.text-lg{font-size:var(--i360-text-size-lg)}.text-sm{font-size:var(--i360-text-size-sm);line-height:var(--i360-line-height-ui)}.font-bold{font-weight:700}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-reading{line-height:var(--i360-line-height)}.tracking-widest{letter-spacing:.1em}.text-event{color:var(--i360-event)}.text-hadith{color:var(--i360-hadith)}.text-page{color:var(--i360-bg)}.text-prayer{color:var(--i360-prayer)}.underline{text-decoration-line:underline}.opacity-0{opacity:0}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:var(--i360-speed-quick)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:var(--i360-speed-quick)}.duration-500{transition-duration:.5s}</style>   <!-- built from src/day.tailwind.js (scripts/build.js) -->
+  <style id="tailwind">*,::backdrop,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:#3b82f680;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:initial}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:initial;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:initial}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.mx-auto{margin-left:auto;margin-right:auto}.mb-lg{margin-bottom:var(--i360-space-lg)}.mb-md{margin-bottom:var(--i360-space-md)}.me-xs{margin-inline-end:var(--i360-space-xs)}.ms-sm{margin-inline-start:var(--i360-space-sm)}.mt-lg{margin-top:var(--i360-space-lg)}.mt-md{margin-top:var(--i360-space-md)}.mt-sm{margin-top:var(--i360-space-sm)}.mt-xs{margin-top:var(--i360-space-xs)}.block{display:block}.inline{display:inline}.flex{display:flex}.table{display:table}.grid{display:grid}.hidden{display:none}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-\[var\(--col-min\)\]{max-width:var(--col-min)}.flex-1{flex:1 1 0%}.flex-auto{flex:1 1 auto}.flex-shrink{flex-shrink:1}.translate-y-4{--tw-translate-y:1rem}.transform,.translate-y-4{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}.cursor-pointer{cursor:pointer}.resize{resize:both}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-md{gap:var(--i360-space-md)}.gap-sm{gap:var(--i360-space-sm)}.gap-xs{gap:var(--i360-space-xs)}.space-y-md>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-md)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-md)*var(--tw-space-y-reverse))}.space-y-sm>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-sm)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-sm)*var(--tw-space-y-reverse))}.space-y-xs>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-xs)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-xs)*var(--tw-space-y-reverse))}.whitespace-pre-line{white-space:pre-line}.rounded-full{border-radius:var(--i360-radius-full)}.rounded-lg{border-radius:var(--i360-radius-lg)}.border{border-width:var(--i360-line-width)}.border-2{border-width:var(--i360-line-width-strong)}.border-t{border-top-width:var(--i360-line-width)}.border-event{border-color:var(--i360-event)}.border-rule{border-color:var(--i360-rule)}.bg-event{background-color:var(--i360-event)}.bg-event-bg{background-color:var(--i360-event-bg)}.bg-hadith-bg{background-color:var(--i360-hadith-bg)}.bg-prayer-bg{background-color:var(--i360-prayer-bg)}.p-md{padding:var(--i360-space-md)}.p-sm{padding:var(--i360-space-sm)}.px-md{padding-left:var(--i360-space-md);padding-right:var(--i360-space-md)}.px-sm{padding-left:var(--i360-space-sm);padding-right:var(--i360-space-sm)}.py-sm{padding-top:var(--i360-space-sm);padding-bottom:var(--i360-space-sm)}.pb-lg{padding-bottom:var(--i360-space-lg)}.pt-md{padding-top:var(--i360-space-md)}.text-center{text-align:center}.text-justify{text-align:justify}.text-end{text-align:end}.text-base{font-size:var(--i360-text-size)}.text-base,.text-lg{line-height:var(--i360-line-height-ui)}.text-lg{font-size:var(--i360-text-size-lg)}.text-sm{font-size:var(--i360-text-size-sm);line-height:var(--i360-line-height-ui)}.font-bold{font-weight:700}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-reading{line-height:var(--i360-line-height)}.tracking-widest{letter-spacing:.1em}.text-event{color:var(--i360-event)}.text-hadith{color:var(--i360-hadith)}.text-page{color:var(--i360-bg)}.text-prayer{color:var(--i360-prayer)}.underline{text-decoration-line:underline}.opacity-0{opacity:0}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:var(--i360-speed-quick)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:var(--i360-speed-quick)}.duration-500{transition-duration:.5s}</style>   <!-- built from src/day.tailwind.js (scripts/build.js) -->
 </head>
 <body class="i360-page min-h-screen flex flex-col items-center">
   <header class="toolbar toolbar-sticky">
@@ -520,12 +657,12 @@ svg[data-lucide] {
       <div class="lang-wrap">
         <button id="btn-lang" type="button" class="toolbar-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-list"><span id="lang-short"></span><svg data-lucide="chevron-down" class="tb-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
         <!-- dir="rtl" keeps the list in a fixed order; each language is written in its own language. -->
-        <div id="lang-list" class="lang-list" dir="rtl" role="group" aria-labelledby="btn-lang" hidden>
-          <button type="button" data-lang="ar" id="lang-ar" lang="ar" class="lang-item">العربية</button>
-          <button type="button" data-lang="ur" id="lang-ur" lang="ur" class="lang-item">اردو</button>
-          <button type="button" data-lang="id" id="lang-id" lang="id" dir="ltr" class="lang-item">Bahasa Indonesia</button>
-          <button type="button" data-lang="tr" id="lang-tr" lang="tr" dir="ltr" class="lang-item">Türkçe</button>
-          <button type="button" data-lang="en" id="lang-en" lang="en" dir="ltr" class="lang-item">English</button>
+        <div id="lang-list" class="lang-list i360-popup" dir="rtl" role="group" aria-labelledby="btn-lang" hidden>
+          <button type="button" data-lang="ar" id="lang-ar" lang="ar" class="i360-list-item">العربية</button>
+          <button type="button" data-lang="ur" id="lang-ur" lang="ur" class="i360-list-item">اردو</button>
+          <button type="button" data-lang="id" id="lang-id" lang="id" dir="ltr" class="i360-list-item">Bahasa Indonesia</button>
+          <button type="button" data-lang="tr" id="lang-tr" lang="tr" dir="ltr" class="i360-list-item">Türkçe</button>
+          <button type="button" data-lang="en" id="lang-en" lang="en" dir="ltr" class="i360-list-item">English</button>
         </div>
       </div>
     </div>
@@ -543,7 +680,7 @@ svg[data-lucide] {
 
   <main id="cards" class="cards">
     <div class="cards-col" id="col-a">
-    <section id="quran-card" class="glass-card opacity-0 translate-y-4 transition-all duration-500">
+    <section id="quran-card" class="glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
       <div class="flex items-center gap-sm mb-md">
         <span class="bg-quran-soft text-quran p-sm rounded-lg"><svg data-lucide="moon-star" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5h4"></path><path d="M20 3v4"></path><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></span>
         <h2 data-i18n="quranLabel" class="text-sm font-bold uppercase tracking-widest text-quran">Quranic Verse</h2>
@@ -553,10 +690,10 @@ svg[data-lucide] {
         <p data-target="quran-translation" class="text-base leading-reading italic text-custom-secondary text-justify"></p>
         <p data-target="quran-ref" class="text-base font-bold text-quran border-t border-rule pt-md"></p>
       </div>
-      <div data-status="quran" class="hidden items-center gap-sm text-sm text-custom-secondary mt-md"><span data-status-text></span><button data-retry type="button" class="underline font-bold"></button></div>
+      <div data-status="quran" class="hidden items-center gap-sm text-sm text-custom-secondary mt-md"><span data-status-text></span><button data-retry type="button" class="i360-btn i360-btn-sm"></button></div>
     </section>
 
-    <section id="hadith-card" class="glass-card opacity-0 translate-y-4 transition-all duration-500">
+    <section id="hadith-card" class="glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
       <div class="flex items-center gap-sm mb-md">
         <span class="bg-hadith-bg text-hadith p-sm rounded-lg"><svg data-lucide="book-open" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v16"></path><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"></path></svg></span>
         <h2 data-i18n="hadithLabel" class="text-base font-bold uppercase tracking-widest text-hadith">Hadith</h2>
@@ -576,41 +713,41 @@ svg[data-lucide] {
           <p class="font-bold text-sm"><span data-i18n="sourceLabel">Source</span>: <a data-target="hadith-link" href="https://hadeethenc.com/" target="_blank" rel="noopener noreferrer" class="underline">HadeethEnc.com</a></p>
         </div>
       </div>
-      <div data-status="hadith" class="hidden items-center gap-sm text-sm text-custom-secondary mt-md"><span data-status-text></span><button data-retry type="button" class="underline font-bold"></button></div>
+      <div data-status="hadith" class="hidden items-center gap-sm text-sm text-custom-secondary mt-md"><span data-status-text></span><button data-retry type="button" class="i360-btn i360-btn-sm"></button></div>
     </section>
 
     </div>
     <div class="cards-col" id="col-b">
-    <section id="prayer-card" class="glass-card opacity-0 translate-y-4 transition-all duration-500">
+    <section id="prayer-card" class="glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
       <div class="flex items-center gap-sm mb-md">
         <span class="bg-prayer-bg text-prayer p-sm rounded-lg"><svg data-lucide="clock" class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></span>
         <h2 data-i18n="prayerLabel" class="text-base font-bold uppercase tracking-widest text-prayer">Prayer Times</h2>
       </div>
       <div data-target="prayer-grid" class="grid grid-cols-3 gap-sm mb-md"></div>
-      <div data-status="prayer" class="hidden items-center gap-sm text-sm text-custom-secondary mb-md"><span data-status-text></span><button data-retry type="button" class="underline font-bold"></button></div>
-      <div class="flex flex-wrap gap-md text-sm text-custom-secondary inset-item p-md">
+      <div data-status="prayer" class="hidden items-center gap-sm text-sm text-custom-secondary mb-md"><span data-status-text></span><button data-retry type="button" class="i360-btn i360-btn-sm"></button></div>
+      <div class="flex flex-wrap gap-md text-sm text-custom-secondary i360-inset p-md">
         <div class="flex flex-col gap-xs flex-auto">
           <p><span class="font-bold" data-i18n="methodLabel">Method:</span> <span data-target="meta-method">...</span></p>
           <p class="flex flex-wrap items-center gap-xs"><span class="font-bold" data-i18n="madhabLabel">Madhab:</span>
-            <button type="button" id="school-0" data-school="0" data-i18n="schoolStd" class="px-sm py-xs rounded-lg font-bold"></button>
-            <button type="button" id="school-1" data-school="1" data-i18n="schoolHanafi" class="px-sm py-xs rounded-lg font-bold"></button>
+            <button type="button" id="school-0" data-school="0" class="i360-chip" aria-pressed="false"><span class="i360-chip-box"></span><span data-i18n="schoolStd"></span></button>
+            <button type="button" id="school-1" data-school="1" class="i360-chip" aria-pressed="false"><span class="i360-chip-box"></span><span data-i18n="schoolHanafi"></span></button>
           </p>
         </div>
         <div class="flex flex-col gap-xs flex-auto">
           <p class="flex flex-wrap items-center gap-xs"><span class="font-bold" data-i18n="locLabel">Location:</span> <span data-target="meta-location">...</span>
-            <button type="button" id="city-change" data-i18n="cityChange" aria-expanded="false" aria-controls="city-picker" class="px-sm py-xs rounded-lg font-bold underline"></button></p>
+            <button type="button" id="city-change" data-i18n="cityChange" aria-expanded="false" aria-controls="city-picker" class="i360-btn i360-btn-sm"></button></p>
           <p><span class="font-bold" data-i18n="tzLabel">Timezone:</span> <span data-target="meta-timezone">...</span></p>
         </div>
       </div>
       <!-- The city picker: Open-Meteo's place search (GeoNames data), asked only from here. -->
-      <div id="city-picker" class="hidden mt-md inset-item p-md flex-col gap-sm">
-        <input id="city-search" type="search" autocomplete="off" spellcheck="false" class="w-full rounded-lg px-sm py-sm text-base bg-transparent border border-current text-custom-secondary">
+      <div id="city-picker" class="hidden mt-md i360-inset p-md flex-col gap-sm">
+        <input id="city-search" type="search" autocomplete="off" spellcheck="false" class="i360-field i360-field-search w-full px-md py-sm">
         <p data-target="city-status" class="text-sm text-custom-secondary" role="status" aria-live="polite"></p>
         <div data-target="city-results" class="flex flex-col gap-xs" role="listbox"></div>
       </div>
     </section>
 
-    <section id="events-card" class="glass-card opacity-0 translate-y-4 transition-all duration-500">
+    <section id="events-card" class="glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
       <div class="flex items-center gap-sm mb-md">
         <span class="bg-event-bg text-event p-sm rounded-lg"><svg data-lucide="calendar-check" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="m9 15 2 2 4-4"></path></svg></span>
         <h2 data-i18n="eventsLabel" class="text-base font-bold uppercase tracking-widest text-event">Upcoming Events</h2>
@@ -2808,7 +2945,7 @@ svg[data-lucide] {
       this.input.setAttribute("aria-label", L.citySearch);
       UI.set("city-status", { loading: L.loading, none: L.cityNone, error: L.loadError }[this.state] || "");
       const row = (label2, sub, on, pick) => {
-        const b = mk("button", `text-start px-sm py-sm rounded-lg text-base ${on ? "active-btn" : "text-custom-secondary"}`);
+        const b = mk("button", `i360-list-item${on ? " active-btn" : ""}`);
         b.type = "button";
         b.setAttribute("role", "option");
         b.setAttribute("aria-selected", on);
@@ -3028,7 +3165,6 @@ svg[data-lucide] {
         const b = document.getElementById(`school-${s}`);
         if (!b) return;
         const on = App.school === s;
-        b.classList.toggle("active-btn", on);
         b.setAttribute("aria-pressed", on);
       });
     },
@@ -3109,7 +3245,7 @@ svg[data-lucide] {
       if (!next) next = "Fajr";
       grid.replaceChildren(...CONFIG.P_KEYS.map((k, i) => {
         const isNext = k === next, m = /(\d{1,2}):(\d{2})/.exec(t[k] || "");
-        const box = mk("div", `flex flex-col items-center p-sm transition-all ${isNext ? "next-prayer-highlight" : "inset-item"}`);
+        const box = mk("div", `flex flex-col items-center p-sm transition-all ${isNext ? "next-prayer-highlight" : "i360-inset"}`);
         box.append(
           mk("span", `text-sm font-bold ${isNext ? "text-accent" : "text-custom-secondary"}`, L.prayers[i]),
           mk("span", `text-base font-bold mt-xs ${isNext ? "text-accent" : "text-custom-secondary"}`, m ? m[0] : "—")
@@ -3132,7 +3268,7 @@ svg[data-lucide] {
       const L = this.L, lang = App.lang, h = App.state.hijri, list = this.targets["events-list"];
       if (!h || !list) return;
       list.replaceChildren(...Hijri.events(h).map((e) => {
-        const row = mk("div", `flex justify-between items-center gap-md p-md transition-all ${e.isT ? "border-2 border-event bg-event-bg rounded-lg" : "inset-item"}`);
+        const row = mk("div", `flex justify-between items-center gap-md p-md transition-all ${e.isT ? "border-2 border-event bg-event-bg rounded-lg" : "i360-inset"}`);
         const left = mk("div", "flex-1"), title = mk("div", "flex items-center gap-sm");
         title.append(mk("span", "text-base font-bold text-custom-secondary", L.events[e.id]));
         if (e.isT) title.append(mk("span", "bg-event text-page text-sm font-bold px-sm rounded-full", L.todayLabel));

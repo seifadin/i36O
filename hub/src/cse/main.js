@@ -66,10 +66,11 @@ i360Theme.onChange(({ choice }) => {
 function setStatus(text, { error = false, retry = null } = {}) {
   statusEl.textContent = '';
   statusEl.classList.toggle('error', error);
+  statusEl.classList.toggle('i360-banner', error);
   if (text) statusEl.append(fmt(text));
   if (retry) {
     const b = document.createElement('button');
-    b.type = 'button'; b.className = 'retry'; b.textContent = T.retry;
+    b.type = 'button'; b.className = 'retry i360-btn i360-btn-sm'; b.textContent = T.retry;
     b.addEventListener('click', retry);
     statusEl.append(b);
   }
@@ -208,7 +209,7 @@ function summaryLine(name) {
 
 function makeMajor(ctx, M) {
   const el = document.createElement('details');
-  el.className = 'major';
+  el.className = 'major i360-card';
   const { summary, count } = summaryLine(M.major);
   const body = document.createElement('div');
   body.className = 'major-body';
@@ -241,7 +242,7 @@ function makeGroup(ctx, U, m) {
   let el, count = null;
   if (details) {
     el = document.createElement('details');
-    el.className = 'inter';
+    el.className = 'inter i360-inset';
     const line = summaryLine(U.name);
     count = line.count;
     const body = document.createElement('div');
@@ -345,7 +346,7 @@ function drawFoot(ctx, g) {
   if (g.done && g.shown === 0) { g.foot.textContent = T.noMatches; return; }
   if (g.done) return;
   const b = document.createElement('button');
-  b.type = 'button'; b.className = 'more-btn'; b.textContent = T.more;
+  b.type = 'button'; b.className = 'i360-btn i360-btn-sm'; b.textContent = T.more;
   b.addEventListener('click', () => loadMore(ctx, g));
   g.foot.append(b);
 }
@@ -354,7 +355,7 @@ function showGroupError(ctx, g) {
   g.foot.textContent = '';
   g.foot.append(T.searchError);
   const b = document.createElement('button');
-  b.type = 'button'; b.className = 'more-btn'; b.textContent = T.retry;
+  b.type = 'button'; b.className = 'i360-btn i360-btn-sm'; b.textContent = T.retry;
   b.addEventListener('click', () => loadMore(ctx, g));
   g.foot.append(b);
 }
@@ -399,7 +400,7 @@ function addHit(ctx, g, hit) {
   const block = sourceBlock(ctx, g, hit.source);
   const sn = hit.snippets[0];
   const a = document.createElement('a');
-  a.className = 'hit';
+  a.className = 'hit i360-list-item';
   const link = CseView.resultLink(hit, ctx.q, sn ? sn.hit : '');
   const toReader = link.startsWith(CseView.READER);
   a.href = link;

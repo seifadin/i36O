@@ -54,11 +54,11 @@
 
     /* Icons: Lucide (lucide.dev, ISC licence), drawn inline; checked by scripts/icons.js. Their
        sizes here; their drawing style for every page: src/page-chrome.css. */
-    .status-icon svg, .floating-btn svg, .panel-btn svg { width: var(--i360-icon-size); height: var(--i360-icon-size); }
+    .status-icon svg, .floating-btn svg { width: var(--i360-icon-size); height: var(--i360-icon-size); }
     #btn-bookmark[aria-pressed="true"] svg { fill: var(--i360-ribbon); stroke: var(--i360-ribbon); }
     #btn-bookmark[aria-pressed="true"] { background-color: transparent; }
 
-    .text-size-btn { font-weight: 700; font-family: 'Amiri', serif; gap: 0; }
+    .text-size-btn { font-weight: 700; font-family: var(--i360-font); gap: 0; }
     .text-size-btn small { font-size: 0.75em; font-weight: 700; }
 
     .page-counter {
@@ -70,19 +70,13 @@
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
+    /* Their look: .i360-field (src/page-chrome.css). */
     .page-input, .vol-select {
       height: 1.75rem;
-      border: var(--i360-line-width) solid var(--i360-border);
-      border-radius: var(--i360-radius-lg);
       font-size: var(--i360-text-size-sm);
-      font-family: inherit;
-      color: var(--i360-text);
-      outline: none;
-      background-color: var(--i360-input);
     }
     .page-input { width: 3.4rem; text-align: center; }
     .vol-select { padding: 0 var(--i360-space-xs); max-width: 5.5rem; }
-    .page-input:focus, .vol-select:focus { border-color: var(--i360-focus); box-shadow: var(--i360-focus-ring); outline: none; }
 
     /* Connection: green online (the theme's Quran green, in every theme), red offline (live). Its words show only inside the ⋮ menu. */
     .status-icon { display: flex; align-items: center; gap: var(--i360-space-sm); padding: 0 var(--i360-space-xs); color: var(--i360-quran); font-size: var(--i360-text-size-sm); }
@@ -148,14 +142,7 @@
       width: var(--page-w);
       max-width: 100%;
       margin: 0 auto var(--container-gap);
-      background-color: var(--i360-banner-bg);
-      border: var(--i360-line-width) solid var(--i360-banner-border);
-      color: var(--i360-banner-text);
-      padding: var(--i360-space-sm) var(--i360-space-md);
-      border-radius: var(--i360-radius-lg);
-      font-size: var(--i360-text-size-sm);
-      line-height: var(--i360-line-height-ui);
-      display: none;
+      display: none;   /* its look: .i360-banner */
       align-items: flex-start;
       gap: var(--i360-space-md);
     }
@@ -229,8 +216,8 @@
     .page-content { flex: 1; display: flex; flex-direction: column; }
     .markdown-body { flex: 1; }
 
-    .page-sheet[dir="rtl"] { direction: rtl; font-family: 'Amiri', serif; }
-    .page-sheet[dir="ltr"] { direction: ltr; font-family: 'Amiri', Georgia, serif; }
+    .page-sheet[dir="rtl"] { direction: rtl; font-family: var(--i360-font); }
+    .page-sheet[dir="ltr"] { direction: ltr; font-family: var(--i360-font); }
 
     .page-sheet h1, .page-sheet h2, .page-sheet h3, .page-sheet h4, .page-sheet h5, .page-sheet h6 {
       margin-top: 1.1em;
@@ -303,7 +290,7 @@
     .page-sheet p.figure-label {
       display: inline-block;
       text-align: start;
-      font-family: 'Amiri', serif;
+      font-family: var(--i360-font);
       font-size: 0.95em;
       color: var(--i360-muted);
       border: var(--i360-line-width) dashed var(--i360-rule);
@@ -358,7 +345,7 @@
       align-items: center;
       justify-content: center;
       color: var(--i360-muted);
-      font-family: 'Amiri', serif;
+      font-family: var(--i360-font);
       font-size: var(--i360-text-size);
       border: var(--i360-line-width) dashed var(--i360-rule);
       border-radius: var(--i360-radius-lg);
@@ -373,7 +360,7 @@
       padding-top: var(--i360-space-sm);
       margin-top: var(--i360-space-md);
       border-top: var(--i360-line-width) dashed var(--i360-rule);
-      font-family: 'Amiri', serif;
+      font-family: var(--i360-font);
       font-variant-numeric: tabular-nums;
     }
 
@@ -383,43 +370,16 @@
       top: calc(var(--toolbar-h) + var(--i360-space-sm) + env(safe-area-inset-top));
       inset-inline-end: var(--i360-space-md);
       width: min(26rem, calc(100vw - 1.5rem));
-      background-color: var(--i360-surface);
-      border: var(--i360-line-width) solid var(--i360-border);
-      border-radius: var(--i360-radius-lg);
-      padding: var(--i360-space-sm);
-      display: none;
+      display: none;   /* its look: .i360-popup */
       flex-direction: column;
       gap: var(--i360-space-sm);
-      box-shadow: var(--i360-popup-shadow);
       z-index: var(--i360-layer-popup);
     }
     .search-popup.active { display: flex; }
     .search-row { display: flex; align-items: center; gap: var(--i360-space-xs); }
-    .search-input {
-      flex: 1;
-      min-width: 0;
-      border: var(--i360-line-width) solid var(--i360-border);
-      border-radius: var(--i360-radius-lg);
-      padding: var(--i360-space-xs) var(--i360-space-sm);
-      font-size: var(--i360-text-size);
-      font-family: inherit;
-      background: var(--i360-input);
-      color: var(--i360-text);
-      outline: none;
-    }
-    .search-input:focus { border-color: var(--i360-focus); }
+    .search-input { flex: 1; min-width: 0; padding: var(--i360-space-xs) var(--i360-space-md); }   /* its look: .i360-field */
     .search-count { font-size: var(--i360-text-size-sm); color: var(--i360-muted); min-width: 3.6rem; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .opt-btn {
-      border: var(--i360-line-width) solid var(--i360-border);
-      background: transparent;
-      color: var(--i360-icon);
-      border-radius: var(--i360-radius-full);
-      padding: var(--i360-space-xs) var(--i360-space-sm);
-      font-size: var(--i360-text-size-sm);
-      font-family: inherit;
-      cursor: pointer;
-    }
-    .opt-btn[aria-pressed="true"] { background: var(--i360-active); color: var(--i360-icon-hover); border-color: var(--i360-focus); }
+    /* The options: .i360-chip. */
     .search-results {
       list-style: none;
       max-height: min(45vh, 22rem);
@@ -428,22 +388,8 @@
       margin: 0 calc(-1 * var(--i360-space-sm)) calc(-1 * var(--i360-space-sm));
       padding: var(--i360-space-xs) 0;
     }
-    .search-results button {
-      display: block;
-      width: 100%;
-      text-align: start;
-      background: transparent;
-      border: none;
-      color: var(--i360-text);
-      padding: var(--i360-space-sm);
-      font-family: 'Amiri', serif;
-      font-size: var(--i360-text-size);
-      line-height: var(--i360-line-height-ui);
-      cursor: pointer;
-    }
-    .search-results button:hover, .search-results li.active button { background: var(--i360-hover); }
-    .search-results .res-page { display: block; font-family: 'Amiri', serif; font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
-    .search-results mark { background: var(--i360-highlight); color: inherit; border-radius: var(--i360-radius-sm); }
+    /* Each result: .i360-list-item. */
+    .search-results .res-page { display: block; font-family: var(--i360-font); font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
     .search-results .res-more { padding: var(--i360-space-sm); font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
 
     ::highlight(search) { background-color: var(--i360-highlight); color: inherit; }
@@ -488,40 +434,12 @@
       cursor: pointer;
     }
     .panel-tab[aria-selected="true"] { background: var(--i360-active); color: var(--i360-heading); }
-    .panel-btn {
-      border: none;
-      background: transparent;
-      color: var(--i360-icon);
-      width: 2rem;
-      height: 2rem;
-      border-radius: var(--i360-radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .panel-btn:hover { background: var(--i360-hover); color: var(--i360-icon-hover); }
+    /* Its close and remove buttons: .toolbar-btn. */
     .panel-body { flex: 1; overflow-y: auto; padding: var(--i360-space-xs) 0; }
     .panel-list { list-style: none; }
-    .panel-item {
-      display: flex;
-      align-items: baseline;
-      gap: var(--i360-space-sm);
-      width: 100%;
-      text-align: start;
-      background: transparent;
-      border: none;
-      color: var(--i360-text);
-      padding: var(--i360-space-sm) var(--i360-space-md);
-      font-family: 'Amiri', serif;
-      font-size: var(--i360-text-size);
-      line-height: var(--i360-line-height-ui);
-      cursor: pointer;
-    }
-    .panel-item:hover, .panel-item.current { background: var(--i360-hover); }
+    .panel-item { display: flex; align-items: baseline; gap: var(--i360-space-sm); padding: var(--i360-space-sm) var(--i360-space-md); }   /* its look: .i360-list-item */
     .panel-item .item-text { flex: 1; min-width: 0; }
-    .panel-item .item-page { font-family: 'Amiri', serif; font-size: var(--i360-text-size-sm); color: var(--i360-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .panel-item .item-page { font-family: var(--i360-font); font-size: var(--i360-text-size-sm); color: var(--i360-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
     .panel-item.lvl-1, .panel-item.lvl-2 { font-weight: 700; }
     .panel-item.lvl-3 { padding-inline-start: calc(2 * var(--i360-space-md)); }
     .panel-item.lvl-4 { padding-inline-start: calc(3 * var(--i360-space-md)); }
@@ -553,17 +471,11 @@
     body.reading .floating-btn { display: flex; }
 
     /* ---------- Toast ---------- */
-    .toast {
+    .toast {   /* its look: .i360-toast */
       position: fixed;
       bottom: calc(var(--i360-space-md) + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
-      background: var(--i360-toast);
-      color: var(--i360-toast-text);
-      padding: var(--i360-space-sm) var(--i360-space-md);
-      border-radius: var(--i360-radius-full);
-      font-size: var(--i360-text-size-sm);
-      z-index: var(--i360-layer-toast);
       opacity: 0;
       pointer-events: none;
       transition: opacity var(--i360-speed);
@@ -627,8 +539,8 @@
           <svg data-lucide="chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>
         </button>
         <div class="page-counter">
-          <select id="vol-select" class="vol-select" hidden></select>
-          <input type="text" inputmode="numeric" autocomplete="off" id="page-num-input" class="page-input" value="">
+          <select id="vol-select" class="vol-select i360-field" hidden></select>
+          <input type="text" inputmode="numeric" autocomplete="off" id="page-num-input" class="page-input i360-field" value="">
           <span id="lbl-of">of</span>
           <span id="total-pages">0</span>
           <span id="page-pos" class="page-pos"></span>
@@ -691,9 +603,9 @@
   </div>
 
   <!-- Search -->
-  <div class="search-popup" id="search-popup" role="search">
+  <div class="search-popup i360-popup" id="search-popup" role="search">
     <div class="search-row">
-      <input type="search" id="search-input" class="search-input" autocomplete="off" enterkeyhint="search">
+      <input type="search" id="search-input" class="search-input i360-field i360-field-search" autocomplete="off" enterkeyhint="search">
       <span class="search-count" id="search-count" aria-live="polite">0 of 0</span>
       <button class="toolbar-btn" id="btn-search-prev" type="button">
         <svg data-lucide="chevron-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"></path></svg>
@@ -709,8 +621,8 @@
       </button>
     </div>
     <div class="search-row">
-      <button class="opt-btn" id="opt-diacritics" type="button" aria-pressed="false"></button>
-      <button class="opt-btn" id="opt-word" type="button" aria-pressed="false"></button>
+      <button class="i360-chip" id="opt-diacritics" type="button" aria-pressed="false"><span class="i360-chip-box"></span><span class="chip-label"></span></button>
+      <button class="i360-chip" id="opt-word" type="button" aria-pressed="false"><span class="i360-chip-box"></span><span class="chip-label"></span></button>
     </div>
     <ol class="search-results" id="search-results" hidden></ol>
   </div>
@@ -720,7 +632,7 @@
     <div class="panel-head" role="tablist">
       <button class="panel-tab" id="tab-contents" type="button" role="tab" aria-selected="true"></button>
       <button class="panel-tab" id="tab-bookmarks" type="button" role="tab" aria-selected="false"></button>
-      <button class="panel-btn" id="btn-panel-close" type="button">
+      <button class="toolbar-btn" id="btn-panel-close" type="button">
         <svg data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
       </button>
     </div>
@@ -731,12 +643,12 @@
     <svg data-lucide="minimize" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
   </button>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast i360-toast" id="toast" role="status" aria-live="polite"></div>
 
   <input type="file" id="file-input" accept=".md,.markdown,.txt,text/markdown,text/plain">
 
   <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
-    <div class="missing-pages-banner" id="missing-pages-banner" role="status">
+    <div class="missing-pages-banner i360-banner" id="missing-pages-banner" role="status">
       <svg data-lucide="triangle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>
     </div>

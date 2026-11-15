@@ -152,7 +152,7 @@ function StatusPill({ busy, text }: { busy?: boolean; text: string }) {
   return (
     <div
       role="status"
-      className={`fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+7rem)] z-toast mx-auto flex w-fit items-center gap-sm rounded-full ${busy ? 'bg-brand-blue' : 'bg-brand-green'} px-md py-sm text-sm font-bold text-brand-on-accent shadow-popup`}
+      className="i360-toast fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+7rem)] mx-auto w-fit"
     >
       {busy ? <LoaderCircle className="animate-spin" /> : <CircleCheck />}
       <span>{text}</span>
@@ -258,10 +258,13 @@ export default function ScienceGrid() {
         <button
           type="button"
           onClick={() => setErrorDialogOpen(true)}
-          className="flex w-full items-center justify-center gap-sm p-md text-center text-base"
+          // Failed: the shared notice (.i360-banner), as the hub pages' errors; retrying: plain status text.
+          className={loading
+            ? 'flex w-full items-center justify-center gap-sm p-md text-center text-base'
+            : 'i360-banner m-md flex w-[calc(100%-2*var(--i360-space-md,1rem))] items-center justify-center gap-sm text-center'}
         >
           {loading && <LoaderCircle className="animate-spin text-brand-muted" />}
-          <span className={loading ? 'text-brand-muted' : 'text-brand-danger underline'}>
+          <span className={loading ? 'text-brand-muted' : undefined}>
             {loading ? (isRetrying ? 'يُعاد المحاولة...' : 'جارٍ التحميل...') : lastFailure.message}
           </span>
         </button>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-RIEWnbe+8CtfU//udAyri50K9vQoK7qGuPjoau6KFhk='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-0pdoRGfnONQaNNJLQsdLYrNQJHJ+cHeQH3o94C3Eg1I='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -412,9 +412,10 @@
 /* Keyboard focus: one ring, shown only when a control is reached by keyboard — a thin gap in the
    page colour, then the focus colour, so it shows on a filled button too (a ring, not an outline:
    some WebViews draw outlines square on rounded buttons). On every toolbar button, and on every
-   control of the hub pages (<body class="i360-page">; text boxes keep their own focus border).
-   The app's other controls keep their own rings (Tailwind's). */
+   control of the hub pages (<body class="i360-page">) and on the shared components below in the
+   app too (text boxes show the field focus instead). */
 .toolbar-btn:focus-visible,
+:is(.i360-btn, .i360-chip, .i360-list-item):focus-visible,
 .i360-page :is(button, a, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: none;
   box-shadow: 0 0 0 var(--i360-line-width-strong, 2px) var(--i360-bg, #FAF7F2), 0 0 0 calc(2 * var(--i360-line-width-strong, 2px)) var(--toolbar-focus);
@@ -478,6 +479,146 @@ svg[data-lucide] {
 .toolbar-densest { --toolbar-btn-min: 1.6rem; --toolbar-pad: var(--i360-space-xs, 0.25rem); }
 .toolbar-densest .toolbar-btn { padding: 0; }
 .toolbar-densest .tb-start > .divider { display: none; }
+
+/* ---------- Shared components (i360-hub.md §10 "Components") ----------
+   One look for each piece that more than one page has, in the hub pages and the app alike. A page
+   sets only where a piece sits and how big it is (width, height, outer spacing); never its look. */
+
+/* Text box. A search box is a pill (.i360-field-search), as on Android and iOS; other boxes take the
+   usual corners. Focus: the focus colour and the theme's focus glow — on the box itself, or on a box
+   that holds the input (the app's search bar). */
+.i360-field {
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  background: var(--i360-input, #FAF7F2);
+  color: var(--i360-text, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  outline: none;
+}
+.i360-field-search { border-radius: var(--i360-radius-full, 999px); }
+.i360-field::placeholder, .i360-field ::placeholder { color: var(--i360-muted, #5A62C9); }
+.i360-field:focus, .i360-field:focus-within { border-color: var(--i360-focus, #0010CF); box-shadow: var(--i360-focus-ring, 0 0 0 3px rgba(0, 16, 207, 0.25)); }
+
+/* An on/off option (or one of a set): a pill with a tick box, so its state shows by more than colour.
+   [type] alongside: Tailwind's reset (Daily Reflection, the app) clears [type="button"] backgrounds
+   after this file, at the same weight; the attribute keeps ours. */
+.i360-chip, .i360-chip[type] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--i360-space-xs, 0.25rem);
+  padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-full, 999px);
+  background: var(--i360-surface, #FAF7F2);
+  color: var(--i360-text, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  cursor: pointer;
+}
+.i360-chip[aria-pressed="true"] { background: var(--i360-active, #EEF2FF); border-color: var(--i360-focus, #0010CF); color: var(--i360-heading, #0010CF); }
+.i360-chip-box {
+  width: 0.9rem; height: 0.9rem; flex-shrink: 0;
+  border: var(--i360-line-width, 1px) solid currentColor; border-radius: var(--i360-radius-sm, 0.25rem);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; line-height: 1;
+}
+.i360-chip[aria-pressed="true"] .i360-chip-box::after { content: '✓'; }
+
+/* Buttons: pills, as on Android and iOS. Outlined by default; filled (.i360-btn-primary) for the main
+   action; .i360-btn-sm for small ones beside text (retry, more). */
+.i360-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-full, 999px);
+  background: transparent;
+  color: var(--i360-accent, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  font-weight: 700;
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-decoration: none;
+  cursor: pointer;
+}
+.i360-btn:hover:not(:disabled) { background: var(--i360-hover, #EEF2FF); }
+.i360-btn-primary, .i360-btn-primary[type], .i360-btn-primary:hover:not(:disabled) { background: var(--i360-accent, #0010CF); border-color: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
+.i360-btn-sm { padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem); font-size: var(--i360-text-size-sm, 0.875rem); }
+.i360-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
+
+/* A row in a list or menu. Hover (or the keyboard's current row, .active): the hover colour; the chosen
+   one (aria-selected, or Daily Reflection's .active-btn): the accent. */
+.i360-list-item {
+  display: block;
+  width: 100%;
+  text-align: start;
+  background: transparent;
+  border: 0;
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  color: var(--i360-text, #0010CF);
+  padding: var(--i360-space-sm, 0.5rem);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-decoration: none;
+  cursor: pointer;
+}
+.i360-list-item:hover, .i360-list-item.active, .i360-list-item.current { background: var(--i360-hover, #EEF2FF); }
+.i360-list-item[aria-selected="true"], .i360-list-item.active-btn { background: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
+
+/* Floating surfaces: pop-ups, menus, dialogs, tooltips (the toolbar's ⋮ menu above has the same look). */
+.i360-popup {
+  background: var(--i360-surface, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
+  padding: var(--i360-space-sm, 0.5rem);
+}
+
+/* A short message that comes and goes. */
+.i360-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  border-radius: var(--i360-radius-full, 999px);
+  background: var(--i360-toast, #1e293b);
+  color: var(--i360-toast-text, #f8fafc);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
+  z-index: var(--i360-layer-toast, 60);
+}
+
+/* A notice (an error, missing pages). */
+.i360-banner {
+  background: var(--i360-banner-bg, #fef2f2);
+  border: var(--i360-line-width, 1px) solid var(--i360-banner-border, #fecaca);
+  color: var(--i360-banner-text, #991b1b);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+}
+
+/* A box around a section (.i360-card), and a box inside one (.i360-inset). */
+.i360-card {
+  background: var(--i360-bg, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--i360-rule, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  box-shadow: var(--i360-page-shadow, 0 4px 6px -1px rgba(0, 16, 207, 0.08), 0 2px 4px -1px rgba(0, 16, 207, 0.05));
+}
+.i360-inset {
+  background: var(--i360-quote, #F4F0E8);
+  border: var(--i360-line-width, 1px) solid var(--i360-rule, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+}
+
+/* Search matches. */
+mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); color: inherit; border-radius: var(--i360-radius-sm, 0.25rem); }
     /* The bar and everything in it: src/page-chrome.css. Here: its place among the Reader's layers,
        and its own content — the page arrows and number, the connection icon, «فتح ملف». */
     .toolbar { z-index: var(--i360-layer-bar); }
@@ -492,11 +633,11 @@ svg[data-lucide] {
 
     /* Icons: Lucide (lucide.dev, ISC licence), drawn inline; checked by scripts/icons.js. Their
        sizes here; their drawing style for every page: src/page-chrome.css. */
-    .status-icon svg, .floating-btn svg, .panel-btn svg { width: var(--i360-icon-size); height: var(--i360-icon-size); }
+    .status-icon svg, .floating-btn svg { width: var(--i360-icon-size); height: var(--i360-icon-size); }
     #btn-bookmark[aria-pressed="true"] svg { fill: var(--i360-ribbon); stroke: var(--i360-ribbon); }
     #btn-bookmark[aria-pressed="true"] { background-color: transparent; }
 
-    .text-size-btn { font-weight: 700; font-family: 'Amiri', serif; gap: 0; }
+    .text-size-btn { font-weight: 700; font-family: var(--i360-font); gap: 0; }
     .text-size-btn small { font-size: 0.75em; font-weight: 700; }
 
     .page-counter {
@@ -508,19 +649,13 @@ svg[data-lucide] {
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
+    /* Their look: .i360-field (src/page-chrome.css). */
     .page-input, .vol-select {
       height: 1.75rem;
-      border: var(--i360-line-width) solid var(--i360-border);
-      border-radius: var(--i360-radius-lg);
       font-size: var(--i360-text-size-sm);
-      font-family: inherit;
-      color: var(--i360-text);
-      outline: none;
-      background-color: var(--i360-input);
     }
     .page-input { width: 3.4rem; text-align: center; }
     .vol-select { padding: 0 var(--i360-space-xs); max-width: 5.5rem; }
-    .page-input:focus, .vol-select:focus { border-color: var(--i360-focus); box-shadow: var(--i360-focus-ring); outline: none; }
 
     /* Connection: green online (the theme's Quran green, in every theme), red offline (live). Its words show only inside the ⋮ menu. */
     .status-icon { display: flex; align-items: center; gap: var(--i360-space-sm); padding: 0 var(--i360-space-xs); color: var(--i360-quran); font-size: var(--i360-text-size-sm); }
@@ -586,14 +721,7 @@ svg[data-lucide] {
       width: var(--page-w);
       max-width: 100%;
       margin: 0 auto var(--container-gap);
-      background-color: var(--i360-banner-bg);
-      border: var(--i360-line-width) solid var(--i360-banner-border);
-      color: var(--i360-banner-text);
-      padding: var(--i360-space-sm) var(--i360-space-md);
-      border-radius: var(--i360-radius-lg);
-      font-size: var(--i360-text-size-sm);
-      line-height: var(--i360-line-height-ui);
-      display: none;
+      display: none;   /* its look: .i360-banner */
       align-items: flex-start;
       gap: var(--i360-space-md);
     }
@@ -667,8 +795,8 @@ svg[data-lucide] {
     .page-content { flex: 1; display: flex; flex-direction: column; }
     .markdown-body { flex: 1; }
 
-    .page-sheet[dir="rtl"] { direction: rtl; font-family: 'Amiri', serif; }
-    .page-sheet[dir="ltr"] { direction: ltr; font-family: 'Amiri', Georgia, serif; }
+    .page-sheet[dir="rtl"] { direction: rtl; font-family: var(--i360-font); }
+    .page-sheet[dir="ltr"] { direction: ltr; font-family: var(--i360-font); }
 
     .page-sheet h1, .page-sheet h2, .page-sheet h3, .page-sheet h4, .page-sheet h5, .page-sheet h6 {
       margin-top: 1.1em;
@@ -741,7 +869,7 @@ svg[data-lucide] {
     .page-sheet p.figure-label {
       display: inline-block;
       text-align: start;
-      font-family: 'Amiri', serif;
+      font-family: var(--i360-font);
       font-size: 0.95em;
       color: var(--i360-muted);
       border: var(--i360-line-width) dashed var(--i360-rule);
@@ -796,7 +924,7 @@ svg[data-lucide] {
       align-items: center;
       justify-content: center;
       color: var(--i360-muted);
-      font-family: 'Amiri', serif;
+      font-family: var(--i360-font);
       font-size: var(--i360-text-size);
       border: var(--i360-line-width) dashed var(--i360-rule);
       border-radius: var(--i360-radius-lg);
@@ -811,7 +939,7 @@ svg[data-lucide] {
       padding-top: var(--i360-space-sm);
       margin-top: var(--i360-space-md);
       border-top: var(--i360-line-width) dashed var(--i360-rule);
-      font-family: 'Amiri', serif;
+      font-family: var(--i360-font);
       font-variant-numeric: tabular-nums;
     }
 
@@ -821,43 +949,16 @@ svg[data-lucide] {
       top: calc(var(--toolbar-h) + var(--i360-space-sm) + env(safe-area-inset-top));
       inset-inline-end: var(--i360-space-md);
       width: min(26rem, calc(100vw - 1.5rem));
-      background-color: var(--i360-surface);
-      border: var(--i360-line-width) solid var(--i360-border);
-      border-radius: var(--i360-radius-lg);
-      padding: var(--i360-space-sm);
-      display: none;
+      display: none;   /* its look: .i360-popup */
       flex-direction: column;
       gap: var(--i360-space-sm);
-      box-shadow: var(--i360-popup-shadow);
       z-index: var(--i360-layer-popup);
     }
     .search-popup.active { display: flex; }
     .search-row { display: flex; align-items: center; gap: var(--i360-space-xs); }
-    .search-input {
-      flex: 1;
-      min-width: 0;
-      border: var(--i360-line-width) solid var(--i360-border);
-      border-radius: var(--i360-radius-lg);
-      padding: var(--i360-space-xs) var(--i360-space-sm);
-      font-size: var(--i360-text-size);
-      font-family: inherit;
-      background: var(--i360-input);
-      color: var(--i360-text);
-      outline: none;
-    }
-    .search-input:focus { border-color: var(--i360-focus); }
+    .search-input { flex: 1; min-width: 0; padding: var(--i360-space-xs) var(--i360-space-md); }   /* its look: .i360-field */
     .search-count { font-size: var(--i360-text-size-sm); color: var(--i360-muted); min-width: 3.6rem; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .opt-btn {
-      border: var(--i360-line-width) solid var(--i360-border);
-      background: transparent;
-      color: var(--i360-icon);
-      border-radius: var(--i360-radius-full);
-      padding: var(--i360-space-xs) var(--i360-space-sm);
-      font-size: var(--i360-text-size-sm);
-      font-family: inherit;
-      cursor: pointer;
-    }
-    .opt-btn[aria-pressed="true"] { background: var(--i360-active); color: var(--i360-icon-hover); border-color: var(--i360-focus); }
+    /* The options: .i360-chip. */
     .search-results {
       list-style: none;
       max-height: min(45vh, 22rem);
@@ -866,22 +967,8 @@ svg[data-lucide] {
       margin: 0 calc(-1 * var(--i360-space-sm)) calc(-1 * var(--i360-space-sm));
       padding: var(--i360-space-xs) 0;
     }
-    .search-results button {
-      display: block;
-      width: 100%;
-      text-align: start;
-      background: transparent;
-      border: none;
-      color: var(--i360-text);
-      padding: var(--i360-space-sm);
-      font-family: 'Amiri', serif;
-      font-size: var(--i360-text-size);
-      line-height: var(--i360-line-height-ui);
-      cursor: pointer;
-    }
-    .search-results button:hover, .search-results li.active button { background: var(--i360-hover); }
-    .search-results .res-page { display: block; font-family: 'Amiri', serif; font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
-    .search-results mark { background: var(--i360-highlight); color: inherit; border-radius: var(--i360-radius-sm); }
+    /* Each result: .i360-list-item. */
+    .search-results .res-page { display: block; font-family: var(--i360-font); font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
     .search-results .res-more { padding: var(--i360-space-sm); font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
 
     ::highlight(search) { background-color: var(--i360-highlight); color: inherit; }
@@ -926,40 +1013,12 @@ svg[data-lucide] {
       cursor: pointer;
     }
     .panel-tab[aria-selected="true"] { background: var(--i360-active); color: var(--i360-heading); }
-    .panel-btn {
-      border: none;
-      background: transparent;
-      color: var(--i360-icon);
-      width: 2rem;
-      height: 2rem;
-      border-radius: var(--i360-radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .panel-btn:hover { background: var(--i360-hover); color: var(--i360-icon-hover); }
+    /* Its close and remove buttons: .toolbar-btn. */
     .panel-body { flex: 1; overflow-y: auto; padding: var(--i360-space-xs) 0; }
     .panel-list { list-style: none; }
-    .panel-item {
-      display: flex;
-      align-items: baseline;
-      gap: var(--i360-space-sm);
-      width: 100%;
-      text-align: start;
-      background: transparent;
-      border: none;
-      color: var(--i360-text);
-      padding: var(--i360-space-sm) var(--i360-space-md);
-      font-family: 'Amiri', serif;
-      font-size: var(--i360-text-size);
-      line-height: var(--i360-line-height-ui);
-      cursor: pointer;
-    }
-    .panel-item:hover, .panel-item.current { background: var(--i360-hover); }
+    .panel-item { display: flex; align-items: baseline; gap: var(--i360-space-sm); padding: var(--i360-space-sm) var(--i360-space-md); }   /* its look: .i360-list-item */
     .panel-item .item-text { flex: 1; min-width: 0; }
-    .panel-item .item-page { font-family: 'Amiri', serif; font-size: var(--i360-text-size-sm); color: var(--i360-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .panel-item .item-page { font-family: var(--i360-font); font-size: var(--i360-text-size-sm); color: var(--i360-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
     .panel-item.lvl-1, .panel-item.lvl-2 { font-weight: 700; }
     .panel-item.lvl-3 { padding-inline-start: calc(2 * var(--i360-space-md)); }
     .panel-item.lvl-4 { padding-inline-start: calc(3 * var(--i360-space-md)); }
@@ -991,17 +1050,11 @@ svg[data-lucide] {
     body.reading .floating-btn { display: flex; }
 
     /* ---------- Toast ---------- */
-    .toast {
+    .toast {   /* its look: .i360-toast */
       position: fixed;
       bottom: calc(var(--i360-space-md) + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
-      background: var(--i360-toast);
-      color: var(--i360-toast-text);
-      padding: var(--i360-space-sm) var(--i360-space-md);
-      border-radius: var(--i360-radius-full);
-      font-size: var(--i360-text-size-sm);
-      z-index: var(--i360-layer-toast);
       opacity: 0;
       pointer-events: none;
       transition: opacity var(--i360-speed);
@@ -1065,8 +1118,8 @@ svg[data-lucide] {
           <svg data-lucide="chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>
         </button>
         <div class="page-counter">
-          <select id="vol-select" class="vol-select" hidden></select>
-          <input type="text" inputmode="numeric" autocomplete="off" id="page-num-input" class="page-input" value="">
+          <select id="vol-select" class="vol-select i360-field" hidden></select>
+          <input type="text" inputmode="numeric" autocomplete="off" id="page-num-input" class="page-input i360-field" value="">
           <span id="lbl-of">of</span>
           <span id="total-pages">0</span>
           <span id="page-pos" class="page-pos"></span>
@@ -1129,9 +1182,9 @@ svg[data-lucide] {
   </div>
 
   <!-- Search -->
-  <div class="search-popup" id="search-popup" role="search">
+  <div class="search-popup i360-popup" id="search-popup" role="search">
     <div class="search-row">
-      <input type="search" id="search-input" class="search-input" autocomplete="off" enterkeyhint="search">
+      <input type="search" id="search-input" class="search-input i360-field i360-field-search" autocomplete="off" enterkeyhint="search">
       <span class="search-count" id="search-count" aria-live="polite">0 of 0</span>
       <button class="toolbar-btn" id="btn-search-prev" type="button">
         <svg data-lucide="chevron-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"></path></svg>
@@ -1147,8 +1200,8 @@ svg[data-lucide] {
       </button>
     </div>
     <div class="search-row">
-      <button class="opt-btn" id="opt-diacritics" type="button" aria-pressed="false"></button>
-      <button class="opt-btn" id="opt-word" type="button" aria-pressed="false"></button>
+      <button class="i360-chip" id="opt-diacritics" type="button" aria-pressed="false"><span class="i360-chip-box"></span><span class="chip-label"></span></button>
+      <button class="i360-chip" id="opt-word" type="button" aria-pressed="false"><span class="i360-chip-box"></span><span class="chip-label"></span></button>
     </div>
     <ol class="search-results" id="search-results" hidden></ol>
   </div>
@@ -1158,7 +1211,7 @@ svg[data-lucide] {
     <div class="panel-head" role="tablist">
       <button class="panel-tab" id="tab-contents" type="button" role="tab" aria-selected="true"></button>
       <button class="panel-tab" id="tab-bookmarks" type="button" role="tab" aria-selected="false"></button>
-      <button class="panel-btn" id="btn-panel-close" type="button">
+      <button class="toolbar-btn" id="btn-panel-close" type="button">
         <svg data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
       </button>
     </div>
@@ -1169,12 +1222,12 @@ svg[data-lucide] {
     <svg data-lucide="minimize" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
   </button>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="toast i360-toast" id="toast" role="status" aria-live="polite"></div>
 
   <input type="file" id="file-input" accept=".md,.markdown,.txt,text/markdown,text/plain">
 
   <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
-    <div class="missing-pages-banner" id="missing-pages-banner" role="status">
+    <div class="missing-pages-banner i360-banner" id="missing-pages-banner" role="status">
       <svg data-lucide="triangle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>
     </div>
@@ -3851,6 +3904,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
       const li = document.createElement("li");
       const btn = document.createElement("button");
       btn.type = "button";
+      btn.className = "i360-list-item";
       const page = document.createElement("span");
       page.className = "res-page";
       page.textContent = state.format === "plain" ? "" : pageLabelText(state.pages[m.page.idx], tr);
@@ -3877,7 +3931,11 @@ Please report this to https://github.com/markedjs/marked.`, e) {
   function markActiveResult() {
     if (searchResults.hidden) return;
     const items = searchResults.children;
-    for (let i = 0; i < items.length; i++) items[i].classList.toggle("active", i === search.current);
+    for (let i = 0; i < items.length; i++) {
+      items[i].classList.toggle("active", i === search.current);
+      const b = items[i].querySelector("button");
+      if (b) b.classList.toggle("active", i === search.current);
+    }
     const active = items[search.current];
     if (active && active.scrollIntoView) active.scrollIntoView({ block: "nearest" });
   }
@@ -3974,7 +4032,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
   function panelItem(text, pageText, onClick, extraClass) {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "panel-item" + (extraClass ? " " + extraClass : "");
+    btn.className = "i360-list-item panel-item" + (extraClass ? " " + extraClass : "");
     const s1 = document.createElement("span");
     s1.className = "item-text";
     s1.textContent = text;
@@ -4037,7 +4095,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
         li.appendChild(panelItem(pageSummary(idx) || label, label, () => jumpToElement(idx, null)));
         const del = document.createElement("button");
         del.type = "button";
-        del.className = "panel-btn";
+        del.className = "toolbar-btn";
         del.innerHTML = ICON.trash;
         setTitle(del, tr.removeBookmark);
         del.addEventListener("click", () => removeBookmarkAt(idx));
@@ -4474,8 +4532,8 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     setTitle(btnSearchNext, tr.nextMatch);
     setTitle(btnSearchList, tr.showResults);
     setTitle(btnSearchClose, tr.closeSearch);
-    optDiacritics.textContent = tr.matchDiacritics;
-    optWord.textContent = tr.wholeWord;
+    optDiacritics.querySelector(".chip-label").textContent = tr.matchDiacritics;
+    optWord.querySelector(".chip-label").textContent = tr.wholeWord;
     tabContents.textContent = tr.contentsTab;
     tabBookmarks.textContent = tr.bookmarksTab;
     setTitle(btnCopyLink, tr.copyLink);

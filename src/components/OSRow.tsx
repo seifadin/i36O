@@ -138,7 +138,7 @@ function ToggleItem({
         <span className="text-brand-blue" aria-hidden="true">
           {icon}
         </span>
-        <span aria-hidden="true" className={`pointer-events-none absolute -top-7 whitespace-nowrap rounded-lg border border-brand-border bg-brand-ivory px-sm py-xs text-base text-brand-blue shadow-page transition-opacity group-hover:opacity-100 ${
+        <span aria-hidden="true" className={`pointer-events-none absolute -top-7 whitespace-nowrap i360-popup px-sm py-xs text-base text-brand-blue transition-opacity group-hover:opacity-100 ${
           tooltipAlign === 'left' ? 'left-0' : 'left-1/2 -translate-x-1/2'
         } ${
           showTooltip ? 'opacity-100' : 'opacity-0'

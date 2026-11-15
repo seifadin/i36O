@@ -50,7 +50,7 @@ async function jumpToElement(idx, el) {
 function panelItem(text, pageText, onClick, extraClass) {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'panel-item' + (extraClass ? ' ' + extraClass : '');
+  btn.className = 'i360-list-item panel-item' + (extraClass ? ' ' + extraClass : '');
   const s1 = document.createElement('span');
   s1.className = 'item-text';
   s1.textContent = text;
@@ -109,7 +109,7 @@ function renderPanel() {
       li.appendChild(panelItem(pageSummary(idx) || label, label, () => jumpToElement(idx, null)));
       const del = document.createElement('button');
       del.type = 'button';
-      del.className = 'panel-btn';
+      del.className = 'toolbar-btn';
       del.innerHTML = ICON.trash;
       setTitle(del, tr.removeBookmark);
       del.addEventListener('click', () => removeBookmarkAt(idx));

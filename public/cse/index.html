@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-iTLJyfwaZAuCA6DYigm2VCxR5P5i5WHgkrsRwba5pK0='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-YNFzwu7Cy2rkD5LgBx/WgcPKt4BTmv6R7RZj2FcZA7Q='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -414,9 +414,10 @@
 /* Keyboard focus: one ring, shown only when a control is reached by keyboard — a thin gap in the
    page colour, then the focus colour, so it shows on a filled button too (a ring, not an outline:
    some WebViews draw outlines square on rounded buttons). On every toolbar button, and on every
-   control of the hub pages (<body class="i360-page">; text boxes keep their own focus border).
-   The app's other controls keep their own rings (Tailwind's). */
+   control of the hub pages (<body class="i360-page">) and on the shared components below in the
+   app too (text boxes show the field focus instead). */
 .toolbar-btn:focus-visible,
+:is(.i360-btn, .i360-chip, .i360-list-item):focus-visible,
 .i360-page :is(button, a, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: none;
   box-shadow: 0 0 0 var(--i360-line-width-strong, 2px) var(--i360-bg, #FAF7F2), 0 0 0 calc(2 * var(--i360-line-width-strong, 2px)) var(--toolbar-focus);
@@ -480,6 +481,146 @@ svg[data-lucide] {
 .toolbar-densest { --toolbar-btn-min: 1.6rem; --toolbar-pad: var(--i360-space-xs, 0.25rem); }
 .toolbar-densest .toolbar-btn { padding: 0; }
 .toolbar-densest .tb-start > .divider { display: none; }
+
+/* ---------- Shared components (i360-hub.md §10 "Components") ----------
+   One look for each piece that more than one page has, in the hub pages and the app alike. A page
+   sets only where a piece sits and how big it is (width, height, outer spacing); never its look. */
+
+/* Text box. A search box is a pill (.i360-field-search), as on Android and iOS; other boxes take the
+   usual corners. Focus: the focus colour and the theme's focus glow — on the box itself, or on a box
+   that holds the input (the app's search bar). */
+.i360-field {
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  background: var(--i360-input, #FAF7F2);
+  color: var(--i360-text, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  outline: none;
+}
+.i360-field-search { border-radius: var(--i360-radius-full, 999px); }
+.i360-field::placeholder, .i360-field ::placeholder { color: var(--i360-muted, #5A62C9); }
+.i360-field:focus, .i360-field:focus-within { border-color: var(--i360-focus, #0010CF); box-shadow: var(--i360-focus-ring, 0 0 0 3px rgba(0, 16, 207, 0.25)); }
+
+/* An on/off option (or one of a set): a pill with a tick box, so its state shows by more than colour.
+   [type] alongside: Tailwind's reset (Daily Reflection, the app) clears [type="button"] backgrounds
+   after this file, at the same weight; the attribute keeps ours. */
+.i360-chip, .i360-chip[type] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--i360-space-xs, 0.25rem);
+  padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-full, 999px);
+  background: var(--i360-surface, #FAF7F2);
+  color: var(--i360-text, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  cursor: pointer;
+}
+.i360-chip[aria-pressed="true"] { background: var(--i360-active, #EEF2FF); border-color: var(--i360-focus, #0010CF); color: var(--i360-heading, #0010CF); }
+.i360-chip-box {
+  width: 0.9rem; height: 0.9rem; flex-shrink: 0;
+  border: var(--i360-line-width, 1px) solid currentColor; border-radius: var(--i360-radius-sm, 0.25rem);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; line-height: 1;
+}
+.i360-chip[aria-pressed="true"] .i360-chip-box::after { content: '✓'; }
+
+/* Buttons: pills, as on Android and iOS. Outlined by default; filled (.i360-btn-primary) for the main
+   action; .i360-btn-sm for small ones beside text (retry, more). */
+.i360-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-full, 999px);
+  background: transparent;
+  color: var(--i360-accent, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  font-weight: 700;
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-decoration: none;
+  cursor: pointer;
+}
+.i360-btn:hover:not(:disabled) { background: var(--i360-hover, #EEF2FF); }
+.i360-btn-primary, .i360-btn-primary[type], .i360-btn-primary:hover:not(:disabled) { background: var(--i360-accent, #0010CF); border-color: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
+.i360-btn-sm { padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem); font-size: var(--i360-text-size-sm, 0.875rem); }
+.i360-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
+
+/* A row in a list or menu. Hover (or the keyboard's current row, .active): the hover colour; the chosen
+   one (aria-selected, or Daily Reflection's .active-btn): the accent. */
+.i360-list-item {
+  display: block;
+  width: 100%;
+  text-align: start;
+  background: transparent;
+  border: 0;
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  color: var(--i360-text, #0010CF);
+  padding: var(--i360-space-sm, 0.5rem);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-decoration: none;
+  cursor: pointer;
+}
+.i360-list-item:hover, .i360-list-item.active, .i360-list-item.current { background: var(--i360-hover, #EEF2FF); }
+.i360-list-item[aria-selected="true"], .i360-list-item.active-btn { background: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
+
+/* Floating surfaces: pop-ups, menus, dialogs, tooltips (the toolbar's ⋮ menu above has the same look). */
+.i360-popup {
+  background: var(--i360-surface, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
+  padding: var(--i360-space-sm, 0.5rem);
+}
+
+/* A short message that comes and goes. */
+.i360-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  border-radius: var(--i360-radius-full, 999px);
+  background: var(--i360-toast, #1e293b);
+  color: var(--i360-toast-text, #f8fafc);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
+  z-index: var(--i360-layer-toast, 60);
+}
+
+/* A notice (an error, missing pages). */
+.i360-banner {
+  background: var(--i360-banner-bg, #fef2f2);
+  border: var(--i360-line-width, 1px) solid var(--i360-banner-border, #fecaca);
+  color: var(--i360-banner-text, #991b1b);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+}
+
+/* A box around a section (.i360-card), and a box inside one (.i360-inset). */
+.i360-card {
+  background: var(--i360-bg, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--i360-rule, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  box-shadow: var(--i360-page-shadow, 0 4px 6px -1px rgba(0, 16, 207, 0.08), 0 2px 4px -1px rgba(0, 16, 207, 0.05));
+}
+.i360-inset {
+  background: var(--i360-quote, #F4F0E8);
+  border: var(--i360-line-width, 1px) solid var(--i360-rule, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+}
+
+/* Search matches. */
+mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); color: inherit; border-radius: var(--i360-radius-sm, 0.25rem); }
     /* The bar and everything in it: src/page-chrome.css. Here: its place in the page. */
     .toolbar { flex-shrink: 0; z-index: var(--i360-layer-bar); }
 
@@ -488,61 +629,16 @@ svg[data-lucide] {
     main { width: var(--page-w); max-width: 100%; margin: 0 auto; }
 
     .search-form { display: flex; gap: var(--i360-space-sm); }
-    .search-input {
-      flex: 1;
-      min-width: 0;
-      height: 2.75rem;
-      padding: 0 var(--i360-space-md);
-      border: var(--i360-line-width) solid var(--i360-border);
-      border-radius: var(--i360-radius-lg);
-      background: var(--i360-input);
-      color: var(--i360-text);
-      font-family: inherit;
-      font-size: var(--i360-text-size);
-      outline: none;
-    }
-    .search-input:focus { border-color: var(--i360-focus); box-shadow: var(--i360-focus-ring); }
-    .search-btn {
-      height: 2.75rem;
-      padding: 0 var(--i360-space-md);
-      border: none;
-      border-radius: var(--i360-radius-lg);
-      background: var(--i360-accent);
-      color: var(--i360-on-accent);
-      font-family: inherit;
-      font-size: var(--i360-text-size);
-      font-weight: 700;
-      cursor: pointer;
-    }
+    /* The look of the box, the button, the options, the notice and the results' boxes, rows and
+       buttons: the shared components (src/page-chrome.css, .i360-…). Here: their sizes and places. */
+    .search-input { flex: 1; min-width: 0; height: 2.75rem; padding: 0 var(--i360-space-md); }
+    .search-btn { height: 2.75rem; padding: 0 var(--i360-space-md); }
 
     .options { display: flex; flex-wrap: wrap; gap: var(--i360-space-sm); margin-top: var(--i360-space-sm); }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--i360-space-xs);
-      height: 2rem;
-      padding: 0 var(--i360-space-sm);
-      border: var(--i360-line-width) solid var(--i360-border);
-      border-radius: var(--i360-radius-full);
-      background: var(--i360-surface);
-      color: var(--i360-text);
-      font-family: inherit;
-      font-size: var(--i360-text-size-sm);
-      cursor: pointer;
-    }
-    .chip[aria-pressed="true"] { background: var(--i360-active); border-color: var(--i360-focus); color: var(--i360-heading); font-weight: 700; }
-    .chip-box { width: 0.9rem; height: 0.9rem; border: var(--i360-line-width) solid currentColor; border-radius: var(--i360-radius-sm); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; line-height: 1; }
-    .chip[aria-pressed="true"] .chip-box::after { content: '✓'; }
 
-    .status { margin-top: var(--i360-space-md); color: var(--i360-muted); font-size: var(--i360-text-size-sm); min-height: 1.5rem; }
-    .status.error {
-      background: var(--i360-banner-bg);
-      border: var(--i360-line-width) solid var(--i360-banner-border);
-      color: var(--i360-banner-text);
-      border-radius: var(--i360-radius-lg);
-      padding: var(--i360-space-sm) var(--i360-space-md);
-    }
-    .status .retry { margin-inline-start: var(--i360-space-sm); font-family: inherit; font-size: var(--i360-text-size-sm); border: var(--i360-line-width) solid currentColor; background: transparent; color: inherit; border-radius: var(--i360-radius-lg); padding: 0 var(--i360-space-sm); cursor: pointer; }
+    .status { margin-top: var(--i360-space-md); font-size: var(--i360-text-size-sm); min-height: 1.5rem; }
+    .status:not(.i360-banner) { color: var(--i360-muted); }   /* as an error: the notice's colours */
+    .status .retry { margin-inline-start: var(--i360-space-sm); }
 
     .about { margin-top: var(--i360-space-lg); color: var(--i360-text); font-size: var(--i360-text-size-sm); line-height: var(--i360-line-height); }
 
@@ -555,8 +651,8 @@ svg[data-lucide] {
     .bar-btns { display: flex; gap: var(--i360-space-sm); }
     .count { font-size: var(--i360-text-size-sm); font-weight: 400; color: var(--i360-muted); font-variant-numeric: tabular-nums; }
 
-    details.major { margin-top: var(--i360-space-md); background: var(--i360-surface); border: var(--i360-line-width) solid var(--i360-border); border-radius: var(--i360-radius-lg); }
-    details.inter { margin-top: var(--i360-space-sm); border: var(--i360-line-width) solid var(--i360-border); border-radius: var(--i360-radius-lg); }
+    details.major { margin-top: var(--i360-space-md); }   /* .i360-card */
+    details.inter { margin-top: var(--i360-space-sm); }   /* .i360-inset */
     details.major > summary, details.inter > summary {
       list-style: none;
       display: flex;
@@ -583,27 +679,13 @@ svg[data-lucide] {
     .source-name .sep { color: var(--i360-muted); font-weight: 400; margin: 0 var(--i360-space-xs); }
     .source-name .file { font-weight: 700; }
 
-    .hit { display: block; margin-top: var(--i360-space-xs); padding: var(--i360-space-xs) var(--i360-space-sm); border-radius: var(--i360-radius-lg); color: inherit; text-decoration: none; }
-    .hit:hover { background: var(--i360-hover); }
+    .hit { margin-top: var(--i360-space-xs); padding: var(--i360-space-xs) var(--i360-space-sm); }   /* .i360-list-item */
     .hit-meta { display: flex; gap: var(--i360-space-sm); font-size: var(--i360-text-size-sm); color: var(--i360-link); font-weight: 700; }
     .hit-meta .more-spots { color: var(--i360-muted); font-weight: 400; }
     .hit-text { font-family: var(--i360-font); font-size: var(--i360-text-size); line-height: var(--i360-line-height); }
-    .hit-text mark { background: var(--i360-highlight); color: inherit; border-radius: var(--i360-radius-sm); padding: 0 0.1rem; }
 
     .group-foot { margin-top: var(--i360-space-sm); display: flex; align-items: center; gap: var(--i360-space-sm); color: var(--i360-muted); font-size: var(--i360-text-size-sm); }
-    .more-btn {
-      font-family: inherit;
-      font-size: var(--i360-text-size-sm);
-      font-weight: 700;
-      color: var(--i360-link);
-      background: transparent;
-      border: var(--i360-line-width) solid var(--i360-border);
-      border-radius: var(--i360-radius-lg);
-      padding: var(--i360-space-xs) var(--i360-space-md);
-      cursor: pointer;
-    }
-    .more-btn:hover { background: var(--i360-hover); }
-    .more-btn.icon-btn { display: inline-flex; align-items: center; padding: var(--i360-space-xs) var(--i360-space-sm); }
+    .icon-btn { padding: var(--i360-space-xs); }
     /* Icons: Lucide (lucide.dev, ISC licence), drawn inline; checked by scripts/icons.js. Their
        sizes here; their drawing style for every page: src/page-chrome.css. */
     .icon-btn svg { width: var(--i360-icon-size); height: var(--i360-icon-size); }
@@ -626,19 +708,19 @@ svg[data-lucide] {
   <div class="scroller safe-area safe-area-top-bar" id="scroller" tabindex="-1">
   <main>
     <form class="search-form" id="search-form" role="search" autocomplete="off">
-      <input class="search-input" id="q" type="search" name="q" enterkeyhint="search" spellcheck="false" aria-label="نص البحث" placeholder="ابحث في نصوص الكتب…">
-      <button class="search-btn" type="submit">بحث</button>
+      <input class="search-input i360-field i360-field-search" id="q" type="search" name="q" enterkeyhint="search" spellcheck="false" aria-label="نص البحث" placeholder="ابحث في نصوص الكتب…">
+      <button class="search-btn i360-btn i360-btn-primary" type="submit">بحث</button>
     </form>
     <div class="options">
-      <button class="chip" id="opt-exact" type="button" aria-pressed="false" title="بدون هذا الخيار يُتجاهل التشكيل وتُعامل أ/إ/آ كـ ا، وة كـ ه، وى كـ ي"><span class="chip-box"></span>مطابقة التشكيل</button>
-      <button class="chip" id="opt-word" type="button" aria-pressed="false" title="تجاهل النتائج التي تقع داخل كلمة أطول"><span class="chip-box"></span>كلمة كاملة</button>
+      <button class="i360-chip" id="opt-exact" type="button" aria-pressed="false" title="بدون هذا الخيار يُتجاهل التشكيل وتُعامل أ/إ/آ كـ ا، وة كـ ه، وى كـ ي"><span class="i360-chip-box"></span>مطابقة التشكيل</button>
+      <button class="i360-chip" id="opt-word" type="button" aria-pressed="false" title="تجاهل النتائج التي تقع داخل كلمة أطول"><span class="i360-chip-box"></span>كلمة كاملة</button>
     </div>
 
     <div class="results-bar">
       <div class="status" id="status" role="status" aria-live="polite"></div>
       <div class="bar-btns" id="bar-btns" hidden>
-        <button class="more-btn icon-btn" id="btn-expand" type="button" aria-label="توسيع الكل" title="توسيع الكل"><svg data-lucide="list-chevrons-up-down" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 8 3-3 3 3"></path><path d="m15 16 3 3 3-3"></path></svg></button>
-        <button class="more-btn icon-btn" id="btn-collapse" type="button" aria-label="طي الكل" title="طي الكل"><svg data-lucide="list-chevrons-down-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 5 3 3 3-3"></path><path d="m15 19 3-3 3 3"></path></svg></button>
+        <button class="i360-btn i360-btn-sm icon-btn" id="btn-expand" type="button" aria-label="توسيع الكل" title="توسيع الكل"><svg data-lucide="list-chevrons-up-down" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 8 3-3 3 3"></path><path d="m15 16 3 3 3-3"></path></svg></button>
+        <button class="i360-btn i360-btn-sm icon-btn" id="btn-collapse" type="button" aria-label="طي الكل" title="طي الكل"><svg data-lucide="list-chevrons-down-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 5 3 3 3-3"></path><path d="m15 19 3-3 3 3"></path></svg></button>
       </div>
     </div>
     <div id="results"></div>
@@ -1421,11 +1503,12 @@ svg[data-lucide] {
   function setStatus(text, { error = false, retry = null } = {}) {
     statusEl.textContent = "";
     statusEl.classList.toggle("error", error);
+    statusEl.classList.toggle("i360-banner", error);
     if (text) statusEl.append(fmt(text));
     if (retry) {
       const b = document.createElement("button");
       b.type = "button";
-      b.className = "retry";
+      b.className = "retry i360-btn i360-btn-sm";
       b.textContent = T.retry;
       b.addEventListener("click", retry);
       statusEl.append(b);
@@ -1556,7 +1639,7 @@ svg[data-lucide] {
   }
   function makeMajor(ctx, M) {
     const el = document.createElement("details");
-    el.className = "major";
+    el.className = "major i360-card";
     const { summary, count } = summaryLine(M.major);
     const body = document.createElement("div");
     body.className = "major-body";
@@ -1584,7 +1667,7 @@ svg[data-lucide] {
     let el, count = null;
     if (details) {
       el = document.createElement("details");
-      el.className = "inter";
+      el.className = "inter i360-inset";
       const line = summaryLine(U.name);
       count = line.count;
       const body = document.createElement("div");
@@ -1690,7 +1773,7 @@ svg[data-lucide] {
     if (g.done) return;
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "more-btn";
+    b.className = "i360-btn i360-btn-sm";
     b.textContent = T.more;
     b.addEventListener("click", () => loadMore(ctx, g));
     g.foot.append(b);
@@ -1700,7 +1783,7 @@ svg[data-lucide] {
     g.foot.append(T.searchError);
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "more-btn";
+    b.className = "i360-btn i360-btn-sm";
     b.textContent = T.retry;
     b.addEventListener("click", () => loadMore(ctx, g));
     g.foot.append(b);
@@ -1741,7 +1824,7 @@ svg[data-lucide] {
     const block = sourceBlock(ctx, g, hit.source);
     const sn = hit.snippets[0];
     const a = document.createElement("a");
-    a.className = "hit";
+    a.className = "hit i360-list-item";
     const link = resultLink(hit, ctx.q, sn ? sn.hit : "");
     const toReader = link.startsWith(READER);
     a.href = link;

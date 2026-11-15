@@ -236,7 +236,7 @@ export default function SearchBar() {
       <span className="sr-only" role="status" aria-live="polite">{liveMessage}</span>
 
       {/* Search input with SearchIcon (right) + Search-execute icon (left) */}
-      <div className="flex flex-1 min-w-0 items-center rounded-full border border-brand-border bg-brand-input px-sm py-xs gap-sm focus-within:shadow-[var(--i360-focus-ring,0_0_0_3px_rgba(0,16,207,0.25))]">
+      <div className="i360-field i360-field-search flex flex-1 min-w-0 items-center px-sm py-xs gap-sm">
         {/* SearchIcon — live 3-state indicator + one-shot override control.
             PencilSparkles: auto-detect, input doesn't match (resting/default,
             including empty input). Tapping while empty flashes CircleAlert.

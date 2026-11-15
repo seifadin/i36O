@@ -349,7 +349,7 @@ const Picker = {
     this.input.placeholder = L.citySearch; this.input.setAttribute('aria-label', L.citySearch);
     UI.set('city-status', { loading: L.loading, none: L.cityNone, error: L.loadError }[this.state] || '');
     const row = (label, sub, on, pick) => {
-      const b = mk('button', `text-start px-sm py-sm rounded-lg text-base ${on ? 'active-btn' : 'text-custom-secondary'}`);
+      const b = mk('button', `i360-list-item${on ? ' active-btn' : ''}`);
       b.type = 'button'; b.setAttribute('role', 'option'); b.setAttribute('aria-selected', on);
       b.append(mk('span', 'font-bold', label)); if (sub) b.append(mk('span', 'text-sm ms-sm', sub));
       b.addEventListener('click', pick);
@@ -511,7 +511,7 @@ const UI = {
       link('Adhan', 'https://github.com/batoulapps/adhan-js'));
   },
   renderSchool() {
-    [0, 1].forEach(s => { const b = document.getElementById(`school-${s}`); if (!b) return; const on = App.school === s; b.classList.toggle('active-btn', on); b.setAttribute('aria-pressed', on); });
+    [0, 1].forEach(s => { const b = document.getElementById(`school-${s}`); if (!b) return; const on = App.school === s; b.setAttribute('aria-pressed', on); });
   },
   renderHijri() {
     const L = this.L, h = App.state.hijri; if (!h) return;
@@ -572,7 +572,7 @@ const UI = {
     if (!next) next = 'Fajr';                                 // after Isha the next prayer is tomorrow's Fajr
     grid.replaceChildren(...CONFIG.P_KEYS.map((k, i) => {
       const isNext = k === next, m = /(\d{1,2}):(\d{2})/.exec(t[k] || '');
-      const box = mk('div', `flex flex-col items-center p-sm transition-all ${isNext ? 'next-prayer-highlight' : 'inset-item'}`);
+      const box = mk('div', `flex flex-col items-center p-sm transition-all ${isNext ? 'next-prayer-highlight' : 'i360-inset'}`);
       box.append(
         mk('span', `text-sm font-bold ${isNext ? 'text-accent' : 'text-custom-secondary'}`, L.prayers[i]),
         mk('span', `text-base font-bold mt-xs ${isNext ? 'text-accent' : 'text-custom-secondary'}`, m ? m[0] : '—'));
@@ -590,7 +590,7 @@ const UI = {
     const L = this.L, lang = App.lang, h = App.state.hijri, list = this.targets['events-list'];
     if (!h || !list) return;
     list.replaceChildren(...Hijri.events(h).map(e => {
-      const row = mk('div', `flex justify-between items-center gap-md p-md transition-all ${e.isT ? 'border-2 border-event bg-event-bg rounded-lg' : 'inset-item'}`);
+      const row = mk('div', `flex justify-between items-center gap-md p-md transition-all ${e.isT ? 'border-2 border-event bg-event-bg rounded-lg' : 'i360-inset'}`);
       const left = mk('div', 'flex-1'), title = mk('div', 'flex items-center gap-sm');
       title.append(mk('span', 'text-base font-bold text-custom-secondary', L.events[e.id]));
       if (e.isT) title.append(mk('span', 'bg-event text-page text-sm font-bold px-sm rounded-full', L.todayLabel));

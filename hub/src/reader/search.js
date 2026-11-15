@@ -168,6 +168,7 @@ function renderResultsList() {
     const li = document.createElement('li');
     const btn = document.createElement('button');
     btn.type = 'button';
+    btn.className = 'i360-list-item';
     const page = document.createElement('span');
     page.className = 'res-page';
     page.textContent = state.format === 'plain' ? '' : pageLabelText(state.pages[m.page.idx], tr);
@@ -195,7 +196,11 @@ function renderResultsList() {
 function markActiveResult() {
   if (searchResults.hidden) return;
   const items = searchResults.children;
-  for (let i = 0; i < items.length; i++) items[i].classList.toggle('active', i === search.current);
+  for (let i = 0; i < items.length; i++) {
+    items[i].classList.toggle('active', i === search.current);
+    const b = items[i].querySelector('button');
+    if (b) b.classList.toggle('active', i === search.current);
+  }
   const active = items[search.current];
   if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest' });
 }
