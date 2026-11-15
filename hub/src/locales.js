@@ -169,12 +169,12 @@ export const DAY = {
   ar: {
     dir:"rtl",title:"التأمل اليومي",quranLabel:"الآية القرآنية",hadithLabel:"الحديث الشريف",prayerLabel:"مواقيت الصلاة",eventsLabel:"المناسبات القادمة",methodLabel:"الطريقة",madhabLabel:"المذهب",locLabel:"الموقع",tzLabel:"المنطقة الزمنية",expected:"متوقع",next:"القادم",todayLabel:"اليوم",months:["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"],
     events: {
-      h_new: "1 محرم: رأس السنة الهجرية (أحد الأشهر الحُرم)",
+      h_new: "1 محرم: أحد الأشهر الحُرم · رأس السنة الهجرية",
       tasua: "9 محرم: يوم تاسوعاء",
       ashura: "10 محرم: يوم عاشوراء، يوم نجى الله فيه موسى عليه السلام و أغرق آل فرعون",
       mig_mecca: "27 صفر: ذكرى هجرة الرسول ﷺ من مكة إلى المدينة (على ما ذُكر في بعض كتب السيرة)",
       mawlid: "12 ربيع الأول: المولد النبوي", arrival: "12 ربيع الأول: وصول الرسول ﷺ إلى المدينة مهاجرًا من مكة فيما عُرف بالهجرة النبوية، وعُدّ ذلك العام بداية التقويم الهجري",
-      isra: "27 رجب: ليلة الإسراء والمعراج على المشهور، وفي تحديدها خلاف بين أهل العلم (أحد الأشهر الحُرم)",
+      isra: "27 رجب: أحد الأشهر الحُرم · ليلة الإسراء والمعراج على المشهور، وفي تحديدها خلاف بين أهل العلم",
       baraah: "15 شعبان: ليلة النصف من شعبان (ليلة البراءة)، وفي فضلها خلاف بين أهل العلم، وقيل: جرى فيها تحويل القبلة",
       cres: "29 شعبان: الليلة ترائي هلال رمضان",
       ram_start: "1 رمضان: أول أيام الصوم",
@@ -202,12 +202,12 @@ export const DAY = {
   en: {
     dir:"ltr",title:"Daily Reflection",quranLabel:"Quranic Verse",hadithLabel:"Hadith",prayerLabel:"Prayer Times",eventsLabel:"Upcoming Events",methodLabel:"Method",madhabLabel:"Madhab",locLabel:"Location",tzLabel:"Timezone",expected:"Expected",next:"NEXT",todayLabel:"TODAY",months:["Muharram","Safar","Rabi' al-Awwal","Rabi' al-Thani","Jumada al-Ula","Jumada al-Akhira","Rajab","Sha'ban","Ramadan","Shawwal","Dhu al-Qi'dah","Dhu al-Hijjah"],
     events: {
-      h_new: "1 Muharram: Hijri New Year (Sacred Month)",
+      h_new: "1 Muharram: Sacred Month · Hijri New Year",
       tasua: "9 Muharram: Day of Tasua",
       ashura: "10 Muharram: Day of Ashura (Allah saved Moses & drowned Pharaoh)",
       mig_mecca: "27 Safar: Prophet's ﷺ Migration from Mecca to Medina, as reported in some biographies",
       mawlid: "12 Rabi' al-Awwal: Mawlid al-Nabi", arrival: "12 Rabi' al-Awwal: The Prophet's ﷺ arrival in Medina from Mecca, known as the Hijra; that year was counted as the start of the Hijri calendar",
-      isra: "27 Rajab: Isra and Mi'raj, per the popular view; scholars differ on its date (Sacred Month)",
+      isra: "27 Rajab: Sacred Month · Isra and Mi'raj, per the popular view; scholars differ on its date",
       baraah: "15 Sha'ban: Mid-Sha'ban night (Laylat al-Bara'ah); scholars differ on its virtue, and it is said the qibla was changed on it",
       cres: "29 Sha'ban: Night of Ramadan moon sighting",
       ram_start: "1 Ramadan: First day of Ramadan Fasting",
@@ -235,12 +235,12 @@ export const DAY = {
   tr: {
     dir:"ltr",title:"Günlük Tefekkür",quranLabel:"Kur'an Ayeti",hadithLabel:"Hadis",prayerLabel:"Namaz Vakitleri",eventsLabel:"Etkinlikler",methodLabel:"Yöntem",madhabLabel:"Mezhep",locLabel:"Konum",tzLabel:"Saat Dilimi",expected:"Beklenen",next:"SONRAKİ",todayLabel:"BUGÜN",months:["Muharrem","Safer","Rebiülevvel","Rebiülahir","Cemaziyelevvel","Cemaziyelahir","Recep","Şaban","Ramazan","Şevval","Zilkade","Zilhicce"],
     events: {
-      h_new: "1 Muharrem: Hicri Yılbaşı (Haram Ay)",
+      h_new: "1 Muharrem: Haram Ay · Hicri Yılbaşı",
       tasua: "9 Muharrem: Tasua Günü",
       ashura: "10 Muharrem: Aşure Günü (Hz. Musa'nın kurtuluşu)",
       mig_mecca: "27 Safer: Peygamberimizin Mekke'den Medine'ye hicreti (bazı siyer kaynaklarına göre)",
       mawlid: "12 Rebiülevvel: Mevlid Kandili", arrival: "12 Rebiülevvel: Hz. Peygamber'in ﷺ Mekke'den hicret ederek Medine'ye varışı; o yıl Hicri takvimin başlangıcı sayıldı",
-      isra: "27 Recep: Miraç Kandili, yaygın görüşe göre; tarihi konusunda âlimler ihtilaf etmiştir (Haram Ay)",
+      isra: "27 Recep: Haram Ay · Miraç Kandili, yaygın görüşe göre; tarihi konusunda âlimler ihtilaf etmiştir",
       baraah: "15 Şaban: Berat Kandili (Şaban'ın ortası gecesi); faziletinde âlimler ihtilaf etmiştir ve kıblenin bu gece değiştiği de söylenir",
       cres: "29 Şaban: Ramazan hilali gözlem gecesi",
       ram_start: "1 Ramazan: Orucun ilk günü",
@@ -268,12 +268,12 @@ export const DAY = {
   id: {
     dir:"ltr",title:"Refleksi Harian",quranLabel:"Ayat Al-Qur'an",hadithLabel:"Hadist",prayerLabel:"Waktu Shalat",eventsLabel:"Acara Mendatang",methodLabel:"Metode",madhabLabel:"Madzhab",locLabel:"Lokasi",tzLabel:"Zona Waktu",expected:"Perkiraan",next:"LANJUT",todayLabel:"HARI INI",months:["Muharram","Safar","Rabi'ul Awwal","Rabi'ul Akhir","Jumadil Ula","Jumadil Akhira","Rajab","Sya'ban","Ramadhan","Syawal","Dzulqa'dah","Dzulhijjah"],
     events: {
-      h_new: "1 Muharram: Tahun Baru Hijriah (Bulan Haram)",
+      h_new: "1 Muharram: Bulan Haram · Tahun Baru Hijriah",
       tasua: "9 Muharram: Hari Tasua",
       ashura: "10 Muharram: Hari Asyura (Allah menyelamatkan Musa)",
       mig_mecca: "27 Safar: Hijrah Nabi ﷺ dari Mekah ke Madinah (menurut sebagian kitab sirah)",
       mawlid: "12 Rabi'ul Awwal: Maulid Nabi", arrival: "12 Rabi'ul Awwal: Kedatangan Rasulullah ﷺ di Madinah saat hijrah dari Makkah; tahun itu dijadikan awal kalender Hijriah",
-      isra: "27 Rajab: Isra Mi'raj menurut pendapat yang masyhur; ulama berbeda pendapat tentang tanggalnya (Bulan Haram)",
+      isra: "27 Rajab: Bulan Haram · Isra Mi'raj menurut pendapat yang masyhur; ulama berbeda pendapat tentang tanggalnya",
       baraah: "15 Sya'ban: Malam Nisfu Sya'ban (Malam Bara'ah); keutamaannya diperselisihkan ulama, dan dikatakan bahwa pada malam itu kiblat dipindahkan",
       cres: "29 Sya'ban: Malam pemantauan hilal Ramadhan",
       ram_start: "1 Ramadhan: Hari pertama Puasa",
@@ -301,12 +301,12 @@ export const DAY = {
   ur: {
     dir:"rtl",title:"روزانہ کی عکاسی",quranLabel:"قرآني آیت",hadithLabel:"حدیث",prayerLabel:"نماز کے اوقات",eventsLabel:"آنے والے واقعات",methodLabel:"طریقہ",madhabLabel:"مذہب",locLabel:"مقام",tzLabel:"ٹائم زون",expected:"متوقع",next:"اگلی",todayLabel:"آج",months:["محرم","صفر","ربیع الاول","ربیع الثانی","جمادی الاول","جمادی الثانی","رجب","شعبان","رمضان","شوال","ذوالقعدہ","ذوالحجہ"],
     events: {
-      h_new: "1 محرم: اسلامی نیا سال (حرمت والا مہینہ)",
+      h_new: "1 محرم: حرمت والا مہینہ · اسلامی نیا سال",
       tasua: "9 محرم: یوم تاسوعاء",
       ashura: "10 محرم: یوم عاشوراء (اللہ نے موسیٰؑ کو نجات دی اور فرعون کو غرق کیا)",
       mig_mecca: "27 صفر: ہجرتِ نبوی ﷺ مکہ سے مدینہ (بعض کتبِ سیرت کے مطابق)",
       mawlid: "12 ربیع الاول: میلاد النبیؐ", arrival: "12 ربیع الاول: رسول اللہ ﷺ کی مکہ سے ہجرت کر کے مدینہ آمد، اور اسی سال کو ہجری تقویم کا آغاز شمار کیا گیا",
-      isra: "27 رجب: اسراء و معراج، مشہور قول کے مطابق؛ تاریخ میں اہلِ علم کا اختلاف ہے (حرمت والا مہینہ)",
+      isra: "27 رجب: حرمت والا مہینہ · اسراء و معراج، مشہور قول کے مطابق؛ تاریخ میں اہلِ علم کا اختلاف ہے",
       baraah: "15 شعبان: شبِ برأت (نصف شعبان کی رات)؛ اس کی فضیلت میں اہلِ علم کا اختلاف ہے، اور کہا جاتا ہے کہ اسی رات قبلہ تبدیل ہوا",
       cres: "29 شعبان: رمضان کا چاند دیکھنے کی رات",
       ram_start: "1 رمضان: روزوں کا آغاز",
