@@ -66,6 +66,9 @@
     body.two-cols .toolbar { --toolbar-row-w: calc(2 * var(--col) + var(--col-gap)); }
     body.two-cols #events-card { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
     body.two-cols #events-card [data-target="events-list"] { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+    /* One column: the whole year's events scroll within the card too (Seif 2026-11-15), at most about
+       two thirds of the screen's height. */
+    body:not(.two-cols) #events-card [data-target="events-list"] { max-height: 66dvh; overflow-y: auto; }
   </style>
   <style id="tailwind">/*@@TAILWIND@@*/</style>   <!-- built from src/day.tailwind.js (scripts/build.js) -->
 </head>
@@ -173,6 +176,7 @@
         <span class="bg-event-bg text-event p-sm rounded-lg"><svg data-lucide="calendar-check" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="m9 15 2 2 4-4"></path></svg></span>
         <h2 data-i18n="eventsLabel" class="text-base font-bold uppercase tracking-widest text-event">Upcoming Events</h2>
       </div>
+      <p data-target="events-note" class="text-sm text-custom-secondary mb-md"></p>
       <div data-target="events-list" class="space-y-md"></div>
     </section>
     </div>

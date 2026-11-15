@@ -28,10 +28,12 @@ const CONFIG = {
   EDITIONS: { quran: { ar: 'ar.jalalayn', en: 'en.sahih', tr: 'tr.ates', id: 'id.indonesian', ur: 'ur.ahmedali' } },
   P_KEYS: ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'],
   P_NEXT_KEYS: ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'],   // Sunrise is shown but is not a prayer
+  // The note above the events (the Islamic day runs sunset to sunset) and its source (Seif, 2026-11-15).
+  DAY_NOTE_SOURCE: 'https://ar.wikipedia.org/wiki/%D9%88%D9%8A%D9%83%D9%8A%D8%A8%D9%8A%D8%AF%D9%8A%D8%A7:%D9%81%D9%8A_%D9%87%D8%B0%D8%A7_%D8%A7%D9%84%D9%8A%D9%88%D9%85/%D8%A7%D9%84%D9%85%D9%86%D8%A7%D8%B3%D8%A8%D8%A7%D8%AA_%D8%A7%D9%84%D9%87%D8%AC%D8%B1%D9%8A%D8%A9',
   EV: [
     {id:'h_new',d:1,m:0},{id:'tasua',d:9,m:0},{id:'ashura',d:10,m:0},
     {id:'mig_mecca',d:27,m:1},
-    {id:'mawlid',d:12,m:2},
+    {id:'mawlid',d:12,m:2},{id:'arrival',d:12,m:2},
     {id:'isra',d:27,m:6},
     {id:'baraah',d:15,m:7},{id:'cres',d:29,m:7},
     {id:'ram_start',d:1,m:8},{id:'badr',d:17,m:8},{id:'fath',d:20,m:8},{id:'qadr',d:27,m:8},
@@ -113,7 +115,8 @@ const Hijri = {
     return this.make(r.date, r.h, r.source, r.provisional);
   },
   label(h, lang) { return HijriCalc.label(h.provisional ? 'provisional' : h.source, lang); },
-  /* Next occurrence of every event, by walking forward day by day (no drifting arithmetic). */
+  /* Next occurrence of every event within the coming year (the whole year, Seif 2026-11-15), by walking
+     forward day by day (no drifting arithmetic). */
   events(h) {
     const out = [], seen = new Set();
     for (let i = 0; i <= 385 && seen.size < CONFIG.EV.length; i++) {
@@ -122,7 +125,7 @@ const Hijri = {
         if (!seen.has(e.id) && e.m + 1 === hh.m && e.d === hh.d) { seen.add(e.id); out.push({ id: e.id, d: e.d, m: e.m, year: hh.y, date: HijriCalc.parseYMD(x), isT: i === 0 }); }
       }
     }
-    return out.slice(0, 10);
+    return out;
   }
 };
 
@@ -589,6 +592,12 @@ const UI = {
   renderEvents() {
     const L = this.L, lang = App.lang, h = App.state.hijri, list = this.targets['events-list'];
     if (!h || !list) return;
+    const note = this.targets['events-note'];
+    if (note) {
+      const a = mk('a', 'underline', L.sourceLabel);
+      a.href = CONFIG.DAY_NOTE_SOURCE; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      note.replaceChildren(`${L.eventsNote} (`, a, ')');
+    }
     list.replaceChildren(...Hijri.events(h).map(e => {
       const row = mk('div', `flex justify-between items-center gap-md p-md transition-all ${e.isT ? 'border-2 border-event bg-event-bg rounded-lg' : 'i360-inset'}`);
       const left = mk('div', 'flex-1'), title = mk('div', 'flex items-center gap-sm');
