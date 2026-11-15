@@ -62,7 +62,7 @@ function DynamicIcon({ name }: { name: string }) {
 // shared gap from them, clear of any safe-area inset (safe-sides, page-chrome.css), one gap
 // more per level down.
 const BUTTON = {
-  major: 'flex w-full items-center justify-between safe-sides py-sm text-right text-list-lg font-bold text-brand-blue hover:bg-brand-highlight focus:outline-none',
+  major: 'flex w-full items-center justify-between safe-sides py-sm text-right text-list-lg font-normal text-brand-blue hover:bg-brand-highlight focus:outline-none',
   intermediate: 'flex w-full items-center justify-between safe-sides [--safe-level:2] py-xs text-right text-list font-normal text-brand-blue hover:bg-brand-highlight focus:outline-none',
 }
 const PANEL = { major: 'divide-y divide-brand-divider bg-brand-ivory', intermediate: 'divide-y divide-brand-divider bg-brand-ivory' }
