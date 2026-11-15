@@ -252,15 +252,15 @@
   <style>
     /* Colours: the shared theme's own variables (--i360-…, hub/theme/site/theme.css), used directly;
        the theme is <html data-theme="…">. */
-    :root { --page-w: 48rem; }   /* the column's text width */
+    :root { --page-w: var(--i360-content-width); }   /* the column's text width */
 
 
     body {
       font-family: var(--i360-font);   /* Amiri, from the shared theme */
-      font-size: 1.05rem;
+      font-size: var(--i360-text-size);
       background-color: var(--i360-bg);
       color: var(--i360-text);
-      line-height: 1.6;
+      line-height: var(--i360-line-height-ui);
       /* The page scrolls inside .scroller, not the window: browsers keep the
          window's scrollbar on the right even in Arabic, but put a
          right-to-left element's scrollbar on the left. */
@@ -481,132 +481,132 @@ svg[data-lucide] {
 .toolbar-densest .toolbar-btn { padding: 0; }
 .toolbar-densest .tb-start > .divider { display: none; }
     /* The bar and everything in it: src/page-chrome.css. Here: its place in the page. */
-    .toolbar { flex-shrink: 0; z-index: 10; }
+    .toolbar { flex-shrink: 0; z-index: var(--i360-layer-bar); }
 
     /* ---------- Search ---------- */
     /* The column, centred in the scrolling area, which keeps it clear of the screen's edges (.safe-area). */
     main { width: var(--page-w); max-width: 100%; margin: 0 auto; }
 
-    .search-form { display: flex; gap: 0.5rem; }
+    .search-form { display: flex; gap: var(--i360-space-sm); }
     .search-input {
       flex: 1;
       min-width: 0;
       height: 2.75rem;
-      padding: 0 0.85rem;
-      border: 1px solid var(--i360-border);
-      border-radius: 0.5rem;
+      padding: 0 var(--i360-space-md);
+      border: var(--i360-line-width) solid var(--i360-border);
+      border-radius: var(--i360-radius-lg);
       background: var(--i360-input);
       color: var(--i360-text);
       font-family: inherit;
-      font-size: 1.15rem;
+      font-size: var(--i360-text-size);
       outline: none;
     }
-    .search-input:focus { border-color: var(--i360-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--i360-focus) 25%, transparent); }
+    .search-input:focus { border-color: var(--i360-focus); box-shadow: var(--i360-focus-ring); }
     .search-btn {
       height: 2.75rem;
-      padding: 0 1.1rem;
+      padding: 0 var(--i360-space-md);
       border: none;
-      border-radius: 0.5rem;
+      border-radius: var(--i360-radius-lg);
       background: var(--i360-accent);
       color: var(--i360-on-accent);
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: var(--i360-text-size);
       font-weight: 700;
       cursor: pointer;
     }
 
-    .options { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
+    .options { display: flex; flex-wrap: wrap; gap: var(--i360-space-sm); margin-top: var(--i360-space-sm); }
     .chip {
       display: inline-flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: var(--i360-space-xs);
       height: 2rem;
-      padding: 0 0.75rem;
-      border: 1px solid var(--i360-border);
-      border-radius: 999px;
+      padding: 0 var(--i360-space-sm);
+      border: var(--i360-line-width) solid var(--i360-border);
+      border-radius: var(--i360-radius-full);
       background: var(--i360-surface);
       color: var(--i360-text);
       font-family: inherit;
-      font-size: 0.85rem;
+      font-size: var(--i360-text-size-sm);
       cursor: pointer;
     }
     .chip[aria-pressed="true"] { background: var(--i360-active); border-color: var(--i360-focus); color: var(--i360-heading); font-weight: 700; }
-    .chip-box { width: 0.9rem; height: 0.9rem; border: 1.5px solid currentColor; border-radius: 0.2rem; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; line-height: 1; }
+    .chip-box { width: 0.9rem; height: 0.9rem; border: var(--i360-line-width) solid currentColor; border-radius: var(--i360-radius-sm); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; line-height: 1; }
     .chip[aria-pressed="true"] .chip-box::after { content: '✓'; }
 
-    .status { margin-top: 1rem; color: var(--i360-muted); font-size: 0.9rem; min-height: 1.5rem; }
+    .status { margin-top: var(--i360-space-md); color: var(--i360-muted); font-size: var(--i360-text-size-sm); min-height: 1.5rem; }
     .status.error {
       background: var(--i360-banner-bg);
-      border: 1px solid var(--i360-banner-border);
+      border: var(--i360-line-width) solid var(--i360-banner-border);
       color: var(--i360-banner-text);
-      border-radius: 0.375rem;
-      padding: 0.6rem 0.9rem;
+      border-radius: var(--i360-radius-lg);
+      padding: var(--i360-space-sm) var(--i360-space-md);
     }
-    .status .retry { margin-inline-start: 0.5rem; font-family: inherit; font-size: 0.85rem; border: 1px solid currentColor; background: transparent; color: inherit; border-radius: 0.25rem; padding: 0 0.5rem; cursor: pointer; }
+    .status .retry { margin-inline-start: var(--i360-space-sm); font-family: inherit; font-size: var(--i360-text-size-sm); border: var(--i360-line-width) solid currentColor; background: transparent; color: inherit; border-radius: var(--i360-radius-lg); padding: 0 var(--i360-space-sm); cursor: pointer; }
 
-    .about { margin-top: 2rem; color: var(--i360-text); font-size: 0.85rem; line-height: 1.9; }
+    .about { margin-top: var(--i360-space-lg); color: var(--i360-text); font-size: var(--i360-text-size-sm); line-height: var(--i360-line-height); }
 
     /* ---------- Results ----------
        As in the app: each major opens and closes; rows without an
        intermediate sit directly under it; each intermediate opens and
        closes inside it. */
-    .results-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 1rem; }
+    .results-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--i360-space-sm); margin-top: var(--i360-space-md); }
     .results-bar .status { margin-top: 0; }
-    .bar-btns { display: flex; gap: 0.4rem; }
-    .count { font-size: 0.8rem; font-weight: 400; color: var(--i360-muted); font-variant-numeric: tabular-nums; }
+    .bar-btns { display: flex; gap: var(--i360-space-sm); }
+    .count { font-size: var(--i360-text-size-sm); font-weight: 400; color: var(--i360-muted); font-variant-numeric: tabular-nums; }
 
-    details.major { margin-top: 0.85rem; background: var(--i360-surface); border: 1px solid var(--i360-border); border-radius: 0.5rem; }
-    details.inter { margin-top: 0.6rem; border: 1px solid var(--i360-border); border-radius: 0.5rem; }
+    details.major { margin-top: var(--i360-space-md); background: var(--i360-surface); border: var(--i360-line-width) solid var(--i360-border); border-radius: var(--i360-radius-lg); }
+    details.inter { margin-top: var(--i360-space-sm); border: var(--i360-line-width) solid var(--i360-border); border-radius: var(--i360-radius-lg); }
     details.major > summary, details.inter > summary {
       list-style: none;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.55rem 0.85rem;
+      gap: var(--i360-space-sm);
+      padding: var(--i360-space-sm) var(--i360-space-md);
       cursor: pointer;
       font-weight: 700;
       color: var(--i360-heading);
       user-select: none;
-      border-radius: 0.5rem;   /* the keyboard focus ring follows the box's corners */
+      border-radius: var(--i360-radius-lg);   /* the keyboard focus ring follows the box's corners */
     }
-    details.major > summary { font-size: 1.2rem; }
-    details.major > summary:hover, details.inter > summary:hover { background: var(--i360-hover); border-radius: 0.5rem; }
+    details.major > summary { font-size: var(--i360-text-size-lg); }
+    details.major > summary:hover, details.inter > summary:hover { background: var(--i360-hover); border-radius: var(--i360-radius-lg); }
     details > summary::-webkit-details-marker { display: none; }
-    details.major > summary::before, details.inter > summary::before { content: '◂'; color: var(--i360-muted); font-size: 0.8rem; transition: transform 0.15s; }
+    details.major > summary::before, details.inter > summary::before { content: '◂'; color: var(--i360-muted); font-size: var(--i360-text-size-sm); transition: transform var(--i360-speed-quick); }
     details.major[open] > summary::before, details.inter[open] > summary::before { transform: rotate(-90deg); }
-    .major-body { padding: 0 0.85rem 0.75rem; }
-    .inter-body { padding: 0 0.85rem 0.75rem; }
+    .major-body { padding: 0 var(--i360-space-md) var(--i360-space-sm); }
+    .inter-body { padding: 0 var(--i360-space-md) var(--i360-space-sm); }
 
-    .source { padding-top: 0.6rem; }
-    .source + .source { border-top: 1px solid var(--i360-rule); margin-top: 0.4rem; }
-    .source-name { font-weight: 700; color: var(--i360-heading); font-size: 0.95rem; }
-    .source-name .sep { color: var(--i360-muted); font-weight: 400; margin: 0 0.3rem; }
+    .source { padding-top: var(--i360-space-sm); }
+    .source + .source { border-top: var(--i360-line-width) solid var(--i360-rule); margin-top: var(--i360-space-sm); }
+    .source-name { font-weight: 700; color: var(--i360-heading); font-size: var(--i360-text-size); }
+    .source-name .sep { color: var(--i360-muted); font-weight: 400; margin: 0 var(--i360-space-xs); }
     .source-name .file { font-weight: 700; }
 
-    .hit { display: block; margin-top: 0.35rem; padding: 0.35rem 0.5rem; border-radius: 0.375rem; color: inherit; text-decoration: none; }
+    .hit { display: block; margin-top: var(--i360-space-xs); padding: var(--i360-space-xs) var(--i360-space-sm); border-radius: var(--i360-radius-lg); color: inherit; text-decoration: none; }
     .hit:hover { background: var(--i360-hover); }
-    .hit-meta { display: flex; gap: 0.6rem; font-size: 0.8rem; color: var(--i360-link); font-weight: 700; }
+    .hit-meta { display: flex; gap: var(--i360-space-sm); font-size: var(--i360-text-size-sm); color: var(--i360-link); font-weight: 700; }
     .hit-meta .more-spots { color: var(--i360-muted); font-weight: 400; }
-    .hit-text { font-family: 'Amiri', serif; font-size: 1.08rem; line-height: 1.9; }
-    .hit-text mark { background: var(--i360-highlight); color: inherit; border-radius: 0.15rem; padding: 0 0.1rem; }
+    .hit-text { font-family: var(--i360-font); font-size: var(--i360-text-size); line-height: var(--i360-line-height); }
+    .hit-text mark { background: var(--i360-highlight); color: inherit; border-radius: var(--i360-radius-sm); padding: 0 0.1rem; }
 
-    .group-foot { margin-top: 0.5rem; display: flex; align-items: center; gap: 0.75rem; color: var(--i360-muted); font-size: 0.85rem; }
+    .group-foot { margin-top: var(--i360-space-sm); display: flex; align-items: center; gap: var(--i360-space-sm); color: var(--i360-muted); font-size: var(--i360-text-size-sm); }
     .more-btn {
       font-family: inherit;
-      font-size: 0.85rem;
+      font-size: var(--i360-text-size-sm);
       font-weight: 700;
       color: var(--i360-link);
       background: transparent;
-      border: 1px solid var(--i360-border);
-      border-radius: 0.375rem;
-      padding: 0.15rem 0.85rem;
+      border: var(--i360-line-width) solid var(--i360-border);
+      border-radius: var(--i360-radius-lg);
+      padding: var(--i360-space-xs) var(--i360-space-md);
       cursor: pointer;
     }
     .more-btn:hover { background: var(--i360-hover); }
-    .more-btn.icon-btn { display: inline-flex; align-items: center; padding: 0.2rem 0.45rem; }
+    .more-btn.icon-btn { display: inline-flex; align-items: center; padding: var(--i360-space-xs) var(--i360-space-sm); }
     /* Icons: Lucide (lucide.dev, ISC licence), drawn inline; checked by scripts/icons.js. Their
        sizes here; their drawing style for every page: src/page-chrome.css. */
-    .icon-btn svg { width: 1.15rem; height: 1.15rem; }
+    .icon-btn svg { width: var(--i360-icon-size); height: var(--i360-icon-size); }
   </style>
 </head>
 <body class="i360-page">
