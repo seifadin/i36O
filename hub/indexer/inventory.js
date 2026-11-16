@@ -21,7 +21,7 @@
 // app's VITE_BASEROW_KEY). Optional: BASEROW_TABLE_SCIENCES (default 193269).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fetchWithTimeout, wait } from '../src/net.js';
+import { fetchWithTimeout, httpError, retrying } from '../src/net.js';
 import { APP_ORIGIN } from '../src/sites.js';
 
 const BASEROW_ROWS = 'https://api.baserow.io/api/database/rows/table/';
@@ -179,23 +179,14 @@ function causeText(err) {
 
 const hostOf = (url) => { try { return new URL(url).host; } catch { return url; } };
 
-async function fetchWithRetry(fetchFn, url, opts = {}) {
-  let lastErr;
-  for (let attempt = 0; attempt <= RETRIES; attempt++) {
-    try {
-      // A time limit for the answer (src/net.js, shared with the hub pages); the retries are the indexer's own.
-      const res = await fetchWithTimeout(url, { redirect: 'follow', ...opts, timeout: TIMEOUT_MS, fetch: fetchFn, headers: { 'User-Agent': USER_AGENT, ...(opts.headers || {}) } });
-      if ((res.status === 429 || res.status >= 500) && attempt < RETRIES) {
-        await wait(1000 * 2 ** attempt);
-        continue;
-      }
-      return res;
-    } catch (err) {
-      lastErr = err;
-      if (attempt < RETRIES) await wait(1000 * 2 ** attempt);
-    }
-  }
-  throw lastErr;
+// A time limit for each answer and tries again after a passing failure (src/net.js, shared with the
+// pages and fetchJson); a 5xx or 429 on the last try is returned, for the caller to report.
+function fetchWithRetry(fetchFn, url, opts = {}) {
+  return retrying(async (last) => {
+    const res = await fetchWithTimeout(url, { redirect: 'follow', ...opts, timeout: TIMEOUT_MS, fetch: fetchFn, headers: { 'User-Agent': USER_AGENT, ...(opts.headers || {}) } });
+    if (!last && (res.status === 429 || res.status >= 500)) throw httpError(res.status);
+    return res;
+  }, { retries: RETRIES, backoff: 1000 });
 }
 
 // Follows redirects one hop at a time, so a failure names the server that

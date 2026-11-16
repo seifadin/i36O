@@ -7,9 +7,9 @@
 //                hub pages are built, since the scripts test them as built)
 // Exit code 0 when every script chosen found nothing different, 1 otherwise.
 import { execFileSync, spawn } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
-import { join, relative } from 'node:path';
-import * as esbuild from 'esbuild';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { appHubFiles } from '../../scripts/app-inputs.js';
 import { REPO, WORK, options, label, pages, app } from './lib/versions.js';
 import { BUILT, MULTI, SCRIPTS, select, everything } from './lib/select.js';
 
@@ -26,26 +26,6 @@ function changedFiles() {
 // A file as it is in one version (null when it isn't there).
 function fileAt(ref, path) {
   try { return ref === WORK ? readFileSync(join(REPO, path)) : git(['show', `${ref}:${path}`], null); } catch { return null; }
-}
-
-// The hub files the app's build reads: those its own files name, and everything their scripts
-// import (esbuild follows the imports, symlinks included). Read from this working copy.
-async function appHubFiles() {
-  const files = ['vite.config.ts', 'index.html', 'tsconfig.app.json', 'tailwind.config.ts'];
-  const walk = (dir) => readdirSync(join(REPO, dir), { withFileTypes: true })
-    .forEach((e) => (e.isDirectory() ? walk(join(dir, e.name)) : /\.(tsx?|css)$/.test(e.name) && files.push(join(dir, e.name))));
-  walk('src');
-  const named = new Set();
-  // Comments left out: they name files the build doesn't read.
-  const code = (f) => readFileSync(join(REPO, f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  for (const f of files) for (const m of code(f).matchAll(/hub\/[\w./-]+\.(?:json|css|js)\b/g)) named.add(m[0]);
-  const scripts = [...named].filter((f) => f.endsWith('.js'));
-  const { metafile } = await esbuild.build({
-    entryPoints: scripts.map((f) => join(REPO, f)), absWorkingDir: REPO, bundle: true, write: false, metafile: true,
-    outdir: 'unused', format: 'esm', platform: 'neutral', packages: 'external', logLevel: 'silent'
-  });
-  for (const input of Object.keys(metafile.inputs)) named.add(relative(REPO, join(REPO, input)));
-  return named;
 }
 
 if (opts.new === WORK && !opts['no-build']) {

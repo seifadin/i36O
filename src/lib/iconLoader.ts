@@ -1,4 +1,4 @@
-import { ComponentType } from 'react'
+import { ComponentType, createElement, ReactElement } from 'react'
 
 // PascalCase (as stored in Baserow, matching lucide-react's named exports) →
 // kebab-case (matching lucide-react's individual icon file names).
@@ -17,12 +17,30 @@ function toKebabCase(name: string): string {
 // only ever fetches the specific icons it actually renders.
 const iconModules = import.meta.glob('/node_modules/lucide-react/dist/esm/icons/*.mjs')
 
-type IconModule = { default: ComponentType<{ size?: number }> }
+type IconModule = { default: ComponentType }
 
-export function loadIcon(name: string): Promise<IconModule> | null {
-  const path = `/node_modules/lucide-react/dist/esm/icons/${toKebabCase(name)}.mjs`
-  const loader = iconModules[path] as (() => Promise<IconModule>) | undefined
-  return loader ? loader() : null
+// Every icon once loaded, by name, as a ready element (made once; an element is a description, so
+// several rows can show the same one) — null for a name Lucide doesn't have, or an icon that failed
+// to load (the row then shows its visible fallback). Shared by the preload and every row, so an
+// icon already loaded is drawn on the row's first frame.
+const loaded = new Map<string, ReactElement | null>()
+const pending = new Map<string, Promise<ReactElement | null>>()
+
+export const iconLoaded = (name: string): boolean => loaded.has(name)
+export const loadedIcon = (name: string): ReactElement | null => loaded.get(name) ?? null
+
+export function fetchIcon(name: string): Promise<ReactElement | null> {
+  if (loaded.has(name)) return Promise.resolve(loadedIcon(name))
+  let request = pending.get(name)
+  if (!request) {
+    const path = `/node_modules/lucide-react/dist/esm/icons/${toKebabCase(name)}.mjs`
+    const loader = iconModules[path] as (() => Promise<IconModule>) | undefined
+    request = (loader ? loader().then((mod) => createElement(mod.default)) : Promise.resolve(null))
+      .catch(() => null)
+      .then((icon) => { loaded.set(name, icon); pending.delete(name); return icon })
+    pending.set(name, request)
+  }
+  return request
 }
 
 // Fires all icon fetches at once, priming the browser's module cache so
@@ -32,9 +50,7 @@ export function loadIcon(name: string): Promise<IconModule> | null {
 // after Sciences data lands — naturally re-runs only when that data
 // actually changes (Edition-gated), same as the underlying fetch itself.
 export function preloadIcons(names: Iterable<string>) {
-  for (const name of names) {
-    loadIcon(name)?.catch(() => {}) // best-effort — DynamicIcon's own fallback handles real failures
-  }
+  for (const name of names) void fetchIcon(name)   // never rejects: a failure is the row's fallback
 }
 
 // WebKit (Safari, the iOS app's WKWebView) has no requestIdleCallback, so

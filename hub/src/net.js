@@ -44,16 +44,34 @@ export async function fetchWithTimeout(url, { timeout = 8000, fetch: send = glob
  * @returns {Promise<any>}
  */
 export async function fetchJson(url, { timeout = 6000, retries = 1, backoff = 800, ...options } = {}) {
-  for (let attempt = 0; ; attempt++) {
+  return retrying(() => fetchWithTimeout(url, { timeout, ...options }, (r) => {
+    if (!r.ok) throw httpError(r.status);
+    return r.json();
+  }), { retries, backoff });
+}
+
+/** An error for an HTTP answer that wasn't OK, carrying its status (what retrying() decides by). @param {number} status */
+export const httpError = (status) => Object.assign(new Error('HTTP ' + status), { status });
+
+// Runs `attempt` again after a passing failure — a network error, no answer in time, or an error
+// with a 5xx or 429 status — up to `retries` more times, waiting backoff, 2×backoff… in between.
+// Any other 4xx is final. `attempt` is told whether this is the last try (to keep an answer
+// rather than throw it). Shared by fetchJson and the CSE indexer.
+/**
+ * @template T
+ * @param {(last: boolean) => Promise<T>} attempt
+ * @param {{ retries?: number, backoff?: number }} [options]
+ * @returns {Promise<T>}
+ */
+export async function retrying(attempt, { retries = 1, backoff = 800 } = {}) {
+  for (let n = 0; ; n++) {
     try {
-      return await fetchWithTimeout(url, { timeout, ...options }, (r) => {
-        if (!r.ok) { const e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
-        return r.json();
-      });
+      return await attempt(n >= retries);
     } catch (e) {
-      const permanent = e.status && e.status >= 400 && e.status < 500 && e.status !== 429;
-      if (permanent || attempt >= retries) throw e;
-      await wait(backoff * 2 ** attempt);
+      const status = /** @type {{ status?: number }} */ (e).status;
+      const permanent = status && status >= 400 && status < 500 && status !== 429;
+      if (permanent || n >= retries) throw e;
+      await wait(backoff * 2 ** n);
     }
   }
 }

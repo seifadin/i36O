@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
+import { Suspense, lazy, useCallback, useState } from 'react'
 import { AppStateProvider } from '@/store/appState'
 import { DataCacheProvider, useDataCache } from '@/store/dataCache'
 import { usePlatform } from '@/hooks/usePlatform'
@@ -30,13 +30,12 @@ function AppShell() {
   const [privacyOpen, setPrivacyOpen] = useState(false)
   const [needsPrivacyNotice, setNeedsPrivacyNotice] = useState(checkPrivacyNotice)
   const [dialogQueue, setDialogQueue] = useState<QueuedDialog[]>([])
+  const [queuedFor, setQueuedFor] = useState<{ resource: typeof resource, changeFlags: typeof changeFlags } | null>(null)
 
   // Shown only once data has settled — the fastest-rendering UI otherwise
-  // caught Amiri's font swap mid-view (§14g).
-  useEffect(() => {
-    if (cacheLoading) return
-    if (needsPrivacyNotice) setPrivacyOpen(true)
-  }, [cacheLoading, needsPrivacyNotice])
+  // caught Amiri's font swap mid-view (§14g). Set while rendering, once (React's pattern for
+  // state that follows other state; an effect would draw a frame without it first).
+  if (!cacheLoading && needsPrivacyNotice && !privacyOpen) setPrivacyOpen(true)
 
   // Stable, so Dialog's focus/keydown effect doesn't re-run on every render.
   // needsPrivacyNotice is cleared too, or the effect above would reopen the
@@ -47,15 +46,16 @@ function AppShell() {
     setPrivacyOpen(false)
   }, [])
 
-  // Broadest scope first: Edition → Version → Revision.
-  useEffect(() => {
-    if (cacheLoading || !resource) return
+  // Broadest scope first: Edition → Version → Revision. Queued once per load (a new resource and
+  // new change flags), set while rendering like the privacy notice above.
+  if (!cacheLoading && resource && (queuedFor?.resource !== resource || queuedFor.changeFlags !== changeFlags)) {
     const queue: QueuedDialog[] = []
     if (changeFlags.editionChanged) queue.push({ title: 'طبعة جديدة', message: 'تمت إضافة / تعديل محتوى مُحدَّث لإثراء تجربتك' })
     if (changeFlags.versionChanged) queue.push({ title: 'إصدار جديد', message: 'تم إطلاق إصدار مُحدَّث لإثراء تجربتك' })
     if (changeFlags.revisionChanged) queue.push({ title: 'مراجعة جديدة', message: 'تم إضافة / تعديل فهرسة تفسير مُحدَّث لإثراء تجربتك' })
+    setQueuedFor({ resource, changeFlags })
     setDialogQueue(queue)
-  }, [cacheLoading, resource, changeFlags])
+  }
 
   const handleDialogClose = useCallback(() => {
     setDialogQueue(prev => prev.slice(1))

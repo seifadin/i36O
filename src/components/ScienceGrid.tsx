@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, Fragment, lazy, Suspense, ComponentType, ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, Fragment, ReactNode } from 'react'
 import { LoaderCircle, Paperclip, CircleCheck, CircleSlash, ChevronDown, ChevronLeft } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { useAppState } from '@/store/appState'
@@ -9,43 +9,28 @@ import { groupSciences } from '@/lib/groupSciences'
 import { checkPageReachable } from '@/lib/reachability'
 import { wait } from '@i360/net'
 import { openResource, ownPagePath } from '@/lib/openResource'
-import { loadIcon } from '@/lib/iconLoader'
+import { fetchIcon, iconLoaded, loadedIcon } from '@/lib/iconLoader'
 import { REPORT_SUBJECTS } from '@/lib/feedbackReport'
 import Dialog from '@/components/Dialog'
 import ReportNotice from '@/components/ReportNotice'
 
-// Caches each lazy component so repeated renders of the same icon name don't
-// recreate a new lazy() wrapper (and re-trigger Suspense) every render.
-const iconCache = new Map<string, ComponentType>()
-
 // Visible fallback for a missing/misnamed icon — silently rendering nothing
 // would make a bad icon name indistinguishable from "no icon set" (a failure
 // nobody sees is hard to diagnose). CircleSlash makes a bad name noticeable.
-function FallbackIcon() {
-  return <CircleSlash />
-}
+const FALLBACK_ICON = <CircleSlash />
 
+// A science's icon, by its Lucide name from Baserow: drawn at once when already loaded (the
+// preload, dataCache.tsx), else as soon as it arrives; nothing until then.
 function DynamicIcon({ name }: { name: string }) {
-  const LazyIcon = useMemo(() => {
-    if (!iconCache.has(name)) {
-      iconCache.set(
-        name,
-        lazy(() => {
-          const promise = loadIcon(name)
-          return promise
-            ? promise.then(mod => ({ default: mod.default }))
-            : Promise.resolve({ default: FallbackIcon })
-        })
-      )
-    }
-    return iconCache.get(name)!
+  const [, setArrived] = useState(0)
+  useEffect(() => {
+    if (iconLoaded(name)) return
+    let live = true
+    void fetchIcon(name).then(() => { if (live) setArrived((n) => n + 1) })
+    return () => { live = false }
   }, [name])
-
-  return (
-    <Suspense fallback={null}>
-      <LazyIcon />
-    </Suspense>
-  )
+  if (!iconLoaded(name)) return null
+  return loadedIcon(name) ?? FALLBACK_ICON
 }
 
 // One button for a minor science, under an intermediate or directly under

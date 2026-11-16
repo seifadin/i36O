@@ -1,63 +1,34 @@
 #!/usr/bin/env bash
 set -x
 
-# ci_post_xcodebuild.sh runs even when xcodebuild fails (Apple's own
-# documented behavior, confirmed via a DTS engineer forum response) — so
-# this MUST gate on CI_XCODEBUILD_EXIT_CODE before releasing anything, or
-# a broken/failed archive could get silently published to OtaKit's real
-# channel as if it were a working release.
+# This script runs even when xcodebuild failed (Apple's documented behaviour): a failed archive
+# must never be released.
 if [ "${CI_XCODEBUILD_EXIT_CODE}" != "0" ]; then
   echo "xcodebuild did not succeed (exit ${CI_XCODEBUILD_EXIT_CODE}) — skipping OtaKit release."
   exit 0
 fi
 
-# Only release on the actual Archive action — CI_XCODEBUILD_ACTION also
-# fires for Build/Test/Analyze, none of which should trigger a release.
+# Only the Archive action releases (not Build, Test or Analyze).
 if [ "${CI_XCODEBUILD_ACTION}" != "archive" ]; then
   echo "Not an archive action (${CI_XCODEBUILD_ACTION}) — skipping OtaKit release."
   exit 0
 fi
 
-# Only release on a manually-triggered build, never an automatic push to
-# vite. This workflow auto-builds on every vite push for free "did I just
-# break iOS" validation — without this gate, every routine WIP commit
-# would get automatically published as a live OTA update to real users.
-# A deliberate "Start Build" click (Xcode or App Store Connect) is the
-# actual "yes, ship this" confirmation, matching pre-push-hook.sh's y/n
-# prompt in spirit, just expressed as a manual dashboard action instead
-# of a terminal keystroke.
+# Only a manual Start Build releases — the deliberate "ship this", like the hook's release
+# question; an automatic build (a workflow started by a push) never does (§15).
 if [ "${CI_START_CONDITION}" != "manual" ]; then
   echo "Automatic build (start condition: ${CI_START_CONDITION}) — skipping OtaKit release. Use a manual Start Build to actually ship."
   exit 0
 fi
 
-# otakit CLI is NOT preinstalled — Xcode Cloud provisions a fresh
-# environment every build, unlike the Mac VM where this was a one-time
-# npm install -g. Needed here, not in ci_post_clone.sh, since nothing
-# before this point actually uses it.
-# Pinned (2026-10-22) to the version the Codespace releases with — never "latest",
-# which changes under us; raise it deliberately, in both places (pre-push-hook.sh).
+# The OtaKit CLI, installed fresh each build, pinned to the version the Codespace releases with
+# (pre-push-hook.sh); raise both together, deliberately.
 npm install -g @otakit/cli@1.4.0
 
-# CWD is this script's own directory — cd to repo root, same reasoning
-# as ci_post_clone.sh. dist/ should still be exactly what ci_post_clone.sh
-# built earlier in this same workflow run — not rebuilding here, since
-# nothing in Xcode's own build step touches the repo-root dist/ (cap sync
-# only copies it into ios/App/App/public). NOT yet verified this holds
-# true against a real log for this specific script — check the first
-# real run carefully before trusting this assumption long-term.
+# The repo root, three levels up; dist/ is the one ci_post_clone.sh built in this run (Xcode's
+# build only copies it into the app), so nothing is rebuilt here.
 cd ../../..
 
-# Shared release-with-retry script (scripts/release-to-otakit.sh, see its
-# own header comment) — extracted 2026-08-17 after the exact same retry
-# logic was duplicated here, in pre-push-hook.sh, and in the iOS Fastfile.
-# No set -e active in this script, so a non-zero exit here doesn't need
-# special handling to avoid aborting anything — but || true keeps it
-# explicit/robust regardless of whether that assumption ever changes.
-#
-# This script previously had no check at all for whether dist/ actually
-# changed since the last OTA release — every genuine manual-start build
-# reaching this point published a release unconditionally. That gap now
-# lives (2026-09-04) inside release-to-otakit.sh itself, shared across
-# all three callers — no changes needed here.
+# The one OTA release path (scripts/release-to-otakit.sh, §14m), which also skips when nothing
+# web-relevant changed since the last release. || true: a failed release never fails the build.
 bash scripts/release-to-otakit.sh || true
