@@ -5,7 +5,7 @@
   "description": "i360 hub: Daily Reflection, Markdown Reader and i360 CSE",
   "scripts": {
     "build": "node scripts/build.js",
-    "test": "eslint . && node --test test/*.test.js",
+    "test": "eslint . && I360_RETRY_BACKOFF_MS=1 node --test test/*.test.js",
     "lint": "eslint .",
     "inventory": "node --env-file=.env indexer/inventory.js",
     "index": "node --env-file=.env indexer/build-index.js",

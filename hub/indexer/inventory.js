@@ -32,6 +32,10 @@ const USER_AGENT = `i360-cse-inventory/1.0 (+${APP_ORIGIN}/)`;
 const CONCURRENCY = 4;
 const TIMEOUT_MS = 30000;
 const RETRIES = 2;
+// The pause before the first retry (then doubled). The hub's tests set I360_RETRY_BACKOFF_MS
+// very short (package.json): they make links fail on purpose, and would otherwise sit out
+// the real pauses (§15ax).
+const BACKOFF_MS = Number(process.env.I360_RETRY_BACKOFF_MS) || 1000;
 const MAX_REDIRECTS = 5;
 // Wikimedia projects that share the MediaWiki API (…/w/api.php).
 const WIKIMEDIA = ['wikipedia', 'wikisource', 'wikiquote', 'wikibooks', 'wiktionary', 'wikinews', 'wikiversity', 'wikivoyage'];
@@ -186,7 +190,7 @@ function fetchWithRetry(fetchFn, url, opts = {}) {
     const res = await fetchWithTimeout(url, { redirect: 'follow', ...opts, timeout: TIMEOUT_MS, fetch: fetchFn, headers: { 'User-Agent': USER_AGENT, ...(opts.headers || {}) } });
     if (!last && (res.status === 429 || res.status >= 500)) throw httpError(res.status);
     return res;
-  }, { retries: RETRIES, backoff: 1000 });
+  }, { retries: RETRIES, backoff: BACKOFF_MS });
 }
 
 // Follows redirects one hop at a time, so a failure names the server that

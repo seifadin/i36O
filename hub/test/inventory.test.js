@@ -228,3 +228,18 @@ test('a missing field stops the run and lists the fields that exist', async () =
 test('no key: a clear message', async () => {
   await assert.rejects(inv.run({ key: '', outDir: '/nonexistent' }), /BASEROW_KEY is not set/);
 });
+
+// The indexer's own retry (src/net.js retrying()): a passing failure is tried again, a last 5xx
+// answer is kept for the report, a 404 is final. The pause is cut short by npm test.
+test('fetchWithRetry: a network error, 5xx or 429 is tried again; the last 5xx answer is returned; a 404 is final', async () => {
+  const answers = (...list) => { const calls = []; return { calls, f: async (url) => { calls.push(url); const a = list.shift(); if (a instanceof Error) throw a; return { status: a, ok: a < 400 }; } }; };
+  let s = answers(new TypeError('fetch failed'), 503, 200);
+  assert.equal((await inv.fetchWithRetry(s.f, 'https://a.example/')).status, 200);
+  assert.equal(s.calls.length, 3);
+  s = answers(429, 500, 502);
+  assert.equal((await inv.fetchWithRetry(s.f, 'https://a.example/')).status, 502);   // kept, not thrown
+  assert.equal(s.calls.length, 3);
+  s = answers(404);
+  assert.equal((await inv.fetchWithRetry(s.f, 'https://a.example/')).status, 404);
+  assert.equal(s.calls.length, 1);
+});
