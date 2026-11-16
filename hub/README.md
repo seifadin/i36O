@@ -38,6 +38,7 @@ src/net.js            fetchWithTimeout(), fetchJson() (time limit, bounded retri
 src/frame.js          oncePerFrame(): layout work at most once per frame
 library/books/        our own books     → lib.i36o.workers.dev/books/ (published by the CSE index workflow)
 forward/404.html      fallback for the forwarding sites
+tools/compare/        dev-only old-vs-new checks (Playwright, not run by npm test) — its README
 ```
 Link to a book: `https://i36o.web.app/md/?file=books/NAME.md`
 Link to a page: add `#p=45` (or `#p=2:45` for volume 2, page 45).
