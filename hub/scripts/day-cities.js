@@ -16,7 +16,7 @@
 // language (listed at the end of --names). The time-zone database is public domain.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { wait } from '../src/net.js';
+import { fetchJson, wait } from '../src/net.js';
 
 const OUT = join(import.meta.dirname, '..', 'src', 'day-cities.json');
 const ZONEINFO = '/usr/share/zoneinfo';
@@ -86,12 +86,11 @@ const km = (a, b, c, d) => {
 
 async function search(name, lang) {
   const url = `${SEARCH}?name=${encodeURIComponent(name)}&count=20&language=${lang}&format=json`;
-  for (let attempt = 1; ; attempt++) {
-    const r = await fetch(url).catch((e) => ({ ok: false, status: e.message }));
-    if (r.ok) return (await r.json()).results || [];
-    if (attempt === 4) throw new Error(`Open-Meteo: ${r.status} for ${name} (${lang})`);
-    await wait(2000 * attempt);
-  }
+  // Up to 4 tries, 2 s apart and doubling (src/net.js; no retry on a 4xx other than 429).
+  const data = await fetchJson(url, { timeout: 15000, retries: 3, backoff: 2000 }).catch((e) => {
+    throw new Error(`Open-Meteo: ${e.status || e.message} for ${name} (${lang})`, { cause: e });
+  });
+  return data.results || [];
 }
 
 // The zone's own city among the results: same country, near the zone's point;

@@ -25,6 +25,9 @@ const state = () => {
     panel: $('side-panel').classList.contains('open') || !$('side-panel').hidden,
     items: document.querySelectorAll('#panel-body .panel-item').length, count: $('search-count').textContent,
     hash: window.location.hash, sheets: document.querySelectorAll('.page-sheet').length,
+    drawn: ['.quran', '.fn-ref', '.fn-note', '.fn-back', '.table-wrap table'].map((s) => document.querySelectorAll(s).length),
+    // what those elements say, not only that they exist (a quote can be drawn empty)
+    drawnText: ['.quran', '.fn-note', '.table-wrap table'].map((s) => [...document.querySelectorAll(s)].map((e) => e.textContent).join('|').length),
     settings: ['btn-theme', 'btn-numerals'].map((id) => { const b = document.getElementById(id); return [b.querySelector('svg')?.dataset.lucide || b.textContent.trim(), b.title, b.getAttribute('aria-label')]; }),
     overflow: document.documentElement.scrollWidth > window.innerWidth
   };

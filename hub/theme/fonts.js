@@ -20,6 +20,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { execFileSync } from 'child_process';
 import * as woff2 from './woff2.js';
+import { fetchWithTimeout } from '../src/net.js';
 
 const SITE = process.env.I360_THEME_SITE || path.join(import.meta.dirname, 'site');   // the variable: tests only
 const FONTS = path.join(SITE, 'fonts');
@@ -56,7 +57,7 @@ function older(a, b) {
 
 async function fetchOk(url, what) {
   let res;
-  try { res = await fetch(url, { signal: AbortSignal.timeout(20000) }); } catch (e) {
+  try { res = await fetchWithTimeout(url, { timeout: 20000 }); } catch (e) {
     throw new Error(`${what}: no answer from ${new URL(url).host} (${(e.cause && e.cause.code) || e.name || e.message})`, { cause: e });
   }
   if (!res.ok) throw new Error(`${what}: HTTP ${res.status} from ${new URL(url).host}`);
