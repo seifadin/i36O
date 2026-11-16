@@ -12,6 +12,7 @@ import {
 import { MD_READER_KEY } from '@i360/storage'
 import { deviceStore } from '@/lib/deviceStorage'
 import { hasChanged, commitBaseline } from '@/lib/changeBaseline'
+import { isNetworkFailure } from '@/lib/startupHealth'
 
 export const LOAD_ERROR = 'تعذّر تحميل البيانات'
 
@@ -107,7 +108,7 @@ interface DataCacheContextType {
   error: string | null
   // Last real failure, kept through retries until a success — user-facing
   // text plus the technical cause, so a bug report says WHAT failed.
-  lastFailure: { message: string; detail: string } | null
+  lastFailure: { message: string; detail: string; network: boolean } | null
   isRetrying: boolean
   findExegesisUrl: (chapter: number, verse: number) => string | null
 }
@@ -126,7 +127,7 @@ export function DataCacheProvider({ children }: { children: ReactNode }): JSX.El
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isRetrying, setIsRetrying] = useState(false)
-  const [lastFailure, setLastFailure] = useState<{ message: string; detail: string } | null>(null)
+  const [lastFailure, setLastFailure] = useState<{ message: string; detail: string; network: boolean } | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -218,6 +219,7 @@ export function DataCacheProvider({ children }: { children: ReactNode }): JSX.El
           setLastFailure({
             message: LOAD_ERROR,
             detail: `${stage}: ${err instanceof Error ? `${err.name}: ${err.message}` : String(err)}`,
+            network: isNetworkFailure(err),   // for the OTA safety net (useOtaHealth.ts)
           })
           if (!retryTimer) {
             retryTimer = setInterval(() => {

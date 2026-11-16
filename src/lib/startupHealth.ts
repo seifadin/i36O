@@ -37,6 +37,19 @@ export function hadUnrecoveredStartupError(): boolean {
   return hadStartupError
 }
 
+// A data failure the network explains — no answer in time (AbortError), no connection (the
+// browsers' own wording: Chrome "Failed to fetch", Safari "Load failed", Firefox "NetworkError…"),
+// or the server busy or down (429, 5xx, as dataSource.ts reports them). Not this bundle's fault, so
+// it must not roll a good update back (§15ba). Anything else — another 4xx, an unexpected answer,
+// a code error — still points at the bundle.
+export function isNetworkFailure(err: unknown): boolean {
+  if (!(err instanceof Error)) return false
+  if (err.name === 'AbortError') return true
+  if (err.name === 'TypeError' && /^(Failed to fetch|Load failed|NetworkError)/i.test(err.message)) return true
+  const status = Number(/^Baserow fetch failed: (\d{3})$/.exec(err.message)?.[1])
+  return status === 429 || status >= 500
+}
+
 // Does the data source's domain respond at all? Single 5s try, shortly
 // before appReadyTimeout. Anything under 500 counts — even a 404 at the bare
 // origin means the domain answered; only a server error or a failed request
