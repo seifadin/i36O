@@ -2,8 +2,8 @@
 //   books()    two long books for the Reader: Arabic with «[ص N]» page marks (40 pages, a chapter
 //              every 8) and English with ==Start pN== / ==End pN== marks (30 pages, a chapter every 6)
 //   linked()   the lib site's /books/ folder for books opened by link (?file=…), where page links
-//              (#p=…) work: the two books, a two-volume book ([ج N ص X], 12 pages each) and a plain
-//              Markdown book without page marks
+//              (#p=…) work: the two books, a two-volume book ([ج N ص X], 12 pages each), a book whose
+//              front matter is lettered ([ص أ] … [ص ج], then [ص 1] … [ص 6]) and a plain Markdown book
 //   library()  a small CSE library written with this working copy's own indexer: three majors,
 //              with and without intermediates, six books, enough hits for «more»
 // The display test (every element the Reader draws: Quran, footnotes, tables, code…) is the repo's
@@ -39,7 +39,7 @@ export function books() {
 
 export function linked() {
   const root = join(DIR, 'linked'), dir = join(root, 'books');
-  if (existsSync(join(dir, 'plain.md'))) return root;
+  if (existsSync(join(dir, 'letters.md'))) return root;
   mkdirSync(dir, { recursive: true });
   const b = books();
   copyFileSync(b.ar, join(dir, 'ar.md'));
@@ -47,6 +47,8 @@ export function linked() {
   let vol = '';
   for (const v of [1, 2]) for (let p = 1; p <= 12; p++) vol += `[ج ${v} ص ${p}]\n\nالجزء ${v} الصفحة ${p} ${'نص '.repeat(150)}\n\n`;
   writeFileSync(join(dir, 'vol.md'), vol);
+  const letters = ['أ', 'ب', 'ج', '1', '2', '3', '4', '5', '6'];
+  writeFileSync(join(dir, 'letters.md'), letters.map((l) => `[ص ${l}]\n\nالصفحة ${l} ${'نص '.repeat(150)}\n\n`).join(''));
   writeFileSync(join(dir, 'plain.md'), `# كتاب\n\n${'نص بلا علامات صفحات. '.repeat(400)}`);
   return root;
 }

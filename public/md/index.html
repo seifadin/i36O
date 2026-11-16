@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-0pdoRGfnONQaNNJLQsdLYrNQJHJ+cHeQH3o94C3Eg1I='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-loiIlLHLT6qHBY1tY9iglBpoY0d8TsUv0P8ydLp27r0='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -4758,6 +4758,10 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     if (n >= 1 && n <= state.pages.length) return n - 1;
     return -1;
   }
+  function hashNamesPage() {
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    return params.has("p") || params.has("n");
+  }
   function hashFor(idx) {
     const p = state.pages[idx];
     if (!p) return "";
@@ -4875,7 +4879,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
       if (idx >= 0) {
         scrollToSheet(idx);
         updateCounter(true);
-      }
+      } else if (hashNamesPage()) updateHash();
     });
     btnBookmark.addEventListener("click", toggleBookmark);
   }
@@ -5424,7 +5428,10 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
       if (target >= 0) {
         scrollToSheet(target);
         updateCounter(true);
-      } else void restorePosition();
+      } else {
+        void restorePosition();
+        if (isLinkable() && hashNamesPage()) queueSave();
+      }
       if (sidePanel.classList.contains("open")) renderPanel();
     }, center);
   }

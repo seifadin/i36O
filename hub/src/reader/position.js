@@ -78,6 +78,15 @@ function hashTargetIdx() {
   return -1;
 }
 
+// Whether the address names a page at all (#p=… or #n=…). One the book doesn't have (#p=abc,
+// a lettered page it lacks, #n= past its end) is replaced by the page actually shown, so the
+// address never names a page that isn't there. Any label is accepted: books number front matter
+// with letters ([ص أ]), and the Reader writes those into the address itself.
+function hashNamesPage() {
+  const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  return params.has('p') || params.has('n');
+}
+
 function hashFor(idx) {
   const p = state.pages[idx];
   if (!p) return '';
@@ -210,9 +219,10 @@ function wirePosition() {
     if (!isLinkable()) return;
     const idx = hashTargetIdx();
     if (idx >= 0) { scrollToSheet(idx); updateCounter(true); }
+    else if (hashNamesPage()) updateHash();
   });
 
   btnBookmark.addEventListener('click', toggleBookmark);
 }
 
-export { applyBookmarkRibbons, bookmarkedSet, copyPageLink, hashTargetIdx, isLinkable, queueSave, removeBookmarkAt, restorePosition, saveNow, shareLink, updateBookmarkButton, wirePosition };
+export { applyBookmarkRibbons, bookmarkedSet, copyPageLink, hashNamesPage, hashTargetIdx, isLinkable, queueSave, removeBookmarkAt, restorePosition, saveNow, shareLink, updateBookmarkButton, wirePosition };

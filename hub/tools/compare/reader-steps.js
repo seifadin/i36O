@@ -2,8 +2,9 @@
 // (the page shown, the page counter, the panel, search results, bookmarks, the address).
 // An Arabic and an English book opened from the device, on a phone (390 px) and a desktop (1280 px):
 // 4 cases × 17 steps; and books opened by link (?file=…, from a local lib site), where page links
-// work: #p= in either numerals and with «ص», #n=, a missing page, volumes, the address following
-// the reading, a reload, a link beating the saved position — 2 cases × 18 steps (+ page errors).
+// work: #p= in either numerals and with «ص», #n=, a missing page, a label that isn't a page (the
+// address then names the page shown), volumes, lettered pages, the address following the reading,
+// a reload, a link beating the saved position — 2 cases × 25 steps (+ page errors).
 // (For a book opened from the device, #p= is ignored on purpose: such a book can't be linked to.)
 //   node reader-steps.js [--old <ref>] [--new <ref>] [--out <folder>]
 import { pages, options, outDir } from './lib/versions.js';
@@ -84,6 +85,8 @@ async function runLinked(browser, v, w) {
   await step('#p=ص 20', () => hash('#p=ص 20'));
   await step('#n=3', () => hash('#n=3'));
   await step('#p=999 (nearest page)', () => hash('#p=999'));
+  await step('#p=abc (not a page: address corrected)', () => hash('#p=abc'));
+  await step('#n=999 (past the end: address corrected)', () => hash('#n=999'));
   await step('Home (address follows)', () => p.keyboard.press('Home'));
   await step('PageDown ×2', async () => { await p.keyboard.press('PageDown'); await p.keyboard.press('PageDown'); });
   await step('reload', async () => { await p.reload(); await p.waitForTimeout(1500); });
@@ -93,6 +96,11 @@ async function runLinked(browser, v, w) {
   await step('volumes: #p=1:9', () => hash('#p=1:9'));
   await step('volumes: #p=7 (this volume)', () => hash('#p=7'));
   await step('volumes: #p=ج2/ص3', () => hash('#p=ج2/ص3'));
+  await step('letters: open #p=ب', () => go(at('letters.md', '#p=ب')));
+  await step('letters: #p=4', () => hash('#p=4'));
+  await step('letters: #p=أ', () => hash('#p=أ'));
+  await step('letters: #p=د (no such letter)', () => hash('#p=د'));
+  await step('letters: open #p=xyz', () => go(at('letters.md', '#p=xyz')));
   await step('English: open #p=7', () => go(at('en.md', '#p=7')));
   await step('plain: open #n=1', () => go(at('plain.md', '#n=1')));
   await step('not in the library', () => go('https://i36o.web.app/md/?file=' + encodeURIComponent('https://example.org/x.md')));

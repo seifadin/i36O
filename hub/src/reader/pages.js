@@ -6,7 +6,7 @@ import * as i360Theme from '../../theme/site/theme-loader.js';
 import { oncePerFrame } from '../frame.js';
 import { BLOCK_SEL, QURAN_CLOSE, QURAN_OPEN } from './text.js';
 import { btnSearchToggle, detectDirection, emptyState, fmtNum, hasVisibleContent, missingPagesBanner, missingPagesText, nextFrame, pagesWrapper, parseBook, progressEl, progressFill, progressText, search, searchInput, searchPopup, setTitle, sidePanel, splitFootnotes, state, storeGet, stripComments, t, viewerContainer } from './state.js';
-import { applyBookmarkRibbons, hashTargetIdx, isLinkable, restorePosition, saveNow } from './position.js';
+import { applyBookmarkRibbons, hashNamesPage, hashTargetIdx, isLinkable, queueSave, restorePosition, saveNow } from './position.js';
 import { updateScanButton } from './library.js';
 import { applyLocalization } from './view.js';
 import { buildVolumeSelect, scrollToSheet, updateCounter, volumeTotals } from './nav.js';
@@ -604,7 +604,12 @@ async function renderDocument(rawText, extraNotices, key, parsedAlready) {
   const center = target >= 0 ? target : (saved && typeof saved.idx === 'number' && saved.idx < state.sheets.length ? saved.idx : 0);
   void buildSheets(run, () => {
     if (target >= 0) { scrollToSheet(target); updateCounter(true); }
-    else void restorePosition();
+    else {
+      void restorePosition();
+      // An address naming a page the book lacks: the page shown is written back once the
+      // position has settled (queueSave writes the address after its pause).
+      if (isLinkable() && hashNamesPage()) queueSave();
+    }
     if (sidePanel.classList.contains('open')) renderPanel();
   }, center);
 }
