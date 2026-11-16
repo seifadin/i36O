@@ -3,7 +3,8 @@
 # i360-instructions.md §10). Only `vite` does anything; other branches push untouched.
 # In order, each only when this push changes what it covers:
 #   1. hub tests (hub/) and app tests (src/ and the app's config) — a failure stops the push
-#   2. the hub Workers: hub/theme/ → theme.i36o.workers.dev, hub/hijri/ → dar-hijri.i36o.workers.dev
+#   2. the hub Workers: hub/theme/ → theme.i36o.workers.dev, hub/hijri/ → dar-hijri.i36o.workers.dev,
+#      and the hub/src files each serves or bundles (scripts/hub-workers-pattern.sh)
 #      (check first — a failure stops the push; a failed publish only warns)
 #   3. build, preview deploy (a check), then ONE question releasing the same build to the web
 #      and, for a web-only change, to phones by OTA (§15r)
@@ -229,7 +230,8 @@ if [ "$DIFF_UNKNOWN" = true ] || printf '%s\n' "$CHANGED_FILES" | grep -qE '^(sr
   fi
 fi
 
-# --- Hub Workers (i360-hub.md §2): a changed hub/theme/ or hub/hijri/ is checked, then
+# --- Hub Workers (i360-hub.md §2): a Worker whose files changed (its folder, or a hub/src file
+# it serves or bundles — scripts/hub-workers-pattern.sh, §15az) is checked, then
 # published from hub/ with its own publish-* script (wrangler pinned there once), before any
 # deploy (pages load theme.css live). A failing CHECK stops the push, so repo and Worker
 # never disagree; a failing PUBLISH only warns. Cloudflare values come from .env in a
@@ -260,14 +262,15 @@ publish_hub_worker() {   # <name> <hub/package.json publish script> <check comma
 
 if [ "$DIFF_UNKNOWN" = true ]; then
   echo "→ Changed files unknown — the theme and Hijri Workers were not checked"
-  echo "  or published. If this push changes hub/theme/ or hub/hijri/, run:"
+  echo "  or published. If this push changes hub/theme/, hub/hijri/ or hub/src/(net|digits|storage).js, run:"
   echo "    cd hub && node theme/fallbacks.js && set -a && source ../.env && set +a && npm run publish-theme"
   echo "    cd hub && node --test test/hijri-*.test.js && set -a && source ../.env && set +a && npm run publish-hijri"
 else
-  if printf '%s\n' "$CHANGED_FILES" | grep -q '^hub/theme/'; then
+  source "$(git rev-parse --show-toplevel)/scripts/hub-workers-pattern.sh"
+  if printf '%s\n' "$CHANGED_FILES" | grep -qE "$THEME_WORKER_PATTERN"; then
     publish_hub_worker "Theme (theme.i36o.workers.dev)" "publish-theme" "node theme/fallbacks.js"
   fi
-  if printf '%s\n' "$CHANGED_FILES" | grep -q '^hub/hijri/'; then
+  if printf '%s\n' "$CHANGED_FILES" | grep -qE "$HIJRI_WORKER_PATTERN"; then
     publish_hub_worker "Hijri Worker (dar-hijri.i36o.workers.dev)" "publish-hijri" "node --test test/hijri-*.test.js"
   fi
 fi
