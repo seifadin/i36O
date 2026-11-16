@@ -119,11 +119,11 @@
 .bpMessageBlocksTextTableData { border: var(--i360-line-width) solid var(--i360-rule); padding: var(--i360-cell-padding); text-align: start; }
 .bpMessageBlocksTextTableHeader { background-color: var(--i360-code); color: var(--i360-heading); font-weight: 700; }
 
-/* Code: as in the Reader — code inside text on the light code colour, code blocks dark; always
+/* Code: as in the Reader — code inside text and code blocks both on the theme's code colour; always
    left-to-right */
 .bpMessageBlocksTextCode { background-color: var(--i360-code); color: var(--i360-text); padding: 0 var(--i360-space-xs); border-radius: var(--i360-radius-sm); direction: ltr; }
 .bpMessageBlocksTextCodeBlock,
-.bpMessageBlocksTextCodeBlockContainer { background-color: var(--i360-code-block); color: var(--i360-code-block-text); direction: ltr; }
+.bpMessageBlocksTextCodeBlockContainer { background-color: var(--i360-code); color: var(--i360-text); direction: ltr; }
 .bpMessageBlocksTextCodeBlockContainer { border-radius: var(--i360-radius-lg); }
 
 /* The share page's top bar (Botpress's page around the chat): title, icons and "Share" in the toolbar's

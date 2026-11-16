@@ -45,10 +45,6 @@
   --i360-focus-ring: 0 0 0 3px rgba(0, 16, 207, 0.25);
   --i360-danger: #b91c1c;
   --i360-overlay: rgba(0, 0, 0, 0.4);
-  --i360-code-block: #0f172a;
-  --i360-code-block-text: #f8fafc;
-  --i360-toast: #1e293b;
-  --i360-toast-text: #f8fafc;
   --i360-hadith: #d97706;
   --i360-hadith-bg: #fef3c7;
   --i360-prayer: #2563eb;
@@ -127,10 +123,6 @@
   --i360-focus-ring: 0 0 0 3px rgba(161, 98, 7, 0.25);
   --i360-danger: #b91c1c;
   --i360-overlay: rgba(0, 0, 0, 0.4);
-  --i360-code-block: #0f172a;
-  --i360-code-block-text: #f8fafc;
-  --i360-toast: #1e293b;
-  --i360-toast-text: #f8fafc;
   --i360-hadith: #b45309;
   --i360-hadith-bg: #fdecc8;
   --i360-prayer: #1d4ed8;
@@ -174,10 +166,6 @@
   --i360-focus-ring: 0 0 0 3px rgba(56, 189, 248, 0.25);
   --i360-danger: #f87171;
   --i360-overlay: rgba(0, 0, 0, 0.55);
-  --i360-code-block: #0b1220;
-  --i360-code-block-text: #f8fafc;
-  --i360-toast: #334155;
-  --i360-toast-text: #f8fafc;
   --i360-hadith: #fbbf24;
   --i360-hadith-bg: rgba(120, 53, 15, 0.3);
   --i360-prayer: #60a5fa;
@@ -606,8 +594,8 @@ svg[data-lucide] {
   gap: var(--i360-space-sm, 0.5rem);
   padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
   border-radius: var(--i360-radius-full, 999px);
-  background: var(--i360-toast, #1e293b);
-  color: var(--i360-toast-text, #f8fafc);
+  background: var(--i360-accent, #0010CF);
+  color: var(--i360-on-accent, #FAF7F2);
   font-size: var(--i360-text-size-sm, 0.875rem);
   line-height: var(--i360-line-height-ui, 1.6);
   box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
@@ -901,8 +889,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
 
     .page-sheet code { background-color: var(--i360-code); padding: 0 var(--i360-space-xs); border-radius: var(--i360-radius-sm); font-family: monospace; font-size: 0.9em; }
     .page-sheet pre {
-      background-color: var(--i360-code-block);
-      color: var(--i360-code-block-text);
+      background-color: var(--i360-code);
+      color: var(--i360-text);
       padding: var(--i360-space-md);
       border-radius: var(--i360-radius-lg);
       overflow-x: auto;

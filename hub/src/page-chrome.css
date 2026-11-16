@@ -311,8 +311,8 @@ svg[data-lucide] {
   gap: var(--i360-space-sm, 0.5rem);
   padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
   border-radius: var(--i360-radius-full, 999px);
-  background: var(--i360-toast, #1e293b);
-  color: var(--i360-toast-text, #f8fafc);
+  background: var(--i360-accent, #0010CF);
+  color: var(--i360-on-accent, #FAF7F2);
   font-size: var(--i360-text-size-sm, 0.875rem);
   line-height: var(--i360-line-height-ui, 1.6);
   box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
