@@ -6,7 +6,7 @@ const TABLE_SCIENCES = import.meta.env.VITE_BASEROW_TABLE_SCIENCES
 const TABLE_RESOURCES = import.meta.env.VITE_BASEROW_TABLE_RESOURCES
 const TABLE_QURAN = import.meta.env.VITE_BASEROW_TABLE_QURAN
 
-import { fetchWithTimeout, wait } from '@i360/net'
+import { fetchJson } from '@i360/net'
 
 const headers = {
   Authorization: `Token ${API_KEY}`,
@@ -78,36 +78,22 @@ interface BaserowResponse<T> {
 // ─── Pagination helper ────────────────────────────────────────────────────────
 
 // Why timeout + retry (§14): without them, one transient network failure, from any
-// source, could break data loading for the whole session.
+// source, could break data loading for the whole session. fetchJson (hub/src/net.js, shared
+// with the hub pages): 3 tries, 1 s then 2 s apart, the 10 s limit covering the answer's body
+// too; a permanent error (4xx other than 429) isn't retried. Closing and reopening the app
+// starts a fresh set of tries — no state is kept across calls.
 const FETCH_TIMEOUT_MS = 10000
 const MAX_RETRIES = 2 // 1 initial attempt + 2 retries = 3 total tries
-const RETRY_BACKOFF_MS = [1000, 2000]
+const RETRY_BACKOFF_MS = 1000 // doubling: 1 s, then 2 s
 
-async function fetchWithRetry(url: string): Promise<Response> {
-  let lastError: unknown
-
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    if (attempt > 0) await wait(RETRY_BACKOFF_MS[attempt - 1] ?? 0)
-
-    try {
-      // The limit covers waiting for the answer (hub/src/net.js, shared with the hub pages).
-      const res = await fetchWithTimeout(url, { headers, timeout: FETCH_TIMEOUT_MS })
-      if (!res.ok) throw new Error(`Baserow fetch failed: ${res.status}`)
-      return res
-    } catch (err) {
-      lastError = err
-      // loop continues to the next attempt, unless this was the last one
-    }
+async function fetchPage<T>(url: string): Promise<BaserowResponse<T>> {
+  try {
+    return await fetchJson(url, { headers, timeout: FETCH_TIMEOUT_MS, retries: MAX_RETRIES, backoff: RETRY_BACKOFF_MS })
+  } catch (err) {
+    // An HTTP error names Baserow in the report; a network error keeps its own words.
+    const status = (err as { status?: number }).status
+    throw status ? new Error(`Baserow fetch failed: ${status}`) : err
   }
-
-  // All retries within this app session exhausted — genuinely propagates
-  // up to dataCache.tsx's catch, setting the visible error. No persistent/
-  // module-level retry counter exists anywhere here by design: closing and
-  // reopening the app is a fresh mount, calling this function fresh, with
-  // its own full, brand-new set of retries — the "last resort" behavior
-  // falls out naturally from not tracking any state across calls, no
-  // special-case code needed for it.
-  throw lastError
 }
 
 async function fetchAllPages<T>(url: string): Promise<T[]> {
@@ -116,8 +102,7 @@ async function fetchAllPages<T>(url: string): Promise<T[]> {
 
   while (nextUrl) {
     const safeUrl = nextUrl.replace(/^http:\/\//, 'https://')
-    const res = await fetchWithRetry(safeUrl)
-    const data: BaserowResponse<T> = await res.json()
+    const data: BaserowResponse<T> = await fetchPage<T>(safeUrl)
     all.push(...data.results)
     nextUrl = data.next
   }
@@ -157,6 +142,13 @@ export async function fetchQuran(): Promise<QuranEntry[]> {
 // fields as strings in JSON despite QuranEntry declaring them as `number` —
 // that TS type is compile-time only and doesn't guarantee the runtime shape,
 // so strict equality against an un-coerced value would silently fail every lookup.
+// The feedback address: the Web field of the i360dbs row named 'Feedback' (§3, §14e), when it is
+// a mailto: link. Used for the saved copy (dataCache.tsx) and its fallback (feedbackReport.ts).
+export function feedbackMailto(sciences: readonly Science[]): string | null {
+  const row = sciences.find(s => s?.ScienceMinor_En === 'Feedback')
+  return row?.Web?.toLowerCase().startsWith('mailto:') ? row.Web : null
+}
+
 export function findExegesisUrl(
   rows: QuranEntry[],
   chapter: number,

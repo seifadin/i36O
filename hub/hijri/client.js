@@ -19,8 +19,10 @@
 
    An ES module, like everything here: bundled into the pages, imported by Node
    and by the Worker, and served as is at dar-hijri.i36o.workers.dev/client.js
-   (it imports calc.js from beside itself). */
+   (it imports calc.js and net.js from beside itself; in the repo net.js is a link to
+   src/net.js). */
 import * as Calc from './calc.js';
+import { fetchWithTimeout } from './net.js';
 
 if (!Calc) throw new Error('HijriClient: load hijri/calc.js first');
 
@@ -41,23 +43,13 @@ function readAnswer(j, date) {
 }
 
 async function ask(url, date, timeoutMs, fetchImpl) {
-  const ctrl = typeof AbortController === 'function' ? new AbortController() : null;
-  let timer;
-  const timeout = new Promise((_, reject) => {
-    timer = setTimeout(() => { if (ctrl) ctrl.abort(); reject(new Error('timeout')); }, timeoutMs);
+  // The time limit covers reading the answer too (src/net.js).
+  return fetchWithTimeout(`${url}/?date=${date}`, { timeout: timeoutMs, fetch: fetchImpl }, async (r) => {
+    if (!r.ok) throw new Error(`status ${r.status}`);
+    const a = readAnswer(await r.json(), date);
+    if (!a) throw new Error('unexpected answer');
+    return a;
   });
-  try {
-    const request = (async () => {
-      const r = await fetchImpl(`${url}/?date=${date}`, ctrl ? { signal: ctrl.signal } : {});
-      if (!r.ok) throw new Error(`status ${r.status}`);
-      const a = readAnswer(await r.json(), date);
-      if (!a) throw new Error('unexpected answer');
-      return a;
-    })();
-    return await Promise.race([request, timeout]);
-  } finally {
-    clearTimeout(timer);
-  }
 }
 
 async function get(options) {

@@ -48,6 +48,18 @@ test('fetchWithTimeout: an answer that never comes is aborted at the limit', asy
   assert.ok(Date.now() - t < 1000);
 });
 
+test('fetchWithTimeout: a fetch that ignores the abort still ends at the limit (AbortError "timeout")', async () => {
+  const t = Date.now();
+  const deaf = () => new Promise(() => { /* never answers, never listens to the signal */ });
+  await assert.rejects(fetchWithTimeout('u', { timeout: 30, fetch: deaf }), (e) => e.name === 'AbortError' && e.message === 'timeout');
+  assert.ok(Date.now() - t < 1000);
+});
+
+test('fetchWithTimeout: the limit covers reading the answer too', async () => {
+  const slowBody = async () => ({ ok: true, json: () => new Promise(() => { /* body never arrives */ }) });
+  await assert.rejects(fetchWithTimeout('u', { timeout: 30, fetch: slowBody }, (r) => r.json()), (e) => e.name === 'AbortError');
+});
+
 test('createStore: JSON under the prefix; missing, empty or broken values give the fallback; never throws', () => {
   const mem = new Map();
   globalThis.localStorage = { getItem: (k) => (mem.has(k) ? mem.get(k) : null), setItem: (k, v) => mem.set(k, String(v)) };

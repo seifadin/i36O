@@ -11,6 +11,9 @@
 /theme-loader.js
   Cache-Control: no-cache
 
+/net.js
+  Cache-Control: no-cache
+
 /botpress.css
   Cache-Control: no-cache
 

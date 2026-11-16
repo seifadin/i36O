@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-5UvvirAPUpeupw0gOKfZifuQ7pIgr6HEMwVIyqHklMc='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-YQ2RKSeWSRJ9Dmw8ChHbVaUcVTVMJ1tiEVFnEEUYzP0='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -1728,6 +1728,53 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     }
   };
 
+  // src/net.js
+  var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read2 = (response) => (
+    /** @type {any} */
+    response
+  )) {
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    let timer, backstop;
+    const expired = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        if (controller) controller.abort();
+        backstop = setTimeout(() => {
+          const e = new Error("timeout");
+          e.name = "AbortError";
+          reject(e);
+        }, 0);
+      }, timeout);
+    });
+    const request = (async () => read2(await send(url, { ...options, signal: controller ? controller.signal : void 0 })))();
+    request.catch(() => {
+    });
+    try {
+      return await Promise.race([request, expired]);
+    } finally {
+      clearTimeout(timer);
+      clearTimeout(backstop);
+    }
+  }
+  async function fetchJson(url, { timeout = 6e3, retries = 1, backoff = 800, ...options } = {}) {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await fetchWithTimeout(url, { timeout, ...options }, (r) => {
+          if (!r.ok) {
+            const e = new Error("HTTP " + r.status);
+            e.status = r.status;
+            throw e;
+          }
+          return r.json();
+        });
+      } catch (e) {
+        const permanent = e.status && e.status >= 400 && e.status < 500 && e.status !== 429;
+        if (permanent || attempt >= retries) throw e;
+        await wait(backoff * 2 ** attempt);
+      }
+    }
+  }
+
   // theme/site/theme-loader.js
   var THEMES = ["system", "light", "sepia", "dark"];
   var NUMERALS = ["western", "arabic", "persian"];
@@ -1999,7 +2046,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     if (copy && (!existing || existing.textContent !== copy)) styleElement().textContent = copy;
     let source = copy ? "cache" : "fallback";
     try {
-      const res = await fetch(CSS_URL, { cache: "no-cache", mode: "cors", credentials: "omit" });
+      const res = await fetchWithTimeout(CSS_URL, { cache: "no-cache", mode: "cors", credentials: "omit" });
       if (!res.ok) throw new Error(`theme.css: HTTP ${res.status}`);
       const text = await res.text();
       if (text.length > MAX_CSS || !text.includes("--i360-bg")) throw new Error("theme.css: unexpected content");
@@ -2163,26 +2210,12 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     return { h: { y: j.h.y, m: j.h.m, d: j.h.d }, source: j.source, provisional: j.provisional, v: j.v };
   }
   async function ask(url, date, timeoutMs, fetchImpl) {
-    const ctrl = typeof AbortController === "function" ? new AbortController() : null;
-    let timer;
-    const timeout = new Promise((_, reject) => {
-      timer = setTimeout(() => {
-        if (ctrl) ctrl.abort();
-        reject(new Error("timeout"));
-      }, timeoutMs);
+    return fetchWithTimeout(`${url}/?date=${date}`, { timeout: timeoutMs, fetch: fetchImpl }, async (r) => {
+      if (!r.ok) throw new Error(`status ${r.status}`);
+      const a = readAnswer(await r.json(), date);
+      if (!a) throw new Error("unexpected answer");
+      return a;
     });
-    try {
-      const request = (async () => {
-        const r = await fetchImpl(`${url}/?date=${date}`, ctrl ? { signal: ctrl.signal } : {});
-        if (!r.ok) throw new Error(`status ${r.status}`);
-        const a = readAnswer(await r.json(), date);
-        if (!a) throw new Error("unexpected answer");
-        return a;
-      })();
-      return await Promise.race([request, timeout]);
-    } finally {
-      clearTimeout(timer);
-    }
   }
   async function get(options) {
     const o = options || {};
@@ -2294,41 +2327,6 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
         }
       }
     };
-  }
-
-  // src/net.js
-  var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read2 = (response) => (
-    /** @type {any} */
-    response
-  )) {
-    const controller = typeof AbortController === "function" ? new AbortController() : null;
-    const timer = setTimeout(() => {
-      if (controller) controller.abort();
-    }, timeout);
-    try {
-      return await read2(await send(url, { ...options, signal: controller ? controller.signal : void 0 }));
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-  async function fetchJson(url, { timeout = 6e3, retries = 1, backoff = 800, ...options } = {}) {
-    for (let attempt = 0; ; attempt++) {
-      try {
-        return await fetchWithTimeout(url, { timeout, ...options }, (r) => {
-          if (!r.ok) {
-            const e = new Error("HTTP " + r.status);
-            e.status = r.status;
-            throw e;
-          }
-          return r.json();
-        });
-      } catch (e) {
-        const permanent = e.status && e.status >= 400 && e.status < 500 && e.status !== 429;
-        if (permanent || attempt >= retries) throw e;
-        await wait(backoff * 2 ** attempt);
-      }
-    }
   }
 
   // src/locales.js

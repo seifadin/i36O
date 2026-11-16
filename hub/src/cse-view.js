@@ -2,7 +2,7 @@
    the page label, the link to open, and the groups to list. No screen code
    here, so it can be tested in Node. An ES module (bundled into
    the CSE page). */
-const LIB_HOST = 'lib.i36o.workers.dev';
+import { LIB_HOST } from './sites.js';
 // The Reader on the same site as this page (i36o.web.app or the app's own copy).
 // Always /md/index.html: inside the app, Capacitor's server answers /md/ with the app's
 // home page (i360-hub.md §10).

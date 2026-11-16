@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
+import { fetchWithTimeout } from './hub/src/net.js'
+import { THEME_ORIGIN } from './hub/src/sites.js'
 
 // The app's Content Security Policy (2026-10-21, §15s) — written into the BUILT
 // index.html only (the dev server's own inline scripts are left alone), as a
@@ -22,8 +24,8 @@ import { createHash } from 'node:crypto'
 // the hub pages allow the same. Scripts stay locked: that is where the risk is.
 const CSP_SOURCES: Record<string, string> = {
   'default-src': "'self'",
-  'style-src': "'self' 'unsafe-inline' https://theme.i36o.workers.dev",
-  'font-src': "'self' https://theme.i36o.workers.dev",
+  'style-src': `'self' 'unsafe-inline' ${THEME_ORIGIN}`,
+  'font-src': `'self' ${THEME_ORIGIN}`,
   'img-src': "'self' data:",
   'connect-src': "'self' https:",
   'object-src': "'none'",
@@ -46,19 +48,21 @@ const CSP_SOURCES: Record<string, string> = {
 //     (Baserow down, no settings), the build goes on and the note keeps '/'.
 const THEME_DIR = fileURLToPath(new URL('./hub/theme/', import.meta.url))
 const THEME_LOADER = `${THEME_DIR}site/theme-loader.js`
-const THEME_SITE_LOADER = 'https://theme.i36o.workers.dev/theme-loader.js'
+const THEME_SITE_LOADER = `${THEME_ORIGIN}/theme-loader.js`
 
 const EARLY_LINK_DEFAULT = "var SUPPORT_LINK = '/';"
 
 async function readSupportLink(env: Record<string, string>): Promise<string | null> {
   const { VITE_BASEROW_URL: url, VITE_BASEROW_KEY: key, VITE_BASEROW_TABLE_RESOURCES: table } = env
   if (!url || !key || !table) throw new Error('no Baserow settings (VITE_BASEROW_* in .env)')
-  const res = await fetch(`${url}${table}/?user_field_names=true&include=Support`, {
+  // The 10 s limit covers reading the answer too (hub/src/net.js).
+  const data = (await fetchWithTimeout(`${url}${table}/?user_field_names=true&include=Support`, {
     headers: { Authorization: `Token ${key}` },
-    signal: AbortSignal.timeout(10000),
-  })
-  if (!res.ok) throw new Error(`Baserow ${res.status}`)
-  const data = (await res.json()) as { results?: { Support?: unknown }[] }
+    timeout: 10000,
+  }, (res) => {
+    if (!res.ok) throw new Error(`Baserow ${res.status}`)
+    return res.json()
+  })) as { results?: { Support?: unknown }[] }
   const link = data.results?.map((row) => row.Support).find((v) => typeof v === 'string' && v.trim())
   if (typeof link !== 'string') return null
   const parsed = new URL(link.trim())
@@ -147,6 +151,7 @@ export default defineConfig({
       '@i360/theme-loader': THEME_LOADER,
       '@i360/net': fileURLToPath(new URL('./hub/src/net.js', import.meta.url)),
       '@i360/storage': fileURLToPath(new URL('./hub/src/storage.js', import.meta.url)),
+      '@i360/sites': fileURLToPath(new URL('./hub/src/sites.js', import.meta.url)),
     },
   },
   build: { target: BUILD_TARGETS },

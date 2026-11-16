@@ -6,7 +6,7 @@ import { Capacitor } from '@capacitor/core'
 import { OtaKit } from '@otakit/capacitor-updater'
 import { deviceStore } from './deviceStorage'
 import { FEEDBACK_MAILTO_KEY, CACHE_KEY_SCIENCES } from '@/store/dataCache'
-import { Science } from '@/api/dataSource'
+import { Science, feedbackMailto } from '@/api/dataSource'
 import { detectOS } from '@/hooks/usePlatform'
 
 // Shared report wording — one definition for every report path.
@@ -33,10 +33,7 @@ export function resolveFeedbackMailto(): string | null {
   const saved = deviceStore.get<unknown>(FEEDBACK_MAILTO_KEY, null)
   if (typeof saved === 'string' && saved) return saved
   const sciences = deviceStore.get<unknown>(CACHE_KEY_SCIENCES, null)
-  const feedbackRow = Array.isArray(sciences)
-    ? (sciences as Science[]).find(s => s?.ScienceMinor_En === 'Feedback')
-    : undefined
-  return feedbackRow?.Web?.toLowerCase().startsWith('mailto:') ? feedbackRow.Web : null
+  return Array.isArray(sciences) ? feedbackMailto(sciences as Science[]) : null
 }
 
 // Diagnostic context prepended to every report (§15d) — nothing personal:

@@ -22,6 +22,7 @@
    anchor = the last date confirmed from Dar al-Ifta (date = Cairo civil date). */
 
 import { fetchWithTimeout } from '../../src/net.js';
+import { toWestern } from '../../src/book-format.js';
 
 const CAIRO = 'Africa/Cairo';
 const STATE_KEY = 'state';
@@ -77,7 +78,9 @@ function parseSite(html) {
   };
 }
 
-const normAr = (s) => String(s).replace(/[٠-٩]/g, (c) => c.charCodeAt(0) - 0x0660)
+// Dar al-Ifta's Arabic text, made comparable: Western digits (the shared toWestern), no
+// diacritics or tatweel, one form of alef, ya and ta marbuta, single spaces.
+const normAr = (s) => toWestern(s)
   .replace(/[ً-ْـ]/g, '').replace(/[إأآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/\s+/g, ' ').trim();
 const AR_MONTHS = (() => {
   const list = { 'ربيع الثاني': 4, 'جمادى الأول': 5, 'جمادى الثانية': 6, 'جمادى الآخر': 6 };

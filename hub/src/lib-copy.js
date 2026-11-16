@@ -6,8 +6,7 @@
    viewer page instead of the text). Also the link to a page's scan on
    archive.org. No page code here. An ES module (bundled into
    the Reader, imported by the tests). */
-const LIB = 'https://lib.i36o.workers.dev/';
-const LIB_HOST = 'lib.i36o.workers.dev';
+import { LIB, LIB_HOST, OLD_BOOK_PATHS } from './sites.js';
 const PARALLEL = 6;   // text chunks downloaded at once
 
 const safeDecode = (s) => { try { return decodeURIComponent(s); } catch { return s; } };
@@ -56,7 +55,7 @@ function isLibBook(link) {
    the Reader page) — and returns the lib site's address for it, or null.
    Everything else is opened only through open(), i.e. only when the
    catalog lists it. */
-const OLD_BOOK_PATHS = { 'i36o.web.app': '/md/books/', 'i360-hub.web.app': '/md/books/', 'i360-e.web.app': '/md/books/', 'i360-md.web.app': '/books/' };
+// The old book paths per site: src/sites.js OLD_BOOK_PATHS.
 
 function bookName(path, prefix) {
   if (!path.startsWith(prefix)) return null;

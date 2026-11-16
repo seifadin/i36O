@@ -4,6 +4,7 @@ import {
   fetchResources,
   fetchQuran,
   findExegesisUrl as findExegesisUrlFn,
+  feedbackMailto,
   Science,
   Resource,
   QuranEntry,
@@ -37,10 +38,8 @@ const CACHE_KEY_QURAN = 'i360CacheQuran'
 export const FEEDBACK_MAILTO_KEY = 'i360FeedbackMailto'
 
 function cacheFeedbackMailto(sciences: Science[]): void {
-  const feedbackRow = sciences.find(s => s.ScienceMinor_En === 'Feedback')
-  if (feedbackRow?.Web?.toLowerCase().startsWith('mailto:')) {
-    deviceStore.set(FEEDBACK_MAILTO_KEY, feedbackRow.Web)
-  }
+  const mailto = feedbackMailto(sciences)
+  if (mailto) deviceStore.set(FEEDBACK_MAILTO_KEY, mailto)
   // Deliberately no else/removal branch: if the Feedback row is temporarily
   // absent from a given fetch (a transient Baserow hiccup, a momentary
   // filter mismatch), keep whatever was last successfully cached rather

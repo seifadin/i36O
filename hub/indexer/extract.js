@@ -8,6 +8,12 @@
 import * as marked from 'marked';
 import zlib from 'node:zlib';
 import * as BookFormat from '../src/book-format.js';
+import { APP_ORIGIN } from '../src/sites.js';
+
+// How the indexer names itself to the sites it reads: plainly to APIs, browser-like to page
+// servers (some refuse a request that doesn't look like a browser's).
+const USER_AGENT = `i360-cse-indexer/1.0 (+${APP_ORIGIN}/)`;
+const BROWSER_LIKE_AGENT = `Mozilla/5.0 (compatible; i360-cse-indexer/1.0; +${APP_ORIGIN}/)`;
 
 const renderer = BookFormat.createRenderer(marked);
 
@@ -115,7 +121,7 @@ function bookPages(raw) {
 async function wikimediaPages(fetchFn, src) {
   const api = `https://${src.lang}.${src.project}.org/w/api.php?format=json&formatversion=2&redirects=1`;
   const get = async (q) => {
-    const res = await fetchFn(`${api}&${q}`, { headers: { 'User-Agent': 'i360-cse-indexer/1.0 (+https://i36o.web.app/)' } });
+    const res = await fetchFn(`${api}&${q}`, { headers: { 'User-Agent': USER_AGENT } });
     if (!res.ok) throw new Error(`${src.project} API HTTP ${res.status}`);
     return res.json();
   };
@@ -162,7 +168,7 @@ function translatedWiki(url) {
 async function translatedWikiPages(fetchFn, src) {
   const t = translatedWiki(src.fetchUrl);
   const api = `https://${t.lang}.${t.project}.org/w/api.php?format=json&formatversion=2&redirects=1&action=query&prop=langlinks&lllang=${encodeURIComponent(t.target)}&titles=${encodeURIComponent(t.title)}`;
-  const res = await fetchFn(api, { headers: { 'User-Agent': 'i360-cse-indexer/1.0 (+https://i36o.web.app/)' } });
+  const res = await fetchFn(api, { headers: { 'User-Agent': USER_AGENT } });
   if (!res.ok) throw new Error(`${t.project} API HTTP ${res.status}`);
   const data = await res.json();
   const page = data.query && data.query.pages && data.query.pages[0];
@@ -298,7 +304,7 @@ async function webPages(fetchFn, src) {
   if (TRANSLATED_IN_BROWSER.test(new URL(src.fetchUrl).hostname)) {
     throw new Error('Google translates this page in the browser; a download gets the untranslated text (not indexed until decided)');
   }
-  const res = await fetchFn(src.fetchUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; i360-cse-indexer/1.0; +https://i36o.web.app/)' } });
+  const res = await fetchFn(src.fetchUrl, { headers: { 'User-Agent': BROWSER_LIKE_AGENT } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const html = await res.text();
   const title = (/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html) || [])[1];

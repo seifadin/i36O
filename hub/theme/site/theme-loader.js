@@ -10,7 +10,7 @@
 //        import * as theme from 'https://theme.i36o.workers.dev/theme-loader.js';
 //        theme.init();
 //
-// init() applies the saved choice, fetches theme.css fresh (no-cache), and
+// init() applies the saved choice, fetches theme.css fresh (no-cache, 8 s at most), and
 // keeps a copy on the device for the next visit and for offline use. Without
 // the site and without a copy, the app's fallback stays. A page whose <html>
 // has data-i360-lock="light" (the i360إ app) always shows that theme.
@@ -18,6 +18,10 @@
 // The choices (theme, and numerals: 0123 · ٠١٢٣ · ۰۱۲۳) are shared by every app
 // on the same site (hub: the landing page, Daily Reflection, the Reader, the
 // CSE) and follow changes made in another tab.
+//
+// It imports net.js from beside itself (the time-limited request every i360 page uses); on
+// the theme site, and here in the repo, that file is a link to hub/src/net.js.
+import { fetchWithTimeout } from './net.js';
 
 // Types, as JSDoc (read by the i360إ app's TypeScript directly, so they are written once, here).
 /** @typedef {'system' | 'light' | 'sepia' | 'dark'} ThemeChoice */
@@ -309,7 +313,7 @@ export async function init() {
   let source = copy ? 'cache' : 'fallback';
 
   try {
-    const res = await fetch(CSS_URL, { cache: 'no-cache', mode: 'cors', credentials: 'omit' });
+    const res = await fetchWithTimeout(CSS_URL, { cache: 'no-cache', mode: 'cors', credentials: 'omit' });
     if (!res.ok) throw new Error(`theme.css: HTTP ${res.status}`);
     const text = await res.text();
     if (text.length > MAX_CSS || !text.includes('--i360-bg')) throw new Error('theme.css: unexpected content');

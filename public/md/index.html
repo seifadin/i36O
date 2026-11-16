@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-gZlT65poafulNhIMqDcl2g8piVtdoKZAHvLDzhtHSA4='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-Cs9dNPot+beFc7HDZ8+6w2ee4eOJAls5Ut/WwFWJSqU='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -1252,6 +1252,35 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       __defProp(target, name, { get: all[name], enumerable: true });
   };
 
+  // src/net.js
+  var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read2 = (response) => (
+    /** @type {any} */
+    response
+  )) {
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    let timer, backstop;
+    const expired = new Promise((_2, reject) => {
+      timer = setTimeout(() => {
+        if (controller) controller.abort();
+        backstop = setTimeout(() => {
+          const e = new Error("timeout");
+          e.name = "AbortError";
+          reject(e);
+        }, 0);
+      }, timeout);
+    });
+    const request = (async () => read2(await send(url, { ...options, signal: controller ? controller.signal : void 0 })))();
+    request.catch(() => {
+    });
+    try {
+      return await Promise.race([request, expired]);
+    } finally {
+      clearTimeout(timer);
+      clearTimeout(backstop);
+    }
+  }
+
   // theme/site/theme-loader.js
   var THEMES = ["system", "light", "sepia", "dark"];
   var NUMERALS = ["western", "arabic", "persian"];
@@ -1490,7 +1519,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     if (copy && (!existing || existing.textContent !== copy)) styleElement().textContent = copy;
     let source = copy ? "cache" : "fallback";
     try {
-      const res = await fetch(CSS_URL, { cache: "no-cache", mode: "cors", credentials: "omit" });
+      const res = await fetchWithTimeout(CSS_URL, { cache: "no-cache", mode: "cors", credentials: "omit" });
       if (!res.ok) throw new Error(`theme.css: HTTP ${res.status}`);
       const text = await res.text();
       if (text.length > MAX_CSS || !text.includes("--i360-bg")) throw new Error("theme.css: unexpected content");
@@ -1505,9 +1534,20 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     return { ...state2, source };
   }
 
-  // src/lib-copy.js
-  var LIB = "https://lib.i36o.workers.dev/";
+  // src/sites.js
+  var APP_HOST = "i36o.web.app";
+  var APP_ORIGIN = `https://${APP_HOST}`;
+  var SITE_FORWARDERS = Object.freeze(["i360-e.web.app", "i360-hub.web.app"]);
+  var TOOL_FORWARDERS = Object.freeze({ "i360-day.web.app": "day", "i360-md.web.app": "md", "i360-cse.web.app": "cse" });
+  var OLD_BOOK_PATHS = Object.freeze({
+    [APP_HOST]: "/md/books/",
+    ...Object.fromEntries(SITE_FORWARDERS.map((host) => [host, "/md/books/"])),
+    "i360-md.web.app": "/books/"
+  });
   var LIB_HOST = "lib.i36o.workers.dev";
+  var LIB = `https://${LIB_HOST}/`;
+
+  // src/lib-copy.js
   var PARALLEL = 6;
   var safeDecode = (s) => {
     try {
@@ -1546,7 +1586,6 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     }
     return null;
   }
-  var OLD_BOOK_PATHS = { "i36o.web.app": "/md/books/", "i360-hub.web.app": "/md/books/", "i360-e.web.app": "/md/books/", "i360-md.web.app": "/books/" };
   function bookName(path, prefix) {
     if (!path.startsWith(prefix)) return null;
     const name = safeDecode(path.slice(prefix.length));
@@ -1643,23 +1682,6 @@ ${body}`;
       }
     }));
     return { source, books: itemBooks(catalog, source), text: texts.filter(Boolean).join("\n\n") };
-  }
-
-  // src/net.js
-  var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read2 = (response) => (
-    /** @type {any} */
-    response
-  )) {
-    const controller = typeof AbortController === "function" ? new AbortController() : null;
-    const timer = setTimeout(() => {
-      if (controller) controller.abort();
-    }, timeout);
-    try {
-      return await read2(await send(url, { ...options, signal: controller ? controller.signal : void 0 }));
-    } finally {
-      clearTimeout(timer);
-    }
   }
 
   // src/page-chrome.js

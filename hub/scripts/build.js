@@ -31,6 +31,7 @@ import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import * as esbuild from 'esbuild';
 import { fallbackCss } from '../theme/fallbacks.js';
+import { LIB_HOST, THEME_ORIGIN as THEME_SITE } from '../src/sites.js';
 import { checkInlineScripts } from './check-scripts.js';
 
 const root = join(import.meta.dirname, '..');
@@ -40,7 +41,7 @@ const { targets: TARGETS } = JSON.parse(read('build-targets.json'));
 const pkgVersion = (name) => JSON.parse(read(`node_modules/${name}/package.json`)).version;
 
 // The shared theme site: theme.css, the fonts (and the hosted copy of the loader).
-const THEME_ORIGIN = process.env.I360_THEME_ORIGIN || 'https://theme.i36o.workers.dev';
+const THEME_ORIGIN = process.env.I360_THEME_ORIGIN || THEME_SITE;
 if (!/^https?:\/\/[a-z0-9.-]+(:\d+)?$/i.test(THEME_ORIGIN)) throw new Error(`I360_THEME_ORIGIN must be a bare origin, got "${THEME_ORIGIN}"`);
 
 const theme = {
@@ -128,7 +129,7 @@ buildPage({
   main: await bundle('src/reader/main.js', {
     banner: `/*! marked v${pkgVersion('marked')} | MIT License | Copyright (c) 2018-2026, MarkedJS; Copyright (c) 2011-2018, Christopher Jeffrey | https://github.com/markedjs/marked */`
   }),
-  connectSrc: 'https://lib.i36o.workers.dev'
+  connectSrc: `https://${LIB_HOST}`
 });
 
 // The CSE page: reads only the lib site (and, for testing on this computer,
@@ -137,7 +138,7 @@ buildPage({
   src: 'src/cse.src.html',
   out: '../public/cse/index.html',
   main: await bundle('src/cse/main.js'),
-  connectSrc: 'https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*'
+  connectSrc: `https://${LIB_HOST} http://localhost:* http://127.0.0.1:*`
 });
 
 // Daily Reflection («التأمل اليومي», at /day/): its Tailwind CSS (built here from src/day.tailwind.js:

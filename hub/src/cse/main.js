@@ -5,10 +5,11 @@ import * as SearchCore from '../search-core.js';
 import * as CseIndex from '../cse-index.js';
 import * as CseView from '../cse-view.js';
 import { fetchWithTimeout } from '../net.js';
+import { LIB } from '../sites.js';
 import { $, IN_APP, drawSettingsButtons, el, setupClose, wireSettingsButtons } from '../page-chrome.js';
 import { CSE as LOCALES } from '../locales.js';
 
-const DEFAULT_DATA = 'https://lib.i36o.workers.dev/';
+const DEFAULT_DATA = LIB;   // src/sites.js
 const BRAND = '\u2066i360\u200Eإ\u2069';   // kept "i360إ" in Arabic text (left-to-right isolate)
 const CONFIRM_BATCH = 8;   // candidate pages checked at once
 

@@ -6,7 +6,9 @@
 export const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // fetch(), aborted after `timeout` ms. The limit also covers `read` (reading the answer), when
-// one is given; without one the Response is returned as soon as it arrives.
+// one is given; without one the Response is returned as soon as it arrives. A fetch that
+// doesn't honour the abort (an old engine, a stand-in) still ends at the limit: an AbortError
+// "timeout" follows one turn later, if the request hasn't ended by itself by then.
 /**
  * @template [T=Response]
  * @param {string} url
@@ -17,11 +19,20 @@ export const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  */
 export async function fetchWithTimeout(url, { timeout = 8000, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => /** @type {any} */ (response)) {
   const controller = typeof AbortController === 'function' ? new AbortController() : null;
-  const timer = setTimeout(() => { if (controller) controller.abort(); }, timeout);
+  let timer, backstop;
+  const expired = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      if (controller) controller.abort();
+      backstop = setTimeout(() => { const e = new Error('timeout'); e.name = 'AbortError'; reject(e); }, 0);
+    }, timeout);
+  });
+  const request = (async () => read(await send(url, { ...options, signal: controller ? controller.signal : undefined })))();
+  request.catch(() => { /* settled after the limit: already answered by `expired` */ });
   try {
-    return await read(await send(url, { ...options, signal: controller ? controller.signal : undefined }));
+    return await Promise.race([request, expired]);
   } finally {
     clearTimeout(timer);
+    clearTimeout(backstop);
   }
 }
 

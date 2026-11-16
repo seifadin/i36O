@@ -2,6 +2,7 @@ import { Browser } from '@capacitor/browser'
 import { Capacitor } from '@capacitor/core'
 import { resolveOpenMethod, matchesWebList } from '@/hooks/usePlatform'
 import { tryOpenNewTab } from '@/lib/openTab'
+import { APP_HOST, SITE_FORWARDERS, TOOL_FORWARDERS } from '@i360/sites'
 
 interface OpenContext {
   useWeb: boolean
@@ -24,8 +25,9 @@ interface OpenContext {
 // addresses and the old forwarders. Always as /<page>/index.html: Capacitor's built-in server answers a
 // path without a file extension with the app's own index.html (i360-hub.md §10).
 const OWN_PAGES = ['day', 'md', 'cse']
-const OWN_HOSTS = ['i36o.web.app', 'i360-e.web.app', 'i360-hub.web.app']
-const FORWARDERS: Record<string, string> = { 'i360-day.web.app': 'day', 'i360-md.web.app': 'md', 'i360-cse.web.app': 'cse' }
+// The addresses themselves are in hub/src/sites.js (shared with the hub and its forwarders' test).
+const OWN_HOSTS: readonly string[] = [APP_HOST, ...SITE_FORWARDERS]
+const FORWARDERS: Readonly<Record<string, string>> = TOOL_FORWARDERS
 
 export function ownPagePath(url: string): string | null {
   if (!Capacitor.isNativePlatform()) return null

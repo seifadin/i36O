@@ -37,6 +37,8 @@ src/storage.js        createStore(prefix): get / set / remove settings on the de
 src/net.js            fetchWithTimeout(), fetchJson() (time limit, bounded retries), wait() — also used by
                       the app (@i360/net), the Hijri Worker, the CSE indexer and scripts/day-cities.js
 src/frame.js          oncePerFrame(): layout work at most once per frame
+src/sites.js          every i360 address (app site, forwarders, old book paths, lib, theme) — also the
+                      app's (@i360/sites); test/sites.test.js checks firebase.json against it
 library/books/        our own books     → lib.i36o.workers.dev/books/ (published by the CSE index workflow)
 indexer/wrangler.jsonc  the lib Worker (lib.i36o.workers.dev: the CSE build and our books, files only)
 forward/404.html      fallback for the forwarding sites

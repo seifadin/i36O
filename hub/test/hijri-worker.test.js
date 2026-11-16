@@ -88,9 +88,11 @@ test('OPTIONS and other methods', async () => {
 });
 
 test('the Worker serves the real shared files: hijri/site/ links to them', () => {
-  for (const name of ['calc.js', 'client.js']) {
+  for (const name of ['calc.js', 'client.js', 'net.js']) {
     const link = join(import.meta.dirname, '../hijri/site', name);
     assert.ok(lstatSync(link).isSymbolicLink(), `hijri/site/${name} must be a symlink, not a copy`);
     assert.equal(realpathSync(link), realpathSync(join(import.meta.dirname, '../hijri', name)));
   }
+  // client.js imports net.js from beside itself: in the repo that is a link to src/net.js too.
+  assert.equal(realpathSync(join(import.meta.dirname, '../hijri/net.js')), realpathSync(join(import.meta.dirname, '../src/net.js')));
 });

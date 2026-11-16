@@ -32,6 +32,9 @@
       ],
       "@i360/storage": [
         "./hub/src/storage.js"
+      ],
+      "@i360/sites": [
+        "./hub/src/sites.js"
       ]
     },
     "noImplicitReturns": true,

@@ -34,12 +34,11 @@ import { writeBuild } from './index-writer.js';
 import * as BookFormat from '../src/book-format.js';
 import * as SearchCore from '../src/search-core.js';
 import * as CseIndex from '../src/cse-index.js';
+import { LIB as LIB_URL, LIB_HOST } from '../src/sites.js';
 
 // Bump when the way text is extracted changes: every cached text is redone.
 const EXTRACTOR_VERSION = 1;
 const CONCURRENCY = 3;
-const LIB_HOST = 'lib.i36o.workers.dev';
-const LIB_URL = `https://${LIB_HOST}/`;
 
 const cacheKey = (id) => {
   let h = 0x811c9dc5;
