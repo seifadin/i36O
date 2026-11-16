@@ -55,6 +55,9 @@ const FAKE_ENV = {
   VITE_BASEROW_KEY: 'compare', VITE_TRANSLATOR_KEY: '', VITE_TRANSLATOR_URL: '', VITE_PSE_CX: ''
 };
 export function app(ref) {
+  // run.js builds the working copy's app once and hands it to the scripts it runs.
+  const given = process.env.I360_COMPARE_WORK_APP;
+  if (ref === WORK && given && existsSync(join(given, 'index.html'))) return { label: label(ref), dist: given, theme: pages(ref).theme };
   const id = ref === WORK ? `work-${Date.now()}` : shortSha(ref);
   const out = join(CACHE, `${id}-app`);
   if (ref !== WORK && existsSync(join(out, 'index.html'))) return { label: label(ref), dist: out, theme: pages(ref).theme };

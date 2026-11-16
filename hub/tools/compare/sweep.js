@@ -57,9 +57,18 @@ async function sweepOne(browser, hosts, url, prepare, inApp = false, clock = fal
   const rows = [];
   for (const w of WIDTHS) {
     await p.setViewportSize({ width: w, height: 800 });
-    await p.waitForTimeout(80);
-    if (clock) await p.clock.runFor(100);
-    rows.push([`${w}px`, await p.evaluate(measure)]);
+    // A page lays itself out again a frame or two after a resize (Daily Reflection's prayer
+    // grid, oncePerFrame); after a big jump, on a busy machine, the first reading can come
+    // before that. So read until two readings in a row agree (at most 6).
+    let last = null, now = null;
+    for (let i = 0; i < 6; i++) {
+      await p.waitForTimeout(i ? 40 : 80);
+      if (clock) await p.clock.runFor(100);
+      now = await p.evaluate(measure);
+      if (last && JSON.stringify(now) === JSON.stringify(last)) break;
+      last = now;
+    }
+    rows.push([`${w}px`, now]);
   }
   await ctx.close();
   return rows;

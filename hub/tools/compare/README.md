@@ -9,11 +9,22 @@ the release checks).
 
 ```
 cd hub/tools/compare
-node reader-steps.js                       # live (origin/vite) vs this working copy
+node run.js                                # only the scripts this change needs, two at a time
+node run.js --plan                         # what it would run, and why, without running anything
+node run.js --all                          # every script on every page
+node reader-steps.js                       # one script: live (origin/vite) vs this working copy
 node day-steps.js --old HEAD~1 --new HEAD  # any two git refs
 node pixels.js --pages day --full          # options per script, see each file's header
 ```
 
+- **`run.js` chooses** (`lib/select.js`): a hub page is checked when its built
+  `public/<page>/index.html` differs between the two versions (exact: it is what the scripts test);
+  the app when a file its web build reads changed (anything outside `hub/` except native, docs, hook
+  scripts and the hub pages, and the hub files it imports — found by following imports); everything
+  when the theme site (`hub/theme/site/`) changed, since every page reads it live; a script on all its
+  pages when it changed itself, all of them when `lib/` changed. With `--new` the working copy it
+  first runs the hub build (`--no-build` to skip). It builds each version's app once for all the
+  scripts, prints each script's result as it finishes, and exits 1 if any found a difference.
 - **Versions:** `--old` defaults to `origin/vite` (what is live), `--new` to `work`: this working copy
   as it is now. The hub pages are compared **as built**, so run `npm run build` in `hub/` first. A
   git ref (branch, tag, commit) is unpacked once into the temporary folder (`i360-compare/`) and
@@ -36,7 +47,7 @@ node pixels.js --pages day --full          # options per script, see each file's
 | `cse-steps.js` | the CSE on a small test library: search, expand / collapse, «more», the two options, a too-short search, a failed search and its retry, the theme button | 390 / 1280 px, up to 15 steps |
 | `day-steps.js` | Daily Reflection, services faked, clock fixed at 2027-01-05 in Cairo (Isra "today"): languages, madhab, the date converter (both directions, a leap day, a missing 30th, a year out of range), city picker and search, numerals, theme | 390 / 1280 px, 20 steps |
 | `app-sizes.js` | the app's title and the science list's three text sizes, with a major and an intermediate opened; also flags a level bigger than the title, or sideways scrolling | 85 widths, 260–1400 px |
-| `sweep.js` | every page resized 260–1800 px: sideways scrolling, the toolbar running off, its level and what sits in ⋮, Day's columns and prayer rows | Reader (browser and app), CSE, Day, app |
+| `sweep.js` | every page resized 260–1800 px: sideways scrolling, the toolbar running off, its level and what sits in ⋮, Day's columns and prayer rows — read until two readings in a row agree (a page lays itself out again a frame after a resize) | Reader (browser and app), CSE, Day, app |
 | `pixels.js` | screenshots pixel by pixel; where they differ, a third image marks the changed pixels in red | Reader (display test), CSE, Day, app × light / sepia / dark × 390 / 1280 px |
 | `safe-area.js` | text or a control inside a left or right safe-area inset (emulated by Chromium); full-width rows and ornaments are skipped, their text is still checked | the same pages × iPhone portrait / landscape and the Surface Duo's three layouts, inset on either side |
 
@@ -52,6 +63,7 @@ Every result also includes the page's uncaught errors, so a new error is a diffe
 - `fixtures.js` — the test books (also as the lib site's books, for links) and the CSE test library, made on the fly from a fixed seed (the
   library with this working copy's own indexer); the display test is `hub/library/books/display-test.md`.
 - `report.js` — the old-vs-new comparison and its printout.
+- `select.js` — which scripts and pages a change needs (`run.js`).
 
 ## Checking the scripts themselves
 
