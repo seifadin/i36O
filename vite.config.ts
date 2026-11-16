@@ -52,13 +52,15 @@ const THEME_SITE_LOADER = `${THEME_ORIGIN}/theme-loader.js`
 
 const EARLY_LINK_DEFAULT = "var SUPPORT_LINK = '/';"
 
+// Baserow's answer at build time; the limit covers reading the answer too (hub/src/net.js).
+const SUPPORT_LINK_TIMEOUT_MS = 10000
+
 async function readSupportLink(env: Record<string, string>): Promise<string | null> {
   const { VITE_BASEROW_URL: url, VITE_BASEROW_KEY: key, VITE_BASEROW_TABLE_RESOURCES: table } = env
   if (!url || !key || !table) throw new Error('no Baserow settings (VITE_BASEROW_* in .env)')
-  // The 10 s limit covers reading the answer too (hub/src/net.js).
   const data = (await fetchWithTimeout(`${url}${table}/?user_field_names=true&include=Support`, {
     headers: { Authorization: `Token ${key}` },
-    timeout: 10000,
+    timeout: SUPPORT_LINK_TIMEOUT_MS,
   }, (res) => {
     if (!res.ok) throw new Error(`Baserow ${res.status}`)
     return res.json()

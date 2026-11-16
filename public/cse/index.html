@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-JoqAL4dzf4a3p9YMGo61weeqV9m33my7TtdBz0TEEc8='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-3Uks/l6zc+jEItytB85DPSJtY1iAwJcTkCXr3Y4Ch7I='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -752,7 +752,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   <script>"use strict";
 (() => {
   // src/net.js
-  async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => (
+  var DEFAULT_TIMEOUT_MS = 8e3;
+  async function fetchWithTimeout(url, { timeout = DEFAULT_TIMEOUT_MS, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => (
     /** @type {any} */
     response
   )) {

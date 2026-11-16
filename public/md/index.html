@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-Qu4tYsopnup8nDNQcsWScd24554umaO4xlmqomQnWJU='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-nyFMFQV5YRezx6o9ZIjEf7nP/lFxlcWrV7hUujCpI8o='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -1268,8 +1268,9 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   };
 
   // src/net.js
+  var DEFAULT_TIMEOUT_MS = 8e3;
   var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => (
+  async function fetchWithTimeout(url, { timeout = DEFAULT_TIMEOUT_MS, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => (
     /** @type {any} */
     response
   )) {

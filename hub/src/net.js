@@ -2,6 +2,10 @@
 // Shared by the hub pages (bundled into each by scripts/build.js) and the i360إ app (imported
 // as '@i360/net'; its types come from the JSDoc below).
 
+// The time limit when a caller names none: long enough for a slow phone network, short enough
+// that a page doesn't seem stuck. Callers with their own reasons pass their own.
+const DEFAULT_TIMEOUT_MS = 8000;
+
 /** A pause, e.g. between two tries. @param {number} ms @returns {Promise<void>} */
 export const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -17,7 +21,7 @@ export const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  * @param {(response: Response) => T | Promise<T>} [read]
  * @returns {Promise<T>}
  */
-export async function fetchWithTimeout(url, { timeout = 8000, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => /** @type {any} */ (response)) {
+export async function fetchWithTimeout(url, { timeout = DEFAULT_TIMEOUT_MS, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => /** @type {any} */ (response)) {
   const controller = typeof AbortController === 'function' ? new AbortController() : null;
   let timer, backstop;
   const expired = new Promise((_, reject) => {
@@ -43,7 +47,7 @@ export async function fetchWithTimeout(url, { timeout = 8000, fetch: send = glob
  * @param {RequestInit & { timeout?: number, retries?: number, backoff?: number }} [init]
  * @returns {Promise<any>}
  */
-export async function fetchJson(url, { timeout = 6000, retries = 1, backoff = 800, ...options } = {}) {
+export async function fetchJson(url, { timeout = DEFAULT_TIMEOUT_MS, retries = 1, backoff = 800, ...options } = {}) {
   return retrying(() => fetchWithTimeout(url, { timeout, ...options }, (r) => {
     if (!r.ok) throw httpError(r.status);
     return r.json();

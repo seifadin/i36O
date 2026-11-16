@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-q5D3tFvqACTTSqZy2yTTrTKQsHq0QUOx8NAqUIb/ARo='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-qgu10WlG7JbH4crb8hhISVMHA4Dj+FLMl2BZmx7XZn0='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -1744,8 +1744,9 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   };
 
   // src/net.js
+  var DEFAULT_TIMEOUT_MS = 8e3;
   var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => (
+  async function fetchWithTimeout(url, { timeout = DEFAULT_TIMEOUT_MS, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => (
     /** @type {any} */
     response
   )) {
@@ -1771,7 +1772,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       clearTimeout(backstop);
     }
   }
-  async function fetchJson(url, { timeout = 6e3, retries = 1, backoff = 800, ...options } = {}) {
+  async function fetchJson(url, { timeout = DEFAULT_TIMEOUT_MS, retries = 1, backoff = 800, ...options } = {}) {
     return retrying(() => fetchWithTimeout(url, { timeout, ...options }, (r) => {
       if (!r.ok) throw httpError(r.status);
       return r.json();
