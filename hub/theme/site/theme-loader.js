@@ -19,11 +19,12 @@
 // on the same site (hub: the landing page, Daily Reflection, the Reader, the
 // CSE) and follow changes made in another tab.
 //
-// It imports net.js (the time-limited request every i360 page uses) and digits.js (the digit
-// converter) from beside itself; on the theme site, and here in the repo, both are links to
-// hub/src/.
+// It imports net.js (the time-limited request every i360 page uses), digits.js (the digit
+// converter) and storage.js (settings as JSON, like every i360 page) from beside itself; on the
+// theme site, and here in the repo, all three are links to hub/src/.
 import { fetchWithTimeout } from './net.js';
 import { ANY_DIGIT, writeNumerals } from './digits.js';
+import { createStore } from './storage.js';
 
 // Types, as JSDoc (read by the i360إ app's TypeScript directly, so they are written once, here).
 /** @typedef {'system' | 'light' | 'sepia' | 'dark'} ThemeChoice */
@@ -85,12 +86,7 @@ const listeners = new Set();
 const numeralListeners = new Set();
 let started = false;
 
-function read(key) {
-  try { return localStorage.getItem(key); } catch { return null; }
-}
-function write(key, value) {
-  try { localStorage.setItem(key, value); return true; } catch { return false; }   // private browsing, full storage
-}
+const store = createStore();   // never throws: private browsing or full storage just isn't remembered
 
 function lockedTheme() {
   const t = root.getAttribute('data-i360-lock');
@@ -101,7 +97,7 @@ function lockedTheme() {
 export function getChoice() {
   const lock = lockedTheme();
   if (lock) return lock;
-  const c = read(CHOICE_KEY);
+  const c = store.get(CHOICE_KEY, null);
   return THEMES.includes(c) ? c : 'system';
 }
 
@@ -125,7 +121,7 @@ function apply() {
 /** Save a choice and show it. Ignored when the page is locked. @param {ThemeChoice} choice @returns {{ choice: ThemeChoice, theme: ThemePalette }} */
 export function setChoice(choice) {
   if (!THEMES.includes(choice)) throw new Error(`Unknown theme: ${choice}`);
-  if (!lockedTheme()) write(CHOICE_KEY, choice);
+  if (!lockedTheme()) store.set(CHOICE_KEY, choice);
   return apply();
 }
 
@@ -149,7 +145,7 @@ export function onChange(fn) {
 
 /** The saved numerals: western (0123), arabic (٠١٢٣) or persian (۰۱۲۳, also Urdu). @returns {Numerals} */
 export function getNumerals() {
-  const n = read(NUMERALS_KEY);
+  const n = store.get(NUMERALS_KEY, null);
   return NUMERALS.includes(n) ? n : 'western';
 }
 
@@ -169,7 +165,7 @@ function applyNumerals() {
 /** Save the numerals choice and tell the page. @param {Numerals} numerals @returns {{ numerals: Numerals }} */
 export function setNumerals(numerals) {
   if (!NUMERALS.includes(numerals)) throw new Error(`Unknown numerals: ${numerals}`);
-  write(NUMERALS_KEY, numerals);
+  store.set(NUMERALS_KEY, numerals);
   return applyNumerals();
 }
 
@@ -278,10 +274,8 @@ function styleElement() {
 }
 
 function cached() {
-  try {
-    const c = JSON.parse(read(CACHE_KEY));
-    return c && c.url === CSS_URL && typeof c.css === 'string' ? c.css : null;
-  } catch { return null; }
+  const c = store.get(CACHE_KEY, null);
+  return c && c.url === CSS_URL && typeof c.css === 'string' ? c.css : null;
 }
 
 /**
@@ -313,7 +307,7 @@ export async function init() {
     const css = absolutize(text);
     const el = styleElement();
     if (el.textContent !== css) el.textContent = css;
-    if (css !== copy) write(CACHE_KEY, JSON.stringify({ url: CSS_URL, css }));
+    if (css !== copy) store.set(CACHE_KEY, { url: CSS_URL, css });
     source = 'network';
   } catch (e) {
     console.warn('i360 theme: using the', source === 'cache' ? 'saved copy' : "page's own colours", '—', e.message);

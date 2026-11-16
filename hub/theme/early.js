@@ -5,11 +5,26 @@
 // too old for the pages, a note instead of a blank page (below).
 // Plain ES5 on purpose: it must run in any browser that can show the page.
 // Keep in step with CHOICE_KEY, CACHE_KEY and THEMES in site/theme-loader.js.
+
+// Device storage holds JSON only (every i360 page and the app write through hub/src/storage.js).
+// Before anything reads it: any i360 value that isn't JSON (plain text saved by older versions) is
+// removed, so it is chosen again rather than converted. Values starting like a JSON object, list
+// or string are ours and left unread (the caches are large). Other code's keys are left alone.
+(function () {
+  try {
+    for (var i = localStorage.length - 1; i >= 0; i--) {
+      var key = localStorage.key(i), v = key && key.indexOf('i360') === 0 ? localStorage.getItem(key) : null;
+      if (v === null || /^[[{"]/.test(v)) continue;
+      try { JSON.parse(v); } catch (e) { localStorage.removeItem(key); }
+    }
+  } catch (e) { /* storage unavailable: nothing to clear */ }
+})();
+
 (function () {
   var root = document.documentElement, themes = ['system', 'light', 'sepia', 'dark'];
   var c = root.getAttribute('data-i360-lock');
   if (themes.indexOf(c) < 0) {
-    try { c = localStorage.getItem('i360.theme'); } catch (e) { c = null; }
+    try { c = JSON.parse(localStorage.getItem('i360.theme')); } catch (e) { c = null; }
   }
   if (themes.indexOf(c) < 0) c = 'system';
   if (c === 'system') {

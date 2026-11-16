@@ -9,6 +9,7 @@ i360إ is an Arabic-only Islamic knowledge discovery app that organizes Islamic 
 ## [Unreleased] — live on the web and over the air (still version 0.14.0)
 
 ### Changed
+- Your theme and numerals choices are now saved in a new way across the encyclopedia, the Markdown Reader, the book search and the Daily Reflection: they start from the device's own theme and 0123 once, so choose them again if you had changed them (2026-11-16)
 - A Markdown Reader link naming a page the book doesn't have now opens where you are and shows that page's number in the address, instead of keeping the wrong one (2026-11-16)
 - The Daily Reflection lists the Islamic events of the whole coming year, scrolling inside their card on every screen, with a short note that the Islamic day runs from sunset to sunset; several events are described more fully, and the Prophet's ﷺ birthday and his arrival in Madinah (12 Rabi' al-Awwal) are listed separately (2026-11-15)
 - One look everywhere: the encyclopedia, the Markdown Reader, the book search and the Daily Reflection now share the same text sizes, spacing, corners, lines and shadows, and the same search boxes, buttons, options, lists, pop-ups, messages and cards. Buttons and search boxes are rounded pills, as on Android and iPhone; options show a tick when they are on (2026-11-15)

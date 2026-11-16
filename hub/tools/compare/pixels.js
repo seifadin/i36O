@@ -4,7 +4,7 @@
 // third image marks the changed pixels in red (in --out, or the temporary folder).
 //   node pixels.js [--old <ref>] [--new <ref>] [--pages reader,cse,day,app] [--full] [--out <folder>]
 //   --full   whole pages instead of the first screen
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { options, outDir, versionFor } from './lib/versions.js';
 import { launch, network, hubHosts, serveFile } from './lib/browser.js';
@@ -28,7 +28,10 @@ const SCREENS = {
 async function shot(browser, screen, theme, w, file) {
   const ctx = await browser.newContext({ viewport: { width: w, height: 800 }, ...(screen.clock ? { timezoneId: DAY_CLOCK.timezoneId, locale: DAY_CLOCK.locale } : {}) });
   await network(ctx, screen.hosts);
-  await ctx.addInitScript((t) => { try { localStorage.setItem('i360.theme', t); localStorage.setItem('i360Privacy', '1'); } catch { /* storage blocked */ } }, theme);
+  // The theme as this version saves it: JSON since the theme loader keeps its choices with
+  // storage.js (beside it on the theme site), plain text before.
+  const saved = existsSync(join(screen.hosts['theme.i36o.workers.dev'], 'storage.js')) ? JSON.stringify(theme) : theme;
+  await ctx.addInitScript((t) => { try { localStorage.setItem('i360.theme', t); localStorage.setItem('i360Privacy', '1'); } catch { /* storage blocked */ } }, saved);
   const p = await ctx.newPage();
   if (screen.clock) await p.clock.install({ time: DAY_CLOCK.time });
   await p.goto(screen.url); await p.waitForTimeout(1200);

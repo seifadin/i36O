@@ -96,14 +96,15 @@ test('_headers: CORS everywhere, theme files never cached stale, fonts immutable
   assert.ok(rules['/theme-loader.js'].includes('Cache-Control: no-cache'));
   assert.ok(rules['/net.js'].includes('Cache-Control: no-cache'));      // the loader imports it
   assert.ok(rules['/digits.js'].includes('Cache-Control: no-cache'));   // and this
+  assert.ok(rules['/storage.js'].includes('Cache-Control: no-cache'));  // and this
   assert.ok(rules['/botpress.css'].includes('Cache-Control: no-cache'));
   assert.ok(rules['/fonts/*'].includes('Cache-Control: public, max-age=31536000, immutable'));
   const cc = Object.values(rules).filter(r => r.some(l => l.startsWith('Cache-Control')));
-  assert.equal(cc.length, 6, 'Cache-Control set by one rule per path');
+  assert.equal(cc.length, 7, 'Cache-Control set by one rule per path');
 });
 
-test('the theme site serves the real net.js and digits.js: links to src/, which the loader imports', () => {
-  for (const name of ['net.js', 'digits.js']) {
+test('the theme site serves the real net.js, digits.js and storage.js: links to src/, which the loader imports', () => {
+  for (const name of ['net.js', 'digits.js', 'storage.js']) {
     const link = path.join(import.meta.dirname, `../theme/site/${name}`);
     assert.ok(fs.lstatSync(link).isSymbolicLink(), `theme/site/${name} must be a symlink, not a copy`);
     assert.equal(fs.realpathSync(link), fs.realpathSync(path.join(import.meta.dirname, `../src/${name}`)));
@@ -145,7 +146,7 @@ test('numerals: any digits to 0123, ٠١٢٣ or ۰۱۲۳; the cycle order; the b
   m.onNumeralsChange(({ numerals }) => seen.push(numerals));
   m.cycleNumerals(); m.cycleNumerals(); m.cycleNumerals();
   assert.deepEqual(seen, ['arabic', 'persian', 'western']);
-  assert.equal(store['i360.numerals'], 'western');
+  assert.equal(store['i360.numerals'], '"western"');   // saved as JSON, like every i360 setting
   const built = fs.readFileSync(path.join(import.meta.dirname, '..', '..', 'public', 'md', 'index.html'), 'utf8');
   for (const k of ['getNumerals', 'setNumerals', 'cycleNumerals', 'onNumeralsChange', 'toNumerals']) assert.ok(built.includes(k), k);
 });
@@ -162,4 +163,35 @@ test('page-chrome.css: its built-in fallbacks are the theme\'s light values', ()
     assert.ok(name in light, `${name} is not in theme.css`);
     assert.equal(value.trim().toLowerCase(), light[name].trim().toLowerCase(), `${name}: ${value} in page-chrome.css, ${light[name]} in theme.css`);
   }
+});
+
+// early.js runs first on every page and in the app: it removes any i360 value that isn't JSON (plain
+// text from older versions), leaves JSON and other code's keys alone, then shows the saved theme.
+test('early.js: i360 values that are not JSON are removed before anything reads them; the theme is read as JSON', () => {
+  const early = fs.readFileSync(path.join(import.meta.dirname, '..', 'theme', 'early.js'), 'utf8');
+  const run = (saved) => {
+    const store = { ...saved }, attrs = {};
+    const localStorage = {
+      get length() { return Object.keys(store).length; },
+      key: (i) => Object.keys(store)[i] ?? null,
+      getItem: (k) => (k in store ? store[k] : null),
+      removeItem: (k) => { delete store[k]; }
+    };
+    const el = () => ({ style: {}, appendChild() {} });
+    const document = {
+      documentElement: { getAttribute: () => null, setAttribute: (k, v) => { attrs[k] = v; } },
+      head: { appendChild() {} }, createElement: () => ({ ...el(), noModule: false }), body: null, addEventListener() {}
+    };
+    const window = { matchMedia: () => ({ matches: false }), structuredClone() {} };
+    new Function('localStorage', 'document', 'window', early)(localStorage, document, window);
+    return { store, theme: attrs['data-theme'] };
+  };
+  const { store, theme } = run({
+    'i360.theme': 'dark', 'i360.numerals': 'arabic', 'i360Version': '0.14.0', 'i360FeedbackMailto': 'mailto:a@example.org',
+    'i360Edition': '12', 'i360Privacy': '1', 'i360CacheSciences': '[{"id":1}]', 'i360reader.pos': '{"p":3}',
+    'otakit_override_channel': 'beta', 'th-v8': '"dark"'
+  });
+  assert.deepEqual(Object.keys(store).sort(), ['i360CacheSciences', 'i360Edition', 'i360Privacy', 'i360reader.pos', 'otakit_override_channel', 'th-v8']);
+  assert.equal(theme, 'light');                                   // the plain 'dark' was removed: the system theme
+  assert.equal(run({ 'i360.theme': '"sepia"' }).theme, 'sepia');   // JSON: shown before the first paint
 });

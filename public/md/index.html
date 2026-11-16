@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-f4FzmEdmBAXyKvtkB/hWFUWkwKkE9YtgJXk0AuRlPJM='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-Qu4tYsopnup8nDNQcsWScd24554umaO4xlmqomQnWJU='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -194,11 +194,26 @@
 // too old for the pages, a note instead of a blank page (below).
 // Plain ES5 on purpose: it must run in any browser that can show the page.
 // Keep in step with CHOICE_KEY, CACHE_KEY and THEMES in site/theme-loader.js.
+
+// Device storage holds JSON only (every i360 page and the app write through hub/src/storage.js).
+// Before anything reads it: any i360 value that isn't JSON (plain text saved by older versions) is
+// removed, so it is chosen again rather than converted. Values starting like a JSON object, list
+// or string are ours and left unread (the caches are large). Other code's keys are left alone.
+(function () {
+  try {
+    for (var i = localStorage.length - 1; i >= 0; i--) {
+      var key = localStorage.key(i), v = key && key.indexOf('i360') === 0 ? localStorage.getItem(key) : null;
+      if (v === null || /^[[{"]/.test(v)) continue;
+      try { JSON.parse(v); } catch (e) { localStorage.removeItem(key); }
+    }
+  } catch (e) { /* storage unavailable: nothing to clear */ }
+})();
+
 (function () {
   var root = document.documentElement, themes = ['system', 'light', 'sepia', 'dark'];
   var c = root.getAttribute('data-i360-lock');
   if (themes.indexOf(c) < 0) {
-    try { c = localStorage.getItem('i360.theme'); } catch (e) { c = null; }
+    try { c = JSON.parse(localStorage.getItem('i360.theme')); } catch (e) { c = null; }
   }
   if (themes.indexOf(c) < 0) c = 'system';
   if (c === 'system') {
@@ -1254,7 +1269,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
 
   // src/net.js
   var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read2 = (response) => (
+  async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => (
     /** @type {any} */
     response
   )) {
@@ -1270,7 +1285,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
         }, 0);
       }, timeout);
     });
-    const request = (async () => read2(await send(url, { ...options, signal: controller ? controller.signal : void 0 })))();
+    const request = (async () => read(await send(url, { ...options, signal: controller ? controller.signal : void 0 })))();
     request.catch(() => {
     });
     try {
@@ -1293,6 +1308,33 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     });
   }
   var toWestern = (s) => writeNumerals(s, "western");
+
+  // src/storage.js
+  function createStore(prefix = "") {
+    return {
+      get(key, fallback) {
+        try {
+          const v = localStorage.getItem(prefix + key);
+          return v ? JSON.parse(v) : fallback;
+        } catch {
+          return fallback;
+        }
+      },
+      set(key, value) {
+        try {
+          localStorage.setItem(prefix + key, JSON.stringify(value));
+        } catch {
+        }
+      },
+      remove(key) {
+        try {
+          localStorage.removeItem(prefix + key);
+        } catch {
+        }
+      }
+    };
+  }
+  var MD_READER_KEY = "i360.mdReader";
 
   // theme/site/theme-loader.js
   var THEMES = ["system", "light", "sepia", "dark"];
@@ -1341,21 +1383,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   var listeners = /* @__PURE__ */ new Set();
   var numeralListeners = /* @__PURE__ */ new Set();
   var started = false;
-  function read(key) {
-    try {
-      return localStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  }
-  function write(key, value) {
-    try {
-      localStorage.setItem(key, value);
-      return true;
-    } catch {
-      return false;
-    }
-  }
+  var store = createStore();
   function lockedTheme() {
     const t2 = root.getAttribute("data-i360-lock");
     return THEMES.includes(t2) ? t2 : null;
@@ -1363,7 +1391,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   function getChoice() {
     const lock = lockedTheme();
     if (lock) return lock;
-    const c = read(CHOICE_KEY);
+    const c = store.get(CHOICE_KEY, null);
     return THEMES.includes(c) ? c : "system";
   }
   function getTheme(choice = getChoice()) {
@@ -1386,7 +1414,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   }
   function setChoice(choice) {
     if (!THEMES.includes(choice)) throw new Error(`Unknown theme: ${choice}`);
-    if (!lockedTheme()) write(CHOICE_KEY, choice);
+    if (!lockedTheme()) store.set(CHOICE_KEY, choice);
     return apply();
   }
   function cycle() {
@@ -1400,7 +1428,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     };
   }
   function getNumerals() {
-    const n = read(NUMERALS_KEY);
+    const n = store.get(NUMERALS_KEY, null);
     return NUMERALS.includes(n) ? n : "western";
   }
   function toNumerals(text, numerals = getNumerals()) {
@@ -1419,7 +1447,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   }
   function setNumerals(numerals) {
     if (!NUMERALS.includes(numerals)) throw new Error(`Unknown numerals: ${numerals}`);
-    write(NUMERALS_KEY, numerals);
+    store.set(NUMERALS_KEY, numerals);
     return applyNumerals();
   }
   function cycleNumerals() {
@@ -1501,12 +1529,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     return el2;
   }
   function cached() {
-    try {
-      const c = JSON.parse(read(CACHE_KEY));
-      return c && c.url === CSS_URL && typeof c.css === "string" ? c.css : null;
-    } catch {
-      return null;
-    }
+    const c = store.get(CACHE_KEY, null);
+    return c && c.url === CSS_URL && typeof c.css === "string" ? c.css : null;
   }
   async function init() {
     const state2 = apply();
@@ -1532,7 +1556,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       const css = absolutize(text);
       const el2 = styleElement();
       if (el2.textContent !== css) el2.textContent = css;
-      if (css !== copy) write(CACHE_KEY, JSON.stringify({ url: CSS_URL, css }));
+      if (css !== copy) store.set(CACHE_KEY, { url: CSS_URL, css });
       source = "network";
     } catch (e) {
       console.warn("i360 theme: using the", source === "cache" ? "saved copy" : "page's own colours", "—", e.message);
@@ -2115,33 +2139,6 @@ ${body}`;
     }
     return { body: lines.slice(0, sep).join("\n"), notes: out };
   }
-
-  // src/storage.js
-  function createStore(prefix = "") {
-    return {
-      get(key, fallback) {
-        try {
-          const v = localStorage.getItem(prefix + key);
-          return v ? JSON.parse(v) : fallback;
-        } catch {
-          return fallback;
-        }
-      },
-      set(key, value) {
-        try {
-          localStorage.setItem(prefix + key, JSON.stringify(value));
-        } catch {
-        }
-      },
-      remove(key) {
-        try {
-          localStorage.removeItem(prefix + key);
-        } catch {
-        }
-      }
-    };
-  }
-  var MD_READER_KEY = "i360.mdReader";
 
   // src/reader/state.js
   var state = {
