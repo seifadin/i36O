@@ -1,7 +1,8 @@
 // Daily Reflection, old vs new, with every outside service faked (lib/fakes.js) and the clock fixed
 // (2027-01-05 in Cairo: the Isra event is "today"): loading, the language list, English and back,
-// the madhab, the city picker and a search, numerals, the theme button.
-// Phone (390 px) and desktop (1280 px): 2 cases × 12 steps.
+// the madhab, the date converter (both directions, a missing 30th, a year out of range), the city
+// picker and a search, numerals, the theme button.
+// Phone (390 px) and desktop (1280 px): 2 cases × 20 steps.
 //   node day-steps.js [--old <ref>] [--new <ref>] [--out <folder>]
 import { pages, options, outDir } from './lib/versions.js';
 import { launch, network, hubHosts, errorsOf } from './lib/browser.js';
@@ -30,6 +31,11 @@ const state = () => {
     langOpen: !document.getElementById('lang-list').hidden, picker: !document.getElementById('city-picker').classList.contains('hidden'),
     cityResults: document.querySelectorAll('[data-target="city-results"] button').length,
     madhab: [0, 1].map((i) => document.getElementById('school-' + i).getAttribute('aria-pressed') === 'true'),
+    conv: {
+      dir: text('conv-dir'), d: document.getElementById('conv-d').value, m: document.getElementById('conv-m').value, y: document.getElementById('conv-y').value,
+      days: document.getElementById('conv-d').options.length - 1, alpha: text('conv-alpha'), iso: text('conv-iso'),
+      error: document.querySelector('[data-target="conv-error"]').hidden ? null : text('conv-error'), label: text('conv-label')
+    },
     overflow: document.documentElement.scrollWidth > window.innerWidth
   };
 };
@@ -49,6 +55,20 @@ async function run(browser, v) {
     await step('back to Arabic', async () => { await p.click('#btn-lang'); await p.click('#lang-ar'); });
     await step('Hanafi', () => p.click('#school-1'));
     await step('standard', () => p.click('#school-0'));
+    // The converter: the year typed first (its change fires on leaving it; it decides whether
+    // 29 February is offered), then the month and the day chosen.
+    const convDate = async (d, m, y) => {
+      await p.fill('#conv-y', String(y)); await p.locator('#conv-y').blur();
+      await p.selectOption('#conv-m', String(m)); await p.selectOption('#conv-d', String(d));
+    };
+    await step('converter: 15/8/2027 → Hijri', () => convDate(15, 8, 2027));
+    await step('converter: swap to Hijri → Gregorian', () => p.click('#conv-swap'));
+    await step('converter: 1 Ramadan 1448', () => convDate(1, 9, 1448));
+    await step('converter: 30 Dhu al-Hijjah 1448', () => convDate(30, 12, 1448));
+    await step('converter: year 0', async () => { await p.fill('#conv-y', '0'); await p.locator('#conv-y').blur(); });
+    await step('converter: swap back', () => p.click('#conv-swap'));
+    await step('converter: 29/2/2028 (leap year)', () => convDate(29, 2, 2028));
+    await step('converter: year 2027 (no 29 Feb)', async () => { await p.fill('#conv-y', '2027'); await p.locator('#conv-y').blur(); });
     await step('city picker', () => p.click('#city-change'));
     await step('city search', async () => { await p.fill('#city-search', 'الإسك'); await p.clock.runFor(800); });
     await step('city chosen', () => p.locator('[data-target="city-results"] button').nth(1).click());

@@ -1,14 +1,19 @@
 // The Reader, old vs new: the same steps on both, recording what a reader would see change
 // (the page shown, the page counter, the panel, search results, bookmarks, the address).
-// An Arabic and an English book, on a phone (390 px) and a desktop (1280 px): 4 cases × 17 steps (+ page errors).
+// An Arabic and an English book opened from the device, on a phone (390 px) and a desktop (1280 px):
+// 4 cases × 17 steps; and books opened by link (?file=…, from a local lib site), where page links
+// work: #p= in either numerals and with «ص», #n=, a missing page, volumes, the address following
+// the reading, a reload, a link beating the saved position — 2 cases × 18 steps (+ page errors).
+// (For a book opened from the device, #p= is ignored on purpose: such a book can't be linked to.)
 //   node reader-steps.js [--old <ref>] [--new <ref>] [--out <folder>]
 import { pages, options, outDir } from './lib/versions.js';
-import { launch, network, hubHosts, errorsOf } from './lib/browser.js';
-import { books } from './lib/fixtures.js';
+import { launch, network, hubHosts, errorsOf, serveFile } from './lib/browser.js';
+import { books, linked } from './lib/fixtures.js';
+import { join } from 'node:path';
 import { compare } from './lib/report.js';
 
 const opts = options();
-const BOOKS = books();
+const BOOKS = books(), LINKED = linked();
 const WIDTHS = [390, 1280];
 
 const state = () => {
@@ -52,14 +57,48 @@ async function run(browser, v) {
     await step('bookmark', () => press('#btn-bookmark'));
     await step('bookmarks tab', async () => { if (!(await p.locator('#tab-bookmarks').isVisible())) await p.click('#btn-panel'); await p.click('#tab-bookmarks'); });
     await step('close panel', () => p.keyboard.press('Escape'));
-    await step('#p=2 link', async () => { await p.evaluate(() => { window.location.hash = '#p=2'; }); await p.waitForTimeout(600); });
+    await step('#p=2 (ignored: a device file)', async () => { await p.evaluate(() => { window.location.hash = '#p=2'; }); await p.waitForTimeout(600); });
     await step('text larger', async () => { await press('#btn-text-larger'); await p.keyboard.press('Escape'); });
     await step('reopen', async () => { await p.reload(); await p.waitForTimeout(500); await open(); });
     log.push(['page errors', errors]);
     res[`${lang} ${w}px`] = log;
     await ctx.close();
   }
+  for (const w of WIDTHS) res[`linked ${w}px`] = await runLinked(browser, v, w);
   return res;
+}
+
+async function runLinked(browser, v, w) {
+  const ctx = await browser.newContext({ viewport: { width: w, height: 800 } });
+  await network(ctx, { ...hubHosts(v), 'lib.i36o.workers.dev': (route, url) => serveFile(route, join(LINKED, decodeURIComponent(url.pathname))) });
+  const p = await ctx.newPage(), errors = errorsOf(p), log = [];
+  // The Reader writes the address 0.5 s after scrolling stops (SAVE_DEBOUNCE_MS): wait past it.
+  const snap = async (name) => { await p.waitForTimeout(900); log.push([name, await p.evaluate(state).catch((e) => 'ERROR ' + e.message.split('\n')[0])]); };
+  const step = async (name, fn) => { try { await fn(); } catch (e) { log.push([name, 'ERROR ' + e.message.split('\n')[0]]); return; } await snap(name); };
+  const at = (book, hash = '') => `https://i36o.web.app/md/?file=${encodeURIComponent(`https://lib.i36o.workers.dev/books/${book}`)}${hash}`;
+  const go = async (url) => { await p.goto(url); await p.waitForTimeout(1500); };
+  const hash = (h) => p.evaluate((x) => { window.location.hash = x; }, h);
+  await step('open ar #p=5', () => go(at('ar.md', '#p=5')));
+  await step('#p=12', () => hash('#p=12'));
+  await step('#p=١٧ (Arabic digits)', () => hash('#p=١٧'));
+  await step('#p=ص 20', () => hash('#p=ص 20'));
+  await step('#n=3', () => hash('#n=3'));
+  await step('#p=999 (nearest page)', () => hash('#p=999'));
+  await step('Home (address follows)', () => p.keyboard.press('Home'));
+  await step('PageDown ×2', async () => { await p.keyboard.press('PageDown'); await p.keyboard.press('PageDown'); });
+  await step('reload', async () => { await p.reload(); await p.waitForTimeout(1500); });
+  await step('open without #p (saved position)', () => go(at('ar.md')));
+  await step('open #p=30 (link beats saved)', () => go(at('ar.md', '#p=30')));
+  await step('volumes: open #p=2:5', () => go(at('vol.md', '#p=2:5')));
+  await step('volumes: #p=1:9', () => hash('#p=1:9'));
+  await step('volumes: #p=7 (this volume)', () => hash('#p=7'));
+  await step('volumes: #p=ج2/ص3', () => hash('#p=ج2/ص3'));
+  await step('English: open #p=7', () => go(at('en.md', '#p=7')));
+  await step('plain: open #n=1', () => go(at('plain.md', '#n=1')));
+  await step('not in the library', () => go('https://i36o.web.app/md/?file=' + encodeURIComponent('https://example.org/x.md')));
+  log.push(['page errors', errors]);
+  await ctx.close();
+  return log;
 }
 
 const oldV = pages(opts.old), newV = pages(opts.new);

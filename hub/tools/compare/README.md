@@ -32,9 +32,9 @@ node pixels.js --pages day --full          # options per script, see each file's
 
 | Script | Compares | Cases |
 |---|---|---|
-| `reader-steps.js` | the Reader step by step: open a book, End / Home / PageDown, type a page, the panel and a heading, search and next results, a bookmark, the bookmarks tab, a `#p=` link, larger text, reopening | Arabic and English book × 390 / 1280 px, 17 steps |
+| `reader-steps.js` | the Reader step by step: open a book, End / Home / PageDown, type a page, the panel and a heading, search and next results, a bookmark, the bookmarks tab, larger text, reopening; and page links (`#p=`, `#n=`, volumes, the address following the reading) on books opened by link | Arabic and English book × 390 / 1280 px, 17 steps; linked books × 390 / 1280 px, 18 steps |
 | `cse-steps.js` | the CSE on a small test library: search, expand / collapse, «more», the two options, a too-short search, a failed search and its retry, the theme button | 390 / 1280 px, up to 15 steps |
-| `day-steps.js` | Daily Reflection, services faked, clock fixed at 2027-01-05 in Cairo (Isra "today"): languages, madhab, city picker and search, numerals, theme | 390 / 1280 px, 12 steps |
+| `day-steps.js` | Daily Reflection, services faked, clock fixed at 2027-01-05 in Cairo (Isra "today"): languages, madhab, the date converter (both directions, a leap day, a missing 30th, a year out of range), city picker and search, numerals, theme | 390 / 1280 px, 20 steps |
 | `app-sizes.js` | the app's title and the science list's three text sizes, with a major and an intermediate opened; also flags a level bigger than the title, or sideways scrolling | 85 widths, 260–1400 px |
 | `sweep.js` | every page resized 260–1800 px: sideways scrolling, the toolbar running off, its level and what sits in ⋮, Day's columns and prayer rows | Reader (browser and app), CSE, Day, app |
 | `pixels.js` | screenshots pixel by pixel; where they differ, a third image marks the changed pixels in red | Reader (display test), CSE, Day, app × light / sepia / dark × 390 / 1280 px |
@@ -49,7 +49,7 @@ Every result also includes the page's uncaught errors, so a new error is a diffe
   theme site) from local folders; every other request is cut off, so nothing reaches a real service.
 - `fakes.js` — Baserow's tables (the app), and the verse, hadith and city search (Daily Reflection),
   the fixed clock.
-- `fixtures.js` — the test books and the CSE test library, made on the fly from a fixed seed (the
+- `fixtures.js` — the test books (also as the lib site's books, for links) and the CSE test library, made on the fly from a fixed seed (the
   library with this working copy's own indexer); the display test is `hub/library/books/display-test.md`.
 - `report.js` — the old-vs-new comparison and its printout.
 
