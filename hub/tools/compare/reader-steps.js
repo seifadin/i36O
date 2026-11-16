@@ -7,11 +7,11 @@
 // a reload, a link beating the saved position — 2 cases × 25 steps (+ page errors).
 // (For a book opened from the device, #p= is ignored on purpose: such a book can't be linked to.)
 //   node reader-steps.js [--old <ref>] [--new <ref>] [--out <folder>]
-import { pages, options, outDir } from './lib/versions.js';
-import { launch, network, hubHosts, errorsOf, serveFile } from './lib/browser.js';
+import { pages, options } from './lib/versions.js';
+import { network, hubHosts, errorsOf, serveFile } from './lib/browser.js';
 import { books, linked } from './lib/fixtures.js';
 import { join } from 'node:path';
-import { compare } from './lib/report.js';
+import { oldVsNew } from './lib/report.js';
 
 const opts = options();
 const BOOKS = books(), LINKED = linked();
@@ -115,8 +115,4 @@ async function runLinked(browser, v, w) {
   return log;
 }
 
-const oldV = pages(opts.old), newV = pages(opts.new);
-const browser = await launch();
-const [a, b] = [await run(browser, oldV), await run(browser, newV)];
-await browser.close();
-compare('reader-steps', a, b, { out: outDir(opts, 'reader-steps'), oldLabel: oldV.label, newLabel: newV.label });
+await oldVsNew('reader-steps', opts, pages(opts.old), pages(opts.new), run);

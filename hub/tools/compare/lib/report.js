@@ -3,6 +3,19 @@
 // The exit code is 0 when everything is identical, 1 when anything differs.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { launch } from './browser.js';
+import { outDir } from './versions.js';
+
+// Every script's ending: the steps on the old version, then on the new one — one at a time, since
+// two side by side compete for the machine and timing-sensitive readings then come out differently —
+// then the comparison printed. Returns the new version's results, for a script's own checks on them.
+export async function oldVsNew(name, opts, oldV, newV, run) {
+  const browser = await launch();
+  let a, b;
+  try { a = await run(browser, oldV); b = await run(browser, newV); } finally { await browser.close(); }
+  compare(name, a, b, { out: outDir(opts, name), oldLabel: oldV.label, newLabel: newV.label });
+  return b;
+}
 
 export function compare(name, oldRes, newRes, { out, oldLabel, newLabel } = {}) {
   let same = 0;

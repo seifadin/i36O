@@ -7,19 +7,14 @@
    ==Start pN== format and plain Markdown, plus the safe Markdown rendering
    the Reader shows. No page or screen code here. An ES module (bundled into
    the Reader, imported by the indexer). The Markdown parser
-   (marked) is passed in, so this file has no dependencies of its own. */
+   (marked) is passed in; its only import is the shared digit converter. */
+import { toWestern } from './digits.js';
 export const VERSION = 1;
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-// Eastern Arabic and Persian digits → Western digits.
-function toWestern(s) {
-  return String(s)
-    .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
-    .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06F0));
-}
 
 /* ================================================================
    Markdown rendering (safe)

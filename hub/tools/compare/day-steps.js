@@ -4,10 +4,10 @@
 // picker and a search, numerals, the theme button.
 // Phone (390 px) and desktop (1280 px): 2 cases × 20 steps.
 //   node day-steps.js [--old <ref>] [--new <ref>] [--out <folder>]
-import { pages, options, outDir } from './lib/versions.js';
-import { launch, network, hubHosts, errorsOf } from './lib/browser.js';
+import { pages, options } from './lib/versions.js';
+import { network, hubHosts, errorsOf } from './lib/browser.js';
 import { dayServices, DAY_CLOCK } from './lib/fakes.js';
-import { compare } from './lib/report.js';
+import { oldVsNew } from './lib/report.js';
 
 const opts = options();
 const WIDTHS = [390, 1280];
@@ -83,8 +83,4 @@ async function run(browser, v) {
   return res;
 }
 
-const oldV = pages(opts.old), newV = pages(opts.new);
-const browser = await launch();
-const [a, b] = [await run(browser, oldV), await run(browser, newV)];
-await browser.close();
-compare('day-steps', a, b, { out: outDir(opts, 'day-steps'), oldLabel: oldV.label, newLabel: newV.label });
+await oldVsNew('day-steps', opts, pages(opts.old), pages(opts.new), run);

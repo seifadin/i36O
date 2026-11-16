@@ -14,6 +14,9 @@
 /net.js
   Cache-Control: no-cache
 
+/digits.js
+  Cache-Control: no-cache
+
 /botpress.css
   Cache-Control: no-cache
 

@@ -5,11 +5,11 @@
 // The new version's findings are listed on their own as well.
 //   node safe-area.js [--old <ref>] [--new <ref>] [--pages reader,cse,day,app] [--out <folder>]
 import { join } from 'node:path';
-import { pages, app, options, outDir } from './lib/versions.js';
-import { launch, network, hubHosts, serveFile } from './lib/browser.js';
+import { options, versionFor } from './lib/versions.js';
+import { network, hubHosts, serveFile } from './lib/browser.js';
 import { library, DISPLAY_TEST } from './lib/fixtures.js';
 import { baserow, dayServices, DAY_CLOCK } from './lib/fakes.js';
-import { compare } from './lib/report.js';
+import { oldVsNew } from './lib/report.js';
 
 const opts = options();
 const WANT = (typeof opts.pages === 'string' ? opts.pages : 'reader,cse,day,app').split(',');
@@ -80,12 +80,7 @@ async function run(browser, v) {
   return res;
 }
 
-const build = (ref) => (WANT.includes('app') ? { ...pages(ref), ...app(ref) } : pages(ref));
-const oldV = build(opts.old), newV = build(opts.new);
-const browser = await launch();
-const [a, b] = await Promise.all([run(browser, oldV), run(browser, newV)]);
-await browser.close();
-compare('safe-area', a, b, { out: outDir(opts, 'safe-area'), oldLabel: oldV.label, newLabel: newV.label });
+const b = await oldVsNew('safe-area', opts, versionFor(opts.old, WANT), versionFor(opts.new, WANT), run);
 for (const [name, log] of Object.entries(b)) for (const [layout, bad] of log) {
   if (bad.length) { console.log(`  new ${name}, ${layout}: ${bad.length} inside the inset — ${bad.slice(0, 4).join(' · ')}`); process.exitCode = 1; }
 }

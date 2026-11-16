@@ -4,7 +4,7 @@ The Reader, the i360 CSE and Daily Reflection are built here into the app's `pub
 (`../public/md/`, `../public/cse/`, `../public/day/`) and served with the app: inside it, at
 `https://i36o.web.app/md|cse|day/` and in its OTA bundle (merge into the app, claude/i360-hub.md §10).
 
-## Forwarding sites (Firebase project `i360-md`, display name `i360-hub`)
+## Forwarding sites (Firebase project `i360-md`, display name «i36o»)
 Since merge sprint 7 every site here only forwards (301, path and `?…` kept):
 | Target | Site | Forwards to |
 |---|---|---|
@@ -37,12 +37,15 @@ src/storage.js        createStore(prefix): get / set / remove settings on the de
 src/net.js            fetchWithTimeout(), fetchJson() (time limit, bounded retries), wait() — also used by
                       the app (@i360/net), the Hijri Worker, the CSE indexer and scripts/day-cities.js
 src/frame.js          oncePerFrame(): layout work at most once per frame
+src/digits.js         the digit converter (0123 · ٠١٢٣ · ۰۱۲۳): writeNumerals(), toWestern() — used by the theme
+                      loader (a link beside it on the theme site, like net.js), book-format.js and the Hijri Worker
 src/sites.js          every i360 address (app site, forwarders, old book paths, lib, theme) — also the
                       app's (@i360/sites); test/sites.test.js checks firebase.json against it
 library/books/        our own books     → lib.i36o.workers.dev/books/ (published by the CSE index workflow)
 indexer/wrangler.jsonc  the lib Worker (lib.i36o.workers.dev: the CSE build and our books, files only)
 forward/404.html      fallback for the forwarding sites
-tools/compare/        dev-only old-vs-new checks (Playwright, not run by npm test) — its README
+tools/compare/        dev-only old-vs-new checks (Playwright, not run by npm test); `node run.js` runs only
+                      the ones a change needs — its README
 ```
 Link to a book: `https://i36o.web.app/md/?file=books/NAME.md`
 Link to a page: add `#p=45` (or `#p=2:45` for volume 2, page 45).

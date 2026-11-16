@@ -94,17 +94,20 @@ test('_headers: CORS everywhere, theme files never cached stale, fonts immutable
   assert.ok(rules['/*'].includes('Access-Control-Allow-Origin: *'));
   assert.ok(rules['/theme.css'].includes('Cache-Control: no-cache'));
   assert.ok(rules['/theme-loader.js'].includes('Cache-Control: no-cache'));
-  assert.ok(rules['/net.js'].includes('Cache-Control: no-cache'));   // the loader imports it
+  assert.ok(rules['/net.js'].includes('Cache-Control: no-cache'));      // the loader imports it
+  assert.ok(rules['/digits.js'].includes('Cache-Control: no-cache'));   // and this
   assert.ok(rules['/botpress.css'].includes('Cache-Control: no-cache'));
   assert.ok(rules['/fonts/*'].includes('Cache-Control: public, max-age=31536000, immutable'));
   const cc = Object.values(rules).filter(r => r.some(l => l.startsWith('Cache-Control')));
-  assert.equal(cc.length, 5, 'Cache-Control set by one rule per path');
+  assert.equal(cc.length, 6, 'Cache-Control set by one rule per path');
 });
 
-test('the theme site serves the real net.js: a link to src/net.js, which the loader imports', () => {
-  const link = path.join(import.meta.dirname, '../theme/site/net.js');
-  assert.ok(fs.lstatSync(link).isSymbolicLink(), 'theme/site/net.js must be a symlink, not a copy');
-  assert.equal(fs.realpathSync(link), fs.realpathSync(path.join(import.meta.dirname, '../src/net.js')));
+test('the theme site serves the real net.js and digits.js: links to src/, which the loader imports', () => {
+  for (const name of ['net.js', 'digits.js']) {
+    const link = path.join(import.meta.dirname, `../theme/site/${name}`);
+    assert.ok(fs.lstatSync(link).isSymbolicLink(), `theme/site/${name} must be a symlink, not a copy`);
+    assert.equal(fs.realpathSync(link), fs.realpathSync(path.join(import.meta.dirname, `../src/${name}`)));
+  }
 });
 
 test('early.js and theme-loader.js agree on storage keys and themes', () => {

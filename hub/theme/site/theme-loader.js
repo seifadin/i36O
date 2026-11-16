@@ -19,9 +19,11 @@
 // on the same site (hub: the landing page, Daily Reflection, the Reader, the
 // CSE) and follow changes made in another tab.
 //
-// It imports net.js from beside itself (the time-limited request every i360 page uses); on
-// the theme site, and here in the repo, that file is a link to hub/src/net.js.
+// It imports net.js (the time-limited request every i360 page uses) and digits.js (the digit
+// converter) from beside itself; on the theme site, and here in the repo, both are links to
+// hub/src/.
 import { fetchWithTimeout } from './net.js';
+import { ANY_DIGIT, writeNumerals } from './digits.js';
 
 // Types, as JSDoc (read by the i360إ app's TypeScript directly, so they are written once, here).
 /** @typedef {'system' | 'light' | 'sepia' | 'dark'} ThemeChoice */
@@ -34,10 +36,10 @@ import { fetchWithTimeout } from './net.js';
 export const THEMES = ['system', 'light', 'sepia', 'dark'];   // the cycle order
 /** @type {readonly Numerals[]} */
 export const NUMERALS = ['western', 'arabic', 'persian'];      // 0123 · ٠١٢٣ · ۰۱۲۳ (the cycle order)
-export const NUMERALS_KEY = 'i360.numerals';
+const NUMERALS_KEY = 'i360.numerals';
 export const CHOICE_KEY = 'i360.theme';
 export const CACHE_KEY = 'i360.theme.css';
-export const CSS_URL = new URL('theme.css', import.meta.url).href;
+const CSS_URL = new URL('theme.css', import.meta.url).href;
 
 // The two buttons' text, the same on every i360 page and in the i360إ app (claude/i360-hub.md §3):
 // the numerals button shows a sample of the choice (4–6, because 1–3 look the same in ٠١٢٣ and
@@ -104,7 +106,7 @@ export function getChoice() {
 }
 
 /** The palette shown now: light, sepia or dark. @param {ThemeChoice} [choice] @returns {ThemePalette} */
-export function getTheme(choice = getChoice()) {
+function getTheme(choice = getChoice()) {
   if (choice !== 'system') return choice;
   return darkQuery && darkQuery.matches ? 'dark' : 'light';
 }
@@ -145,8 +147,6 @@ export function onChange(fn) {
 
 /* ---------- Numerals: the second shared choice (display only) ---------- */
 
-const DIGIT_ZERO = { western: 0x30, arabic: 0x0660, persian: 0x06F0 };
-
 /** The saved numerals: western (0123), arabic (٠١٢٣) or persian (۰۱۲۳, also Urdu). @returns {Numerals} */
 export function getNumerals() {
   const n = read(NUMERALS_KEY);
@@ -155,12 +155,7 @@ export function getNumerals() {
 
 /** Every digit in text (Western, Arabic-Indic or Persian) written in the given numerals. @param {string} text @param {Numerals} [numerals] @returns {string} */
 export function toNumerals(text, numerals = getNumerals()) {
-  const zero = DIGIT_ZERO[numerals] || DIGIT_ZERO.western;
-  return String(text).replace(/[0-9\u0660-\u0669\u06F0-\u06F9]/g, (d) => {
-    const c = d.charCodeAt(0);
-    const v = c >= 0x06F0 ? c - 0x06F0 : c >= 0x0660 ? c - 0x0660 : c - 0x30;
-    return String.fromCharCode(zero + v);
-  });
+  return writeNumerals(text, numerals);
 }
 
 function applyNumerals() {
@@ -199,8 +194,6 @@ export function onNumeralsChange(fn) {
 // alone: `skip`, a selector whose text keeps its digits (what the visitor types, code, the
 // numerals button's own samples…); `attributes`, attribute names converted too (tooltips,
 // placeholders), except under `attributeSkip` (default: `skip`).
-
-const ANY_DIGIT = /[0-9\u0660-\u0669\u06F0-\u06F9]/;
 
 /** @param {Text} node @param {string} skip @param {Numerals} numerals */
 function convertText(node, skip, numerals) {

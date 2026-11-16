@@ -4,10 +4,10 @@
 // Widths 260–600 px every 5, then to 1400 every 50 (85 widths). Builds each version's app first
 // (lib/versions.js, fake Baserow tables from lib/fakes.js).
 //   node app-sizes.js [--old <ref>] [--new <ref>] [--widths 320,390,1280] [--out <folder>]
-import { app, options, outDir } from './lib/versions.js';
-import { launch, network, errorsOf } from './lib/browser.js';
+import { app, options } from './lib/versions.js';
+import { network, errorsOf } from './lib/browser.js';
 import { baserow } from './lib/fakes.js';
-import { compare } from './lib/report.js';
+import { oldVsNew } from './lib/report.js';
 
 const opts = options();
 const WIDTHS = typeof opts.widths === 'string' ? opts.widths.split(',').map(Number)
@@ -51,11 +51,7 @@ async function run(browser, v) {
   return res;
 }
 
-const oldV = app(opts.old), newV = app(opts.new);
-const browser = await launch();
-const [a, b] = await Promise.all([run(browser, oldV), run(browser, newV)]);
-await browser.close();
-compare('app-sizes', a, b, { out: outDir(opts, 'app-sizes'), oldLabel: oldV.label, newLabel: newV.label });
+const b = await oldVsNew('app-sizes', opts, app(opts.old), app(opts.new), run);
 const broken = Object.entries(b).filter(([, s]) => s[0][1].biggerThanTitle?.length || s[0][1].overflow);
 if (broken.length) {
   console.log(`  new: a level bigger than the title, or sideways scrolling, at ${broken.map(([k]) => k).join(', ')}`);

@@ -29,6 +29,9 @@ node pixels.js --pages day --full          # options per script, see each file's
   as it is now. The hub pages are compared **as built**, so run `npm run build` in `hub/` first. A
   git ref (branch, tag, commit) is unpacked once into the temporary folder (`i360-compare/`) and
   reused; the app is built there with `vite build`, using this working copy's `node_modules`.
+  The folder keeps what was used lately: before anything new is unpacked or built, working-copy app
+  builds unused for an hour and versions unused for a week are removed. Every script runs the old
+  version, then the new one (one at a time: side by side, timing-sensitive readings came out differently).
 - **Results:** each script prints `DIFF case · step` with only the fields that changed, then
   `N identical, M different`. The exit code is 0 when identical, 1 otherwise. Full results (and the
   screenshots) go to `--out <folder>`, else `i360-compare/out/<script>/` in the temporary folder.

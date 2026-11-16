@@ -5,7 +5,7 @@
 // A ref is anything git understands: a branch, a tag, a commit, HEAD~1…
 // Each git version is unpacked once into the system's temporary folder and reused.
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, rmSync, statSync, symlinkSync, utimesSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -30,10 +30,25 @@ export function options(defaults = {}) {
 const shortSha = (ref) => git('rev-parse', '--short=8', `${ref}^{commit}`);
 export const label = (ref) => (ref === WORK ? 'working copy' : `${ref} (${shortSha(ref)})`);
 
+// The cache keeps what was used lately: a folder's time is set on every use, and before anything
+// new is unpacked or built, working-copy app builds unused for an hour and versions unused for a
+// week are removed (an hour, not at once: another script may be using a build right now).
+const HOUR = 3600e3, KEEP = { work: HOUR, version: 7 * 24 * HOUR };
+const used = (dir) => { const now = new Date(); utimesSync(dir, now, now); return dir; };
+function prune() {
+  if (!existsSync(CACHE)) return;
+  for (const name of readdirSync(CACHE)) {
+    if (!/^(work-\d+-app|[0-9a-f]{8,}-(pages|src|app))$/.test(name)) continue;   // results, fixtures: kept
+    const dir = join(CACHE, name);
+    if (Date.now() - statSync(dir).mtimeMs > KEEP[name.startsWith('work-') ? 'work' : 'version']) rmSync(dir, { recursive: true, force: true });
+  }
+}
+
 // Unpacks the given paths of a commit (once) and returns the folder.
 function unpack(ref, paths, name) {
   const dir = join(CACHE, `${shortSha(ref)}-${name}`);
-  if (existsSync(join(dir, '.done'))) return dir;
+  if (existsSync(join(dir, '.done'))) return used(dir);
+  prune();
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
   execFileSync('sh', ['-c', `git archive "$0" -- "$@" | tar -x -C "${dir}"`, ref, ...paths], { cwd: REPO });
@@ -47,6 +62,10 @@ export function pages(ref) {
   return { label: label(ref), public: join(root, 'public'), theme: join(root, 'hub/theme/site') };
 }
 
+// A version for a script checking several pages: the hub pages, and the app's build when 'app'
+// is among them.
+export const versionFor = (ref, want) => (want.includes('app') ? { ...pages(ref), ...app(ref) } : pages(ref));
+
 // The app's web build of one version, with Baserow pointed at the fake tables of lib/fakes.js.
 // Built with this working copy's node_modules (the versions compared normally share them).
 const FAKE_ENV = {
@@ -57,10 +76,11 @@ const FAKE_ENV = {
 export function app(ref) {
   // run.js builds the working copy's app once and hands it to the scripts it runs.
   const given = process.env.I360_COMPARE_WORK_APP;
-  if (ref === WORK && given && existsSync(join(given, 'index.html'))) return { label: label(ref), dist: given, theme: pages(ref).theme };
+  if (ref === WORK && given && existsSync(join(given, 'index.html'))) return { label: label(ref), dist: used(given), theme: pages(ref).theme };
   const id = ref === WORK ? `work-${Date.now()}` : shortSha(ref);
   const out = join(CACHE, `${id}-app`);
-  if (ref !== WORK && existsSync(join(out, 'index.html'))) return { label: label(ref), dist: out, theme: pages(ref).theme };
+  if (ref !== WORK && existsSync(join(out, 'index.html'))) return { label: label(ref), dist: used(out), theme: pages(ref).theme };
+  prune();
   let src = REPO;
   if (ref !== WORK) {
     src = unpack(ref, ['.', ':(exclude)android', ':(exclude)ios'], 'src');

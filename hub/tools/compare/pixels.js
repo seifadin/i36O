@@ -6,7 +6,7 @@
 //   --full   whole pages instead of the first screen
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { pages, app, options, outDir } from './lib/versions.js';
+import { options, outDir, versionFor } from './lib/versions.js';
 import { launch, network, hubHosts, serveFile } from './lib/browser.js';
 import { library, DISPLAY_TEST } from './lib/fixtures.js';
 import { baserow, dayServices, DAY_CLOCK } from './lib/fakes.js';
@@ -63,8 +63,7 @@ async function diff(page, a, b, file) {
   return { changedPixels: res.n, sizes: res.size[0] === res.size[2] && res.size[1] === res.size[3] ? 'same' : `${res.size[0]}×${res.size[1]} → ${res.size[2]}×${res.size[3]}` };
 }
 
-const build = (ref) => (WANT.includes('app') ? { ...pages(ref), ...app(ref) } : pages(ref));
-const oldV = build(opts.old), newV = build(opts.new);
+const oldV = versionFor(opts.old, WANT), newV = versionFor(opts.new, WANT);
 const browser = await launch();
 const blank = await (await browser.newContext()).newPage();
 const oldRes = {}, newRes = {};

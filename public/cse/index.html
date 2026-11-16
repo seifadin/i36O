@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-VPBfybFKiKqzWl4nnja3tebzdZj+TmSS9utKSsK5YMI='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-dJZsUgTEnW+QZceVgvmVFdmNahFkqgy8hj9xkhDeoXE='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -764,6 +764,18 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     }
   }
 
+  // src/digits.js
+  var ZERO = { western: 48, arabic: 1632, persian: 1776 };
+  var ANY_DIGIT = /[0-9٠-٩۰-۹]/;
+  function writeNumerals(text, numerals) {
+    const zero = ZERO[numerals] || ZERO.western;
+    return String(text).replace(/[0-9٠-٩۰-۹]/g, (d) => {
+      const c = d.charCodeAt(0);
+      const v = c >= 1776 ? c - 1776 : c >= 1632 ? c - 1632 : c - 48;
+      return String.fromCharCode(zero + v);
+    });
+  }
+
   // theme/site/theme-loader.js
   var THEMES = ["system", "light", "sepia", "dark"];
   var NUMERALS = ["western", "arabic", "persian"];
@@ -869,18 +881,12 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       listeners.delete(fn);
     };
   }
-  var DIGIT_ZERO = { western: 48, arabic: 1632, persian: 1776 };
   function getNumerals() {
     const n = read(NUMERALS_KEY);
     return NUMERALS.includes(n) ? n : "western";
   }
   function toNumerals(text, numerals = getNumerals()) {
-    const zero = DIGIT_ZERO[numerals] || DIGIT_ZERO.western;
-    return String(text).replace(/[0-9\u0660-\u0669\u06F0-\u06F9]/g, (d) => {
-      const c = d.charCodeAt(0);
-      const v = c >= 1776 ? c - 1776 : c >= 1632 ? c - 1632 : c - 48;
-      return String.fromCharCode(zero + v);
-    });
+    return writeNumerals(text, numerals);
   }
   function applyNumerals() {
     const numerals = getNumerals();
@@ -908,7 +914,6 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       numeralListeners.delete(fn);
     };
   }
-  var ANY_DIGIT = /[0-9\u0660-\u0669\u06F0-\u06F9]/;
   function convertText(node, skip, numerals) {
     const parent = node.parentElement;
     if (!parent || skip && parent.closest(skip)) return;

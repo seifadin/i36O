@@ -32,6 +32,7 @@ import { join, dirname } from 'node:path';
 import * as esbuild from 'esbuild';
 import { fallbackCss } from '../theme/fallbacks.js';
 import { LIB_HOST, THEME_ORIGIN as THEME_SITE } from '../src/sites.js';
+import { WORKER as HIJRI_WORKER } from '../hijri/client.js';
 import { checkInlineScripts } from './check-scripts.js';
 
 const root = join(import.meta.dirname, '..');
@@ -165,6 +166,6 @@ buildPage({
       banner: `/*! adhan-js ${pkgVersion('adhan')} | MIT License | Copyright (c) Batoul Apps | https://github.com/batoulapps/adhan-js */`,
       plugins: [dayCities]
     }),
-    connectSrc: 'https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev'
+    connectSrc: `https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com ${HIJRI_WORKER}`
   });
 }

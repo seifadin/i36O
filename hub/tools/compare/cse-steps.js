@@ -2,10 +2,10 @@
 // «more», the two options, a too-short search, a failed search and its retry, the theme button.
 // Phone (390 px) and desktop (1280 px): 2 cases × up to 15 steps.
 //   node cse-steps.js [--old <ref>] [--new <ref>] [--out <folder>]
-import { pages, options, outDir } from './lib/versions.js';
-import { launch, network, hubHosts, errorsOf, serveFile } from './lib/browser.js';
+import { pages, options } from './lib/versions.js';
+import { network, hubHosts, errorsOf, serveFile } from './lib/browser.js';
 import { library } from './lib/fixtures.js';
-import { compare } from './lib/report.js';
+import { oldVsNew } from './lib/report.js';
 import { join } from 'node:path';
 
 const opts = options();
@@ -67,8 +67,4 @@ async function run(browser, v) {
   return res;
 }
 
-const oldV = pages(opts.old), newV = pages(opts.new);
-const browser = await launch();
-const [a, b] = [await run(browser, oldV), await run(browser, newV)];
-await browser.close();
-compare('cse-steps', a, b, { out: outDir(opts, 'cse-steps'), oldLabel: oldV.label, newLabel: newV.label });
+await oldVsNew('cse-steps', opts, pages(opts.old), pages(opts.new), run);

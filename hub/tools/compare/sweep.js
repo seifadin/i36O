@@ -4,11 +4,11 @@
 // browser and as inside the app), the CSE (with results), Daily Reflection, the app's home screen.
 // Besides old vs new, any sideways scrolling in the new version is listed on its own.
 //   node sweep.js [--old <ref>] [--new <ref>] [--pages reader,cse,day,app] [--out <folder>]
-import { pages, app, options, outDir } from './lib/versions.js';
-import { launch, network, hubHosts, serveFile } from './lib/browser.js';
+import { options, versionFor } from './lib/versions.js';
+import { network, hubHosts, serveFile } from './lib/browser.js';
 import { books, library } from './lib/fixtures.js';
 import { baserow, dayServices, DAY_CLOCK } from './lib/fakes.js';
-import { compare } from './lib/report.js';
+import { oldVsNew } from './lib/report.js';
 import { join } from 'node:path';
 
 const opts = options();
@@ -80,12 +80,7 @@ async function run(browser, v) {
   return res;
 }
 
-const withApp = (ref) => (WANT.includes('app') ? { ...pages(ref), ...app(ref) } : pages(ref));
-const oldV = withApp(opts.old), newV = withApp(opts.new);
-const browser = await launch();
-const [a, b] = await Promise.all([run(browser, oldV), run(browser, newV)]);
-await browser.close();
-compare('sweep', a, b, { out: outDir(opts, 'sweep'), oldLabel: oldV.label, newLabel: newV.label });
+const b = await oldVsNew('sweep', opts, versionFor(opts.old, WANT), versionFor(opts.new, WANT), run);
 for (const [name, rows] of Object.entries(b)) {
   const bad = rows.filter(([, m]) => m.overflow || m.barOverflow || m.prayerBoxOverflow).map(([w]) => w);
   if (bad.length) { console.log(`  new ${name}: runs off the side at ${bad.join(', ')}`); process.exitCode = 1; }
