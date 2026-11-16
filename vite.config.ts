@@ -143,7 +143,10 @@ const BUILD_TARGETS: string[] = JSON.parse(
   readFileSync(fileURLToPath(new URL('./hub/build-targets.json', import.meta.url)), 'utf-8'),
 ).targets
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // A build prints only warnings and errors: the list of every output file (one per Lucide icon,
+  // §6) is too long to read. The dev server keeps its usual messages.
+  logLevel: command === 'build' ? 'warn' : 'info',
   plugins: [react(), sharedTheme(), contentSecurityPolicy()],
   resolve: {
     alias: {
@@ -169,4 +172,4 @@ export default defineConfig({
     include: ['src/**/*.test.ts'],
     environment: 'node',
   },
-})
+}))
