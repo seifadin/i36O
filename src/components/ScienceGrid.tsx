@@ -19,9 +19,8 @@ import ReportNotice from '@/components/ReportNotice'
 const iconCache = new Map<string, ComponentType>()
 
 // Visible fallback for a missing/misnamed icon — silently rendering nothing
-// makes a bad icon name indistinguishable from "no icon set," same class of
-// problem as the Keyboard field-mismatch bug (zero visible failure = hard to
-// diagnose). CircleSlash makes a bad name immediately noticeable instead.
+// would make a bad icon name indistinguishable from "no icon set" (a failure
+// nobody sees is hard to diagnose). CircleSlash makes a bad name noticeable.
 function FallbackIcon() {
   return <CircleSlash />
 }
@@ -49,9 +48,8 @@ function DynamicIcon({ name }: { name: string }) {
   )
 }
 
-// Extracted after the intermediate-nested minor button and the direct
-// minor button (rendered when a science has no intermediate parent) were
-// found to be identical except for indent depth (3 gaps vs 2). Defined
+// One button for a minor science, under an intermediate or directly under
+// its major (only the indent differs: 3 gaps vs 2). Defined
 // at module scope, not nested inside ScienceGrid, with onTap passed as a
 // prop rather than closed over — a component defined inside another
 // component's render body gets a fresh function identity every render,
@@ -245,8 +243,7 @@ export default function ScienceGrid() {
   }
   if (lastFailure) {
     // At least one failure has happened since the last genuine success —
-    // one unified, continuously-tappable indicator, replacing the
-    // earlier separate loading/error blocks and inline report button.
+    // one continuously-tappable indicator for loading, retrying and failed.
     // Opens a dialog with the error details and an optional report
     // action instead, matching the OTA rollback notice's own pattern
     // (App.tsx) — same shared reporting mechanism, same Dialog.tsx

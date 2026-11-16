@@ -1,10 +1,10 @@
 // The Reader: the side panel (contents, bookmarks), reading mode, the toolbar's layout by
 // measurement, and keyboard shortcuts.
 import { oncePerFrame } from '../frame.js';
-import { fittingToolbar } from '../page-chrome.js';
+import { el, fittingToolbar, setLabel } from '../page-chrome.js';
 import { READER_FOLD } from './fold.js';
 import { ICON, PANEL_COVERS, ZOOM_STEP } from './text.js';
-import { btnCopyLink, btnExitReading, btnMore, btnPanel, btnPanelClose, btnReading, fmtNum, moreMenu, nextFrame, panelBody, searchPopup, setTitle, sidePanel, state, t, tabBookmarks, tabContents, tbEnd, toolbar, viewerContainer } from './state.js';
+import { btnCopyLink, btnExitReading, btnMore, btnPanel, btnPanelClose, btnReading, fmtNum, moreMenu, nextFrame, panelBody, searchPopup, sidePanel, state, t, tabBookmarks, tabContents, tbEnd, toolbar, viewerContainer } from './state.js';
 import { isBuilding, pageLabelText } from './pages.js';
 import { bookmarkedSet, copyPageLink, removeBookmarkAt } from './position.js';
 import { captureAnchor, remPx, restoreAnchor, setZoom } from './view.js';
@@ -35,38 +35,32 @@ function closePanel() {
   btnPanel.setAttribute('aria-pressed', 'false');
 }
 
-async function jumpToElement(idx, el) {
+async function jumpToElement(idx, target) {
   scrollToSheet(idx);
-  if (el) {
+  if (target) {
     await nextFrame(); await nextFrame();
     const v = viewerContainer.getBoundingClientRect();
-    viewerContainer.scrollTop += el.getBoundingClientRect().top - v.top - remPx(0.75);
-    pinElement(el, remPx(0.75));
+    viewerContainer.scrollTop += target.getBoundingClientRect().top - v.top - remPx(0.75);
+    pinElement(target, remPx(0.75));
   }
   updateCounter(true);
   if (panelCoversPage()) closePanel();
 }
 
 function panelItem(text, pageText, onClick, extraClass) {
-  const btn = document.createElement('button');
+  const btn = el('button');
   btn.type = 'button';
   btn.className = 'i360-list-item panel-item' + (extraClass ? ' ' + extraClass : '');
-  const s1 = document.createElement('span');
-  s1.className = 'item-text';
-  s1.textContent = text;
+  const s1 = el('span', 'item-text', text);
   s1.dir = 'auto';
-  const s2 = document.createElement('span');
-  s2.className = 'item-page';
-  s2.textContent = pageText;
+  const s2 = el('span', 'item-page', pageText);
   btn.append(s1, s2);
   btn.addEventListener('click', onClick);
   return btn;
 }
 
 function emptyNote(text) {
-  const div = document.createElement('div');
-  div.className = 'panel-empty';
-  div.textContent = text;
+  const div = el('div', 'panel-empty', text);
   return div;
 }
 
@@ -85,15 +79,14 @@ function renderPanel() {
 
   if (state.sheets.length === 0) { panelBody.appendChild(emptyNote(tr.emptyHint)); return; }
 
-  const ul = document.createElement('ul');
-  ul.className = 'panel-list';
+  const ul = el('ul', 'panel-list');
 
   if (state.panelTab === 'contents') {
     state.sheets.forEach((sheet, idx) => {
       for (const h of sheet.querySelectorAll('.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4')) {
         const text = h.textContent.replace(/\s+/g, ' ').trim();
         if (!text) continue;
-        const li = document.createElement('li');
+        const li = el('li');
         li.appendChild(panelItem(text, state.format === 'plain' ? '' : pageLabelText(state.pages[idx], tr),
           () => jumpToElement(idx, h), `lvl-${h.tagName.slice(1)}`));
         ul.appendChild(li);
@@ -103,15 +96,14 @@ function renderPanel() {
   } else {
     const indices = [...bookmarkedSet()].sort((a, b) => a - b);
     for (const idx of indices) {
-      const li = document.createElement('li');
-      li.className = 'bm-row';
+      const li = el('li', 'bm-row');
       const label = state.format === 'plain' ? fmtNum(idx + 1) : pageLabelText(state.pages[idx], tr);
       li.appendChild(panelItem(pageSummary(idx) || label, label, () => jumpToElement(idx, null)));
-      const del = document.createElement('button');
+      const del = el('button');
       del.type = 'button';
       del.className = 'toolbar-btn';
       del.innerHTML = ICON.trash;
-      setTitle(del, tr.removeBookmark);
+      setLabel(del, tr.removeBookmark);
       del.addEventListener('click', () => removeBookmarkAt(idx));
       li.appendChild(del);
       ul.appendChild(li);
@@ -129,9 +121,9 @@ function enterReading() {
   closePanel(); closeSearch(); closeMore();
   document.body.classList.add('reading');
   restoreAnchor(anchor);
-  const el = document.documentElement;
-  if (el.requestFullscreen && !document.fullscreenElement) {
-    el.requestFullscreen().catch(() => { /* not allowed here: the toolbar is hidden anyway */ });
+  const page = document.documentElement;
+  if (page.requestFullscreen && !document.fullscreenElement) {
+    page.requestFullscreen().catch(() => { /* not allowed here: the toolbar is hidden anyway */ });
   }
   btnExitReading.focus();
 }

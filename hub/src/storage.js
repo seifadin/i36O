@@ -1,6 +1,17 @@
 // Settings kept on this device (localStorage), as JSON, under a page's own key prefix. Never
 // throws: storage can be off or full (private browsing, blocked site data) — the page then just
-// doesn't remember. Shared by the hub pages; bundled into each by scripts/build.js.
+// doesn't remember. Shared by the hub pages (bundled into each by scripts/build.js) and the i360إ
+// app (imported as '@i360/storage'; its types come from the JSDoc below).
+
+/**
+ * @typedef {object} Store
+ * @property {<T>(key: string, fallback: T) => T} get  the saved value, or `fallback` when there is
+ *   none, it isn't JSON, or storage can't be read
+ * @property {(key: string, value: unknown) => void} set
+ * @property {(key: string) => void} remove
+ */
+
+/** @param {string} [prefix] @returns {Store} */
 export function createStore(prefix = '') {
   return {
     get(key, fallback) {
@@ -17,3 +28,7 @@ export function createStore(prefix = '') {
     }
   };
 }
+
+/** The Reader's public address from Baserow (i360dbc's MdReader): written by the app, read by the
+ * Reader for "copy link" (i360-md-reader.md §4). */
+export const MD_READER_KEY = 'i360.mdReader';

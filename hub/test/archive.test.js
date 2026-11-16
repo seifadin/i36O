@@ -4,17 +4,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import * as ex from '../indexer/extract.js';
+import { reply } from './helpers.js';
 
-function reply(status, body) {
-  const buf = Buffer.isBuffer(body) ? body : Buffer.from(typeof body === 'string' ? body : JSON.stringify(body));
-  return {
-    status, ok: status >= 200 && status < 300,
-    headers: { get: () => null },
-    json: async () => JSON.parse(buf.toString('utf8')),
-    text: async () => buf.toString('utf8'),
-    arrayBuffer: async () => buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength)
-  };
-}
 
 // Three pages of search text, one paragraph per line, as archive.org stores it.
 const P1 = 'كلمة الناشر\nالحمد لله الذي فطرنا على حب دينه.';

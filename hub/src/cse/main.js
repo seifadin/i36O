@@ -5,7 +5,7 @@ import * as SearchCore from '../search-core.js';
 import * as CseIndex from '../cse-index.js';
 import * as CseView from '../cse-view.js';
 import { fetchWithTimeout } from '../net.js';
-import { $, IN_APP, setupClose, THEME_ICONS } from '../page-chrome.js';
+import { $, IN_APP, drawSettingsButtons, el, setupClose, wireSettingsButtons } from '../page-chrome.js';
 import { CSE as LOCALES } from '../locales.js';
 
 const DEFAULT_DATA = 'https://lib.i36o.workers.dev/';
@@ -39,9 +39,7 @@ const fmtNum = (n) => fmt(Number(n).toLocaleString('en-US'));
 
 // Re-draws every number on the page in the chosen numerals.
 function applyNumerals() {
-  btnNumerals.textContent = i360Theme.NUMERALS_SAMPLE[state.numerals];
-  btnNumerals.title = i360Theme.numeralsLabel(state.numerals);
-  btnNumerals.setAttribute('aria-label', btnNumerals.title);
+  drawSettingsButtons(btnTheme, btnNumerals);
   // The page and the header's name; not what the visitor typed.
   for (const root of [document.querySelector('.tb-title'), document.querySelector('main')]) {
     i360Theme.convertNumerals(root, { skip: 'form', numerals: state.numerals });
@@ -52,15 +50,21 @@ function applyNumerals() {
 // Theme: the shared i360 choice, kept by the built-in theme loader
 // (i360Theme), followed live when it changes in another app or tab.
 function applyTheme() {   // the button shows the choice
-  btnTheme.innerHTML = THEME_ICONS[state.theme];
-  btnTheme.title = i360Theme.themeLabel(state.theme);
-  btnTheme.setAttribute('aria-label', btnTheme.title);
+  drawSettingsButtons(btnTheme, btnNumerals);
 }
 i360Theme.onChange(({ choice }) => {
   if (choice === state.theme) return;
   state.theme = choice;
   applyTheme();
 });
+
+// A small outlined button (retry, more).
+function smallButton(cls, text, onClick) {
+  const b = el('button', `${cls} i360-btn i360-btn-sm`.trim(), text);
+  b.type = 'button';
+  b.addEventListener('click', onClick);
+  return b;
+}
 
 /* ---------------- Status line ---------------- */
 function setStatus(text, { error = false, retry = null } = {}) {
@@ -69,10 +73,7 @@ function setStatus(text, { error = false, retry = null } = {}) {
   statusEl.classList.toggle('i360-banner', error);
   if (text) statusEl.append(fmt(text));
   if (retry) {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'retry i360-btn i360-btn-sm'; b.textContent = T.retry;
-    b.addEventListener('click', retry);
-    statusEl.append(b);
+    statusEl.append(smallButton('retry', T.retry, retry));
   }
 }
 
@@ -198,23 +199,18 @@ async function runSearch(run, q) {
 
 // A summary line: name, then its count.
 function summaryLine(name) {
-  const summary = document.createElement('summary');
-  const n = document.createElement('span');
-  n.textContent = name;
-  const count = document.createElement('span');
-  count.className = 'count';
-  summary.append(n, count);
+  const summary = el('summary');
+  const count = el('span', 'count');
+  summary.append(el('span', '', name), count);
   return { summary, count };
 }
 
 function makeMajor(ctx, M) {
-  const el = document.createElement('details');
-  el.className = 'major i360-card';
+  const box = el('details', 'major i360-card');
   const { summary, count } = summaryLine(M.major);
-  const body = document.createElement('div');
-  body.className = 'major-body';
-  el.append(summary, body);
-  const m = { el, count, groups: [] };
+  const body = el('div', 'major-body');
+  box.append(summary, body);
+  const m = { el: box, count, groups: [] };
   for (const U of M.units) {
     const g = makeGroup(ctx, U, m);
     m.groups.push(g);
@@ -224,8 +220,8 @@ function makeMajor(ctx, M) {
   updateMajor(m);
   // Rows without an intermediate show as soon as the major opens; a sub-group that is the
   // only one inside it opens with it.
-  el.addEventListener('toggle', () => {
-    if (!el.open) return;
+  box.addEventListener('toggle', () => {
+    if (!box.open) return;
     if (m.groups.length === 1 && m.groups[0].details) m.groups[0].el.open = true;
     for (const g of m.groups) if (!g.details && g.next === 0 && !g.loading) loadMore(ctx, g);
   });
@@ -235,28 +231,24 @@ function makeMajor(ctx, M) {
 // One unit: an intermediate (its own box that opens and closes) or the
 // rows without one (directly in the major).
 function makeGroup(ctx, U, m) {
-  const list = document.createElement('div');
-  const foot = document.createElement('div');
-  foot.className = 'group-foot';
+  const list = el('div');
+  const foot = el('div', 'group-foot');
   const details = U.name != null;
-  let el, count = null;
+  let box, count = null;
   if (details) {
-    el = document.createElement('details');
-    el.className = 'inter i360-inset';
+    box = el('details', 'inter i360-inset');
     const line = summaryLine(U.name);
     count = line.count;
-    const body = document.createElement('div');
-    body.className = 'inter-body';
+    const body = el('div', 'inter-body');
     body.append(list, foot);
-    el.append(line.summary, body);
+    box.append(line.summary, body);
   } else {
-    el = document.createElement('div');
-    el.className = 'direct';
-    el.append(list, foot);
+    box = el('div', 'direct');
+    box.append(list, foot);
   }
-  const g = { el, details, count, list, foot, gps: U.gps, next: 0, shown: 0, done: false, loading: null, sources: new Map(), major: m };
+  const g = { el: box, details, count, list, foot, gps: U.gps, next: 0, shown: 0, done: false, loading: null, sources: new Map(), major: m };
   setCount(g);
-  if (details) el.addEventListener('toggle', () => { if (el.open && g.next === 0 && !g.loading) loadMore(ctx, g); });
+  if (details) box.addEventListener('toggle', () => { if (box.open && g.next === 0 && !g.loading) loadMore(ctx, g); });
   return g;
 }
 
@@ -345,38 +337,22 @@ function drawFoot(ctx, g) {
   g.foot.textContent = '';
   if (g.done && g.shown === 0) { g.foot.textContent = T.noMatches; return; }
   if (g.done) return;
-  const b = document.createElement('button');
-  b.type = 'button'; b.className = 'i360-btn i360-btn-sm'; b.textContent = T.more;
-  b.addEventListener('click', () => loadMore(ctx, g));
-  g.foot.append(b);
+  g.foot.append(smallButton('', T.more, () => loadMore(ctx, g)));
 }
 
 function showGroupError(ctx, g) {
   g.foot.textContent = '';
   g.foot.append(T.searchError);
-  const b = document.createElement('button');
-  b.type = 'button'; b.className = 'i360-btn i360-btn-sm'; b.textContent = T.retry;
-  b.addEventListener('click', () => loadMore(ctx, g));
-  g.foot.append(b);
+  g.foot.append(smallButton('', T.retry, () => loadMore(ctx, g)));
 }
 
 function sourceBlock(ctx, g, source) {
   if (g.sources.has(source.key)) return g.sources.get(source.key);
-  const block = document.createElement('div');
-  block.className = 'source';
-  const head = document.createElement('div');
-  head.className = 'source-name';
+  const block = el('div', 'source');
+  const head = el('div', 'source-name');
   const nm = CseView.sourceName(source, state.counts);
-  const title = document.createElement('span');
-  title.textContent = `«${nm.title}»`;
-  head.append(title);
-  if (nm.file) {
-    const sep = document.createElement('span');
-    sep.className = 'sep'; sep.textContent = '\\';
-    const file = document.createElement('span');
-    file.className = 'file'; file.textContent = `«${nm.file}»`;
-    head.append(sep, file);
-  }
+  head.append(el('span', '', `«${nm.title}»`));
+  if (nm.file) head.append(el('span', 'sep', '\\'), el('span', 'file', `«${nm.file}»`));
   block.append(head);
   g.list.append(block);
   g.sources.set(source.key, block);
@@ -399,8 +375,7 @@ function addHit(ctx, g, hit) {
   g.shown++;
   const block = sourceBlock(ctx, g, hit.source);
   const sn = hit.snippets[0];
-  const a = document.createElement('a');
-  a.className = 'hit i360-list-item';
+  const a = el('a', 'hit i360-list-item');
   const link = CseView.resultLink(hit, ctx.q, sn ? sn.hit : '');
   const toReader = link.startsWith(CseView.READER);
   a.href = link;
@@ -415,18 +390,14 @@ function addHit(ctx, g, hit) {
   a.title = toReader ? T.openReader : T.openTitle;
   const label = CseView.pageLabel(hit);
   if (label || hit.count > 1) {
-    const meta = document.createElement('div');
-    meta.className = 'hit-meta';
-    if (label) { const l = document.createElement('span'); l.textContent = label; meta.append(l); }
-    if (hit.count > 1) { const c = document.createElement('span'); c.className = 'more-spots'; c.textContent = T.spots(hit.count); meta.append(c); }
+    const meta = el('div', 'hit-meta');
+    if (label) meta.append(el('span', '', label));
+    if (hit.count > 1) meta.append(el('span', 'more-spots', T.spots(hit.count)));
     a.append(meta);
   }
   if (sn) {
-    const t = document.createElement('div');
-    t.className = 'hit-text';
-    const mark = document.createElement('mark');
-    mark.textContent = sn.hit;
-    t.append(sn.before, mark, sn.after);
+    const t = el('div', 'hit-text');
+    t.append(sn.before, el('mark', '', sn.hit), sn.after);
     a.append(t);
   }
   block.append(a);
@@ -446,15 +417,12 @@ btnWord.addEventListener('click', () => {
   state.word = !state.word; setOption(btnWord, state.word);
   if (input.value.trim()) search(input.value);
 });
-// Numerals: the shared i360 choice, also followed when another app or tab changes it.
-btnNumerals.addEventListener('click', () => { i360Theme.cycleNumerals(); });
+// Theme and numerals: the shared i360 choices, also followed when another app or tab changes them.
+wireSettingsButtons(btnTheme, btnNumerals);
 i360Theme.onNumeralsChange(({ numerals }) => {
   if (numerals === state.numerals) return;
   state.numerals = numerals;
   applyNumerals();
-});
-btnTheme.addEventListener('click', () => {
-  i360Theme.cycle();
 });
 // Opening a group loads its first step of results, as a tap does.
 $('btn-expand').addEventListener('click', () => {

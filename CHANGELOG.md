@@ -9,6 +9,17 @@ i360إ is an Arabic-only Islamic knowledge discovery app that organizes Islamic 
 ## [Unreleased] — live on the web and over the air (still version 0.14.0)
 
 ### Changed
+- A Markdown Reader link naming a page the book doesn't have now opens where you are and shows that page's number in the address, instead of keeping the wrong one (2026-11-16)
+- The Daily Reflection lists the Islamic events of the whole coming year, scrolling inside their card on every screen, with a short note that the Islamic day runs from sunset to sunset; several events are described more fully, and the Prophet's ﷺ birthday and his arrival in Madinah (12 Rabi' al-Awwal) are listed separately (2026-11-15)
+- One look everywhere: the encyclopedia, the Markdown Reader, the book search and the Daily Reflection now share the same text sizes, spacing, corners, lines and shadows, and the same search boxes, buttons, options, lists, pop-ups, messages and cards. Buttons and search boxes are rounded pills, as on Android and iPhone; options show a tick when they are on (2026-11-15)
+- The encyclopedia's title is larger where the screen has room, and the science list is never larger than the title; the science names are no longer bold, so the title stands out (2026-11-15)
+- Reading text — books, verses, hadith, search results and the assistant's answers — has more space between lines (2026-11-14)
+- The Daily Reflection fits any screen without fixed width steps: prayer times show all six in one row wherever they fit, the cards are a little wider on large screens, and the "today" label on an event is readable in the dark theme too (2026-11-14)
+- The AI assistant's chat takes the encyclopedia's colours and typeface from the same shared source, with tables and code shown as in the Markdown Reader (2026-11-15)
+- A failed data load now shows as a clear red notice, like the book search's (2026-11-15)
+- On iPhones whose status bar or camera sits at the side (in landscape, and on the folding iPhone), the encyclopedia's search bar and lists and the book search keep clear of it, with the same spacing on every page (2026-11-08)
+- Every bar now looks and behaves the same, the encyclopedia's bottom bar included: the same colours in every theme, wider buttons wherever there is room (the Markdown Reader fits its buttons to the room it has), one size for the numerals and other button text, and the Daily Reflection's title shows «التأمل» correctly (2026-10-30)
+- Every top and bottom bar now has the same height and the same buttons: the Daily Reflection's bar is slimmer, the Markdown Reader's and the book search's a little slimmer, and the encyclopedia's bottom bar a little taller. Each button reacts to a tap anywhere across the bar's height, so the small buttons are easier to hit (2026-10-30)
 - The book search «البحث في i360إ» shows its results collapsed at first, so every science found is visible at once with its approximate count; a science or sub-group that is the only one opens by itself, and an opened group with no real match now says «لا توجد نتائج مطابقة» instead of disappearing (2026-10-26)
 - The Markdown Reader stays responsive while a big book builds and while scrolling it: only the pages near the screen are watched by the browser, so taps act sooner and the progress bar moves smoothly (2026-10-26)
 - The Markdown Reader's pause while a big book is prepared is shorter (each downloaded part is split into pages as it arrives, and its empty pages are made a slice at a time), and the moving progress stripe keeps moving through it instead of looking stuck (2026-10-26)
@@ -25,6 +36,8 @@ i360إ is an Arabic-only Islamic knowledge discovery app that organizes Islamic 
 - The Markdown Reader opens only the i360 library's books — our own books and the books the i360 search has indexed — and reads them from the library itself. «نسخ رابط هذه الصفحة» copies the Reader's public link, also inside the app (2026-10-22)
 
 ### Added
+- The Daily Reflection has a date converter: Gregorian to Hijri or Hijri to Gregorian, one tap to swap, opening on today, with a note that the calculated date may differ by a day or two (2026-11-15)
+- Browsers too old for the encyclopedia now show a short note instead of a blank page: «متصفحك قديم ولا يدعم الموسوعة الإسلامية i360إ؛ يُرجى استخدام متصفح أحدث», with a link to the support page for more (2026-11-04)
 - The Markdown Reader now opens inside the app instead of the browser, with a close button back to the encyclopedia (2026-10-22)
 - The Reader no longer freezes on very large books: it builds a book's pages a little at a time, starting with the page you open it at and moving outward from there (whatever is on screen first), with a row under the toolbar showing the download and then the preparation, in percent; the screen, the close button and the back button keep working meanwhile, and search becomes available once the book is ready (2026-10-22)
 - The Reader's connection icon now checks the connection for real, so it also turns red on Android phones and on Wi-Fi without internet (2026-10-22)
@@ -176,4 +189,4 @@ This release replaces the original low-code SAP Build Apps (AppGyver) implementa
 
 ## [0.12.4] and earlier
 
-Original implementation, built on SAP Build Apps (AppGyver). See prior release history for details.
+Original implementation, built on SAP Build Apps (AppGyver). Its release history is in [README-AppGyver.md](README-AppGyver.md).

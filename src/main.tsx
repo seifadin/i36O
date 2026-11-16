@@ -7,11 +7,16 @@ import { installStartupErrorGuard } from './lib/startupHealth'
 import { primeDiagnosticContext } from './lib/feedbackReport'
 import { startTheme } from './lib/theme'
 import { installBackButton } from './lib/backButton'
+import { upgradeStoredValues } from './lib/deviceStorage'
 
 // Installed here, before anything else — genuinely as early as possible,
 // so it can catch a startup-relevant error even before ErrorBoundary/App
 // mount. See startupHealth.ts's own header comment for the full reasoning.
 installStartupErrorGuard()
+
+// Values older bundles saved as plain text become JSON, before anything reads them
+// (lib/deviceStorage.ts).
+upgradeStoredValues()
 
 // Reads the OTA build once so bug reports never have to await it at tap
 // time — see feedbackReport.ts's copyAndEmailReport() for why. Installed

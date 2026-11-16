@@ -6,6 +6,7 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import * as inv from '../indexer/inventory.js';
+import { reply } from './helpers.js';
 
 const tmp = () => mkdtempSync(join(tmpdir(), 'inv-'));
 
@@ -65,14 +66,6 @@ test('the real reason behind "fetch failed"', () => {
 });
 
 // ---- Simulated services ----
-function reply(status, body, headers = {}) {
-  const h = new Map(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v]));
-  return {
-    status, ok: status >= 200 && status < 300,
-    headers: { get: (k) => (h.has(k.toLowerCase()) ? h.get(k.toLowerCase()) : null) },
-    json: async () => body, text: async () => JSON.stringify(body)
-  };
-}
 const row = (id, minor, major, inter, bot, aikb) => ({
   id, ScienceMinorId: id, ScienceMinor_Ar: minor, ScienceMajorId: '1', ScienceMajor_Ar: major,
   ScienceIntermediateId: inter ? '10' : '', ScienceIntermediate_Ar: inter, BotKB: bot, CustomSearchAIKBlessBotKB: aikb

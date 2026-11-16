@@ -9,15 +9,8 @@ import { join } from 'node:path';
 import * as idx from '../indexer/build-index.js';
 import { search } from '../indexer/search.js';
 import * as ex from '../indexer/extract.js';
+import { reply } from './helpers.js';
 
-function reply(status, body, headers = {}, text) {
-  const h = new Map(Object.entries(headers).map(([k, v]) => [k.toLowerCase(), v]));
-  return {
-    status, ok: status >= 200 && status < 300,
-    headers: { get: (k) => (h.has(k.toLowerCase()) ? h.get(k.toLowerCase()) : null) },
-    json: async () => body, text: async () => (text != null ? text : JSON.stringify(body))
-  };
-}
 const row = (id, majorId, major, interId, inter, minor, links) => ({
   id, ScienceMinorId: id, ScienceMinor_Ar: minor, ScienceMajorId: majorId, ScienceMajor_Ar: major,
   ScienceIntermediateId: interId, ScienceIntermediate_Ar: inter, BotKB: links, CustomSearchAIKBlessBotKB: ''

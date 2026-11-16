@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-GDdMmup7qpagcV2VaYbADlkU1zvjgsqDyY7FvDAOxaQ='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-5UvvirAPUpeupw0gOKfZifuQ7pIgr6HEMwVIyqHklMc='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -1881,13 +1881,13 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     const next = toNumerals(v, numerals);
     if (next !== v) node.nodeValue = next;
   }
-  function convertAttributes(el, attributes, skip, numerals) {
-    if (!attributes.length || skip && el.closest(skip)) return;
+  function convertAttributes(el2, attributes, skip, numerals) {
+    if (!attributes.length || skip && el2.closest(skip)) return;
     for (const name of attributes) {
-      const v = el.getAttribute(name);
+      const v = el2.getAttribute(name);
       if (v === null || !ANY_DIGIT.test(v)) continue;
       const next = toNumerals(v, numerals);
-      if (next !== v) el.setAttribute(name, next);
+      if (next !== v) el2.setAttribute(name, next);
     }
   }
   function convertNumerals(root2, { skip = "", attributes = [], attributeSkip = skip, numerals = getNumerals() } = {}) {
@@ -1966,13 +1966,13 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     );
   }
   function styleElement() {
-    let el = document.getElementById(STYLE_ID);
-    if (!el) {
-      el = document.createElement("style");
-      el.id = STYLE_ID;
-      document.head.appendChild(el);
+    let el2 = document.getElementById(STYLE_ID);
+    if (!el2) {
+      el2 = document.createElement("style");
+      el2.id = STYLE_ID;
+      document.head.appendChild(el2);
     }
-    return el;
+    return el2;
   }
   function cached() {
     try {
@@ -2004,8 +2004,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       const text = await res.text();
       if (text.length > MAX_CSS || !text.includes("--i360-bg")) throw new Error("theme.css: unexpected content");
       const css = absolutize(text);
-      const el = styleElement();
-      if (el.textContent !== css) el.textContent = css;
+      const el2 = styleElement();
+      if (el2.textContent !== css) el2.textContent = css;
       if (css !== copy) write(CACHE_KEY, JSON.stringify({ url: CSS_URL, css }));
       source = "network";
     } catch (e) {
@@ -2210,6 +2210,12 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
 
   // src/page-chrome.js
   var $ = (id) => document.getElementById(id);
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== void 0) e.textContent = text;
+    return e;
+  }
   var IN_APP = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
   function setupClose(button, stepsBack = () => 1) {
     if (!IN_APP) return;
@@ -2230,6 +2236,25 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     sepia: '<svg data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>',
     dark: '<svg data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>'
   });
+  function drawSettingsButtons(themeBtn, numeralsBtn, lang) {
+    const theme = getChoice(), numerals = getNumerals();
+    themeBtn.innerHTML = THEME_ICONS[theme];
+    setLabel(themeBtn, themeLabel(theme, lang));
+    numeralsBtn.textContent = NUMERALS_SAMPLE[numerals];
+    setLabel(numeralsBtn, numeralsLabel(numerals, lang));
+  }
+  function wireSettingsButtons(themeBtn, numeralsBtn) {
+    themeBtn.addEventListener("click", () => {
+      cycle();
+    });
+    numeralsBtn.addEventListener("click", () => {
+      cycleNumerals();
+    });
+  }
+  function setLabel(control, text) {
+    control.title = text;
+    control.setAttribute("aria-label", text);
+  }
 
   // src/frame.js
   function oncePerFrame(fn) {
@@ -2791,12 +2816,6 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       return n.getHours() * 60 + n.getMinutes();
     }
   }
-  function mk(tag, cls, text) {
-    const el = document.createElement(tag);
-    if (cls) el.className = cls;
-    if (text !== void 0) el.textContent = text;
-    return el;
-  }
   var HOURGLASS = '<svg data-lucide="hourglass" class="icon-inline me-xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>';
   function svgIcon(markup) {
     const t = document.createElement("template");
@@ -2804,7 +2823,6 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     return t.content.firstChild;
   }
   var DataStore = createStore();
-  var Net = { fetch: fetchJson };
   var Hijri = {
     today: () => todayIn(Intl.DateTimeFormat().resolvedOptions().timeZone),
     make(date, h, source, provisional) {
@@ -2843,12 +2861,12 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   var HE = {
     per: 20,
     async list(lang, cat, page) {
-      const r = await Net.fetch(`${CONFIG.API.HE}/hadeeths/list/?language=${lang}&category_id=${cat}&page=${page}&per_page=${this.per}`);
+      const r = await fetchJson(`${CONFIG.API.HE}/hadeeths/list/?language=${lang}&category_id=${cat}&page=${page}&per_page=${this.per}`);
       const m = r.meta || {};
       return { items: Array.isArray(r) ? r : r.data || [], total: Number(m.total_items ?? m.total ?? m.count) || 0, lastPage: Number(m.last_page) || 0 };
     },
     async pickId(lang) {
-      const r = await Net.fetch(`${CONFIG.API.HE}/categories/roots/?language=${lang}`);
+      const r = await fetchJson(`${CONFIG.API.HE}/categories/roots/?language=${lang}`);
       const roots = (Array.isArray(r) ? r : r.data || []).filter((c) => !CONFIG.HADEETH_EXCLUDE_ROOTS.includes(String(c.id)));
       if (!roots.length) throw new Error("HadeethEnc: no root categories");
       const counts = roots.map((c) => Number(c.hadeeths_count) || 0), total = counts.reduce((a, b) => a + b, 0);
@@ -2883,7 +2901,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       return String(res.items[Math.min(idx % this.per, res.items.length - 1)].id);
     },
     one(lang, id, opts) {
-      return Net.fetch(`${CONFIG.API.HE}/hadeeths/one/?id=${id}&language=${lang}`, opts);
+      return fetchJson(`${CONFIG.API.HE}/hadeeths/one/?id=${id}&language=${lang}`, opts);
     },
     async daily(lang) {
       const day = ymdKey(localYMD()), c = DataStore.get(CONFIG.S.H);
@@ -2959,7 +2977,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       return [...out].slice(0, 6);
     },
     async search(q, lang) {
-      const lists = await Promise.all(this.variants(q).map((v) => Net.fetch(`${CONFIG.API.CITY}?name=${encodeURIComponent(v)}&count=10&language=${lang}&format=json`).then((r) => r.results || [])));
+      const lists = await Promise.all(this.variants(q).map((v) => fetchJson(`${CONFIG.API.CITY}?name=${encodeURIComponent(v)}&count=10&language=${lang}&format=json`).then((r) => r.results || [])));
       const seen = /* @__PURE__ */ new Map();
       lists.flat().forEach((p) => {
         if (p && p.id != null && !seen.has(p.id) && typeof p.latitude === "number" && p.timezone && p.country_code) seen.set(p.id, p);
@@ -3027,7 +3045,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
           rec = { day, id: Math.floor(Math.random() * 6236) + 1 };
           DataStore.set(CONFIG.S.Q, rec);
         }
-        return Net.fetch(`${CONFIG.API.Q}/${rec.id}/editions/quran-uthmani,${CONFIG.EDITIONS.quran[lang]}`);
+        return fetchJson(`${CONFIG.API.Q}/${rec.id}/editions/quran-uthmani,${CONFIG.EDITIONS.quran[lang]}`);
       },
       hadith: (lang) => HE.daily(lang),
       async prayer() {
@@ -3089,9 +3107,9 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     state: "",
     timer: 0,
     init() {
-      this.box = document.getElementById("city-picker");
-      this.input = document.getElementById("city-search");
-      this.btn = document.getElementById("city-change");
+      this.box = $("city-picker");
+      this.input = $("city-search");
+      this.btn = $("city-change");
       this.btn.addEventListener("click", () => this.toggle());
       this.input.addEventListener("input", () => {
         clearTimeout(this.timer);
@@ -3147,12 +3165,12 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       this.input.setAttribute("aria-label", L.citySearch);
       UI.set("city-status", { loading: L.loading, none: L.cityNone, error: L.loadError }[this.state] || "");
       const row = (label2, sub, on, pick) => {
-        const b = mk("button", `i360-list-item${on ? " active-btn" : ""}`);
+        const b = el("button", `i360-list-item${on ? " active-btn" : ""}`);
         b.type = "button";
         b.setAttribute("role", "option");
         b.setAttribute("aria-selected", on);
-        b.append(mk("span", "font-bold", label2));
-        if (sub) b.append(mk("span", "text-sm ms-sm", sub));
+        b.append(el("span", "font-bold", label2));
+        if (sub) b.append(el("span", "text-sm ms-sm", sub));
         b.addEventListener("click", pick);
         return b;
       };
@@ -3170,8 +3188,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   var LANG_SHORT = { ar: "ع", ur: "ار", id: "ID", tr: "TR", en: "EN" };
   var LangMenu = {
     init() {
-      this.btn = document.getElementById("btn-lang");
-      this.list = document.getElementById("lang-list");
+      this.btn = $("btn-lang");
+      this.list = $("lang-list");
       this.btn.addEventListener("click", () => this.list.hidden ? this.open() : this.close(true));
       document.addEventListener("click", (e) => {
         if (!this.list.hidden && !e.target.closest(".lang-wrap")) this.close(false);
@@ -3194,13 +3212,13 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   };
   var Cols = {
     init() {
-      this.a = document.getElementById("col-a");
-      this.b = document.getElementById("col-b");
-      this.prayer = document.getElementById("prayer-card");
+      this.a = $("col-a");
+      this.b = $("col-b");
+      this.prayer = $("prayer-card");
       this.grid = this.prayer.querySelector('[data-target="prayer-grid"]');
       if (window.ResizeObserver) {
         const ro = new ResizeObserver(() => this.queue());
-        [document.getElementById("cards"), this.a, this.prayer].forEach((e) => ro.observe(e));
+        [$("cards"), this.a, this.prayer].forEach((e) => ro.observe(e));
       }
       window.addEventListener("resize", () => this.queue());
       this.queue();
@@ -3333,14 +3351,14 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     // fields = false while typing in the year box: its text is left as typed.
     render(fields = true) {
       if (!this.el) return;
-      const L = this.L, lang = App.lang, el = this.el, num = getNumerals();
+      const L = this.L, lang = App.lang, box = this.el, num = getNumerals();
       UI.set("conv-dir", this.g ? L.convG2H : L.convH2G);
       const sw = $("conv-swap");
       sw.title = L.convSwap;
       sw.setAttribute("aria-label", `${L.convSwap}: ${this.g ? L.convG2H : L.convH2G}`);
       $("conv-fields").setAttribute("aria-label", this.g ? L.convG2H : L.convH2G);
       const option = (value, text, placeholder) => {
-        const o = mk("option", "", text);
+        const o = el("option", "", text);
         o.value = value;
         if (placeholder) {
           o.disabled = true;
@@ -3349,23 +3367,22 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       };
       const days = this.days();
       if (this.d > days) this.d = days;
-      el.d.replaceChildren(option("", L.convDay, true), ...Array.from({ length: days }, (_, i) => option(i + 1, String(i + 1))));
-      el.d.value = this.d ? String(this.d) : "";
-      el.m.replaceChildren(option("", L.convMonth, true), ...this.monthNames(lang).map((n, i) => option(i + 1, `${i + 1}. ${n}`)));
-      el.m.value = this.m ? String(this.m) : "";
-      el.y.placeholder = toNumerals(this.g ? L.convYearHintG : L.convYearHintH, num);
-      if (fields) el.y.value = toNumerals(this.y, num);
-      el.pick.hidden = !(this.g && this.canPick);
-      el.pickBtn.title = L.convPick;
-      el.pickBtn.setAttribute("aria-label", L.convPick);
+      box.d.replaceChildren(option("", L.convDay, true), ...Array.from({ length: days }, (_, i) => option(i + 1, String(i + 1))));
+      box.d.value = this.d ? String(this.d) : "";
+      box.m.replaceChildren(option("", L.convMonth, true), ...this.monthNames(lang).map((n, i) => option(i + 1, `${i + 1}. ${n}`)));
+      box.m.value = this.m ? String(this.m) : "";
+      box.y.placeholder = toNumerals(this.g ? L.convYearHintG : L.convYearHintH, num);
+      if (fields) box.y.value = toNumerals(this.y, num);
+      box.pick.hidden = !(this.g && this.canPick);
+      setLabel(box.pickBtn, L.convPick);
       const r = this.result(lang), isoBox = UI.targets["conv-iso"], err = UI.targets["conv-error"];
       if (this.g) {
         const y = this.year();
-        el.native.value = r && r.carry && y !== null ? `${String(y).padStart(4, "0")}-${pad(this.m)}-${pad(this.d)}` : "";
+        box.native.value = r && r.carry && y !== null ? `${String(y).padStart(4, "0")}-${pad(this.m)}-${pad(this.d)}` : "";
       }
       UI.set("conv-alpha", r && !r.error ? r.alpha : "");
       if (r && !r.error) {
-        const b = mk("bdi", "", r.iso);
+        const b = el("bdi", "", r.iso);
         b.dir = "ltr";
         isoBox.replaceChildren(b, ` ${r.mark}`);
       } else isoBox.replaceChildren();
@@ -3382,9 +3399,9 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       return DAY[App.lang] || DAY.ar;
     },
     init() {
-      document.querySelectorAll("[data-target]").forEach((el) => this.targets[el.dataset.target] = el);
-      document.querySelectorAll("[data-status]").forEach((el) => {
-        el.querySelector("[data-retry]").addEventListener("click", () => App.retry(el.dataset.status));
+      document.querySelectorAll("[data-target]").forEach((node) => this.targets[node.dataset.target] = node);
+      document.querySelectorAll("[data-status]").forEach((node) => {
+        node.querySelector("[data-retry]").addEventListener("click", () => App.retry(node.dataset.status));
       });
       document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => {
         LangMenu.close(true);
@@ -3393,16 +3410,15 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       LangMenu.init();
       document.querySelectorAll("[data-school]").forEach((b) => b.addEventListener("click", () => App.setSchool(+b.dataset.school)));
       Picker.init();
-      setupClose(document.getElementById("btn-close"));
-      document.getElementById("btn-theme").addEventListener("click", () => cycle());
-      onChange(() => this.theme());
-      document.getElementById("btn-numerals").addEventListener("click", () => cycleNumerals());
+      setupClose($("btn-close"));
+      wireSettingsButtons($("btn-theme"), $("btn-numerals"));
+      onChange(() => this.settingsButtons());
       onNumeralsChange(() => {
-        this.numeralsButton();
+        this.settingsButtons();
         Conv.render();
       });
       watchNumerals(document.body, NUMERALS_SKIP);
-      this.theme();
+      this.settingsButtons();
       init();
       Cols.init();
       Conv.init();
@@ -3412,18 +3428,10 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
         if (!document.hidden) App.tick();
       });
     },
-    numeralsButton() {
-      const n = getNumerals(), btn = document.getElementById("btn-numerals");
-      btn.textContent = NUMERALS_SAMPLE[n];
-      btn.title = numeralsLabel(n, App.lang);
-      btn.setAttribute("aria-label", btn.title);
+    settingsButtons() {
+      drawSettingsButtons($("btn-theme"), $("btn-numerals"), App.lang);
     },
-    theme() {
-      const c = getChoice(), btn = document.getElementById("btn-theme");
-      btn.innerHTML = THEME_ICONS[c];
-      btn.title = themeLabel(c, App.lang);
-      btn.setAttribute("aria-label", btn.title);
-    },
+    // in the page's language
     set(t, v) {
       if (this.targets[t]) this.targets[t].textContent = v;
     },
@@ -3446,7 +3454,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       if (this.shown) return;
       this.shown = true;
       ["quran-card", "hadith-card", "prayer-card", "converter-card", "events-card"].forEach((id, i) => setTimeout(() => {
-        const e = document.getElementById(id);
+        const e = $(id);
         if (e) {
           e.style.opacity = 1;
           e.style.transform = "translateY(0)";
@@ -3457,23 +3465,19 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       const L = this.L, lang = App.lang;
       document.documentElement.lang = lang;
       document.documentElement.dir = L.dir;
-      document.querySelectorAll("[data-i18n]").forEach((el) => {
-        el.textContent = L[el.dataset.i18n] || DAY.en[el.dataset.i18n];
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        node.textContent = L[node.dataset.i18n] || DAY.en[node.dataset.i18n];
       });
-      document.querySelectorAll("[data-lang]").forEach((el) => {
-        const on = el.dataset.lang === lang;
-        el.classList.toggle("active-btn", on);
-        el.setAttribute("aria-pressed", on);
+      document.querySelectorAll("[data-lang]").forEach((node) => {
+        const on = node.dataset.lang === lang;
+        node.classList.toggle("active-btn", on);
+        node.setAttribute("aria-pressed", on);
       });
-      const lb = document.getElementById("btn-lang"), cur = document.getElementById(`lang-${lang}`);
-      document.getElementById("lang-short").textContent = LANG_SHORT[lang];
-      lb.title = `${L.language}: ${cur.textContent}`;
-      lb.setAttribute("aria-label", lb.title);
-      this.theme();
-      this.numeralsButton();
-      const x = document.getElementById("btn-close");
-      x.title = L.close;
-      x.setAttribute("aria-label", L.close);
+      const lb = $("btn-lang"), cur = $(`lang-${lang}`);
+      $("lang-short").textContent = LANG_SHORT[lang];
+      setLabel(lb, `${L.language}: ${cur.textContent}`);
+      this.settingsButtons();
+      setLabel($("btn-close"), L.close);
       document.title = L.title;
       this.renderSchool();
       this.renderHijri();
@@ -3489,7 +3493,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       const L = this.L, box = this.targets.credits;
       if (!box) return;
       const link = (text, href) => {
-        const a = mk("a", "underline", text);
+        const a = el("a", "underline", text);
         a.href = href;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
@@ -3507,7 +3511,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     },
     renderSchool() {
       [0, 1].forEach((s) => {
-        const b = document.getElementById(`school-${s}`);
+        const b = $(`school-${s}`);
         if (!b) return;
         const on = App.school === s;
         b.setAttribute("aria-pressed", on);
@@ -3541,13 +3545,13 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     },
     renderHadith() {
       const h = App.state.hadith, L = this.L, lang = App.lang;
-      const hide = (el, on) => {
-        if (el) el.classList.toggle("hidden", on);
+      const hide = (node, on) => {
+        if (node) node.classList.toggle("hidden", on);
       };
       if (!h) {
         ["hadith-title", "hadith-narrator", "hadith-text", "hadith-grade", "hadith-ref"].forEach((t) => this.set(t, ""));
         hide(this.targets["hadith-narrator"], true);
-        hide(document.getElementById("hadith-refs"), true);
+        hide($("hadith-refs"), true);
         return;
       }
       this.set("hadith-title", h.title || "");
@@ -3566,7 +3570,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       this.set("hadith-grade", [h.grade ? `${L.gradeLabel}: ${h.grade}` : "", h.attribution || ""].filter(Boolean).join(" · "));
       const refs = (h.reference || "").trim();
       this.set("hadith-ref", refs);
-      hide(document.getElementById("hadith-refs"), !refs);
+      hide($("hadith-refs"), !refs);
       const a = this.targets["hadith-link"];
       if (a) a.href = `https://hadeethenc.com/${lang}/browse/hadith/${encodeURIComponent(h.id)}`;
     },
@@ -3590,12 +3594,12 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       if (!next) next = "Fajr";
       grid.replaceChildren(...CONFIG.P_KEYS.map((k, i) => {
         const isNext = k === next, m = /(\d{1,2}):(\d{2})/.exec(t[k] || "");
-        const box = mk("div", `flex flex-col items-center p-sm transition-all ${isNext ? "next-prayer-highlight" : "i360-inset"}`);
+        const box = el("div", `flex flex-col items-center p-sm transition-all ${isNext ? "next-prayer-highlight" : "i360-inset"}`);
         box.append(
-          mk("span", `text-sm font-bold ${isNext ? "text-accent" : "text-custom-secondary"}`, L.prayers[i]),
-          mk("span", `text-base font-bold mt-xs ${isNext ? "text-accent" : "text-custom-secondary"}`, m ? m[0] : "—")
+          el("span", `text-sm font-bold ${isNext ? "text-accent" : "text-custom-secondary"}`, L.prayers[i]),
+          el("span", `text-base font-bold mt-xs ${isNext ? "text-accent" : "text-custom-secondary"}`, m ? m[0] : "—")
         );
-        if (isNext) box.append(mk("span", "text-sm mt-xs font-bold text-accent animate-pulse", L.next));
+        if (isNext) box.append(el("span", "text-sm mt-xs font-bold text-accent animate-pulse", L.next));
         return box;
       }));
       const names = METHOD_NAMES[p.method];
@@ -3614,22 +3618,22 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       if (!h || !list) return;
       const note = this.targets["events-note"];
       if (note) {
-        const a = mk("a", "underline", L.sourceLabel);
+        const a = el("a", "underline", L.sourceLabel);
         a.href = CONFIG.DAY_NOTE_SOURCE;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         note.replaceChildren(`${L.eventsNote} (`, a, ")");
       }
       list.replaceChildren(...Hijri.events(h).map((e) => {
-        const row = mk("div", `flex justify-between items-center gap-md p-md transition-all ${e.isT ? "border-2 border-event bg-event-bg rounded-lg" : "i360-inset"}`);
-        const left = mk("div", "flex-1"), title = mk("div", "flex items-center gap-sm");
-        title.append(mk("span", "text-base font-bold text-custom-secondary", L.events[e.id]));
-        if (e.isT) title.append(mk("span", "bg-event text-page text-sm font-bold px-sm rounded-full", L.todayLabel));
-        left.append(title, mk("span", "text-sm text-custom-secondary font-bold", `${e.d} ${L.months[e.m]} ${e.year}`));
-        const right = mk("div", "text-end");
+        const row = el("div", `flex justify-between items-center gap-md p-md transition-all ${e.isT ? "border-2 border-event bg-event-bg rounded-lg" : "i360-inset"}`);
+        const left = el("div", "flex-1"), title = el("div", "flex items-center gap-sm");
+        title.append(el("span", "text-base font-bold text-custom-secondary", L.events[e.id]));
+        if (e.isT) title.append(el("span", "bg-event text-page text-sm font-bold px-sm rounded-full", L.todayLabel));
+        left.append(title, el("span", "text-sm text-custom-secondary font-bold", `${e.d} ${L.months[e.m]} ${e.year}`));
+        const right = el("div", "text-end");
         right.append(
-          mk("span", "text-sm uppercase font-bold text-event block", L.expected),
-          mk("span", "text-sm font-bold text-custom-secondary", e.date.toLocaleDateString(lang, { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }))
+          el("span", "text-sm uppercase font-bold text-event block", L.expected),
+          el("span", "text-sm font-bold text-custom-secondary", e.date.toLocaleDateString(lang, { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }))
         );
         row.append(left, right);
         return row;

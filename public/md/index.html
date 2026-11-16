@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-loiIlLHLT6qHBY1tY9iglBpoY0d8TsUv0P8ydLp27r0='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-H0dxgoqRnNzfp9m78rJwexreHHyOUeVBGRWNX+CR1d8=' 'sha256-gZlT65poafulNhIMqDcl2g8piVtdoKZAHvLDzhtHSA4='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -1405,13 +1405,13 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     const next = toNumerals(v, numerals);
     if (next !== v) node.nodeValue = next;
   }
-  function convertAttributes(el, attributes, skip, numerals) {
-    if (!attributes.length || skip && el.closest(skip)) return;
+  function convertAttributes(el2, attributes, skip, numerals) {
+    if (!attributes.length || skip && el2.closest(skip)) return;
     for (const name of attributes) {
-      const v = el.getAttribute(name);
+      const v = el2.getAttribute(name);
       if (v === null || !ANY_DIGIT.test(v)) continue;
       const next = toNumerals(v, numerals);
-      if (next !== v) el.setAttribute(name, next);
+      if (next !== v) el2.setAttribute(name, next);
     }
   }
   function convertNumerals(root2, { skip = "", attributes = [], attributeSkip = skip, numerals = getNumerals() } = {}) {
@@ -1457,13 +1457,13 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     );
   }
   function styleElement() {
-    let el = document.getElementById(STYLE_ID);
-    if (!el) {
-      el = document.createElement("style");
-      el.id = STYLE_ID;
-      document.head.appendChild(el);
+    let el2 = document.getElementById(STYLE_ID);
+    if (!el2) {
+      el2 = document.createElement("style");
+      el2.id = STYLE_ID;
+      document.head.appendChild(el2);
     }
-    return el;
+    return el2;
   }
   function cached() {
     try {
@@ -1495,8 +1495,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       const text = await res.text();
       if (text.length > MAX_CSS || !text.includes("--i360-bg")) throw new Error("theme.css: unexpected content");
       const css = absolutize(text);
-      const el = styleElement();
-      if (el.textContent !== css) el.textContent = css;
+      const el2 = styleElement();
+      if (el2.textContent !== css) el2.textContent = css;
       if (css !== copy) write(CACHE_KEY, JSON.stringify({ url: CSS_URL, css }));
       source = "network";
     } catch (e) {
@@ -1646,6 +1646,7 @@ ${body}`;
   }
 
   // src/net.js
+  var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   async function fetchWithTimeout(url, { timeout = 8e3, fetch: send = globalThis.fetch, ...options } = {}, read2 = (response) => (
     /** @type {any} */
     response
@@ -1663,6 +1664,12 @@ ${body}`;
 
   // src/page-chrome.js
   var $ = (id) => document.getElementById(id);
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== void 0) e.textContent = text;
+    return e;
+  }
   var IN_APP = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
   function setupClose(button, stepsBack = () => 1) {
     if (!IN_APP) return;
@@ -1683,10 +1690,29 @@ ${body}`;
     sepia: '<svg data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>',
     dark: '<svg data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>'
   });
-  function inRow(el) {
-    if (el.hidden) return false;
-    const cs = getComputedStyle(el);
+  function inRow(node) {
+    if (node.hidden) return false;
+    const cs = getComputedStyle(node);
     return cs.display !== "none" && cs.position !== "absolute" && cs.position !== "fixed";
+  }
+  function drawSettingsButtons(themeBtn, numeralsBtn, lang2) {
+    const theme = getChoice(), numerals = getNumerals();
+    themeBtn.innerHTML = THEME_ICONS[theme];
+    setLabel(themeBtn, themeLabel(theme, lang2));
+    numeralsBtn.textContent = NUMERALS_SAMPLE[numerals];
+    setLabel(numeralsBtn, numeralsLabel(numerals, lang2));
+  }
+  function wireSettingsButtons(themeBtn, numeralsBtn) {
+    themeBtn.addEventListener("click", () => {
+      cycle();
+    });
+    numeralsBtn.addEventListener("click", () => {
+      cycleNumerals();
+    });
+  }
+  function setLabel(control, text) {
+    control.title = text;
+    control.setAttribute("aria-label", text);
   }
   function fittingToolbar({ bar, fold = [] }) {
     const DENSE = ["toolbar-dense", "toolbar-densest"];
@@ -1696,13 +1722,13 @@ ${body}`;
         const slot = bar.querySelector(`template[data-slot="${to}"]`);
         if (!slot) throw new Error(`toolbar: no slot "${to}"`);
         for (const id of items) {
-          const el = document.getElementById(id);
+          const item = document.getElementById(id);
           const home = document.createComment(id);
-          el.parentNode.insertBefore(home, el);
+          item.parentNode.insertBefore(home, item);
           changes.push((folded) => {
             if (folded) {
-              if (el.nextSibling !== slot) slot.parentNode.insertBefore(el, slot);
-            } else if (home.nextSibling !== el) home.parentNode.insertBefore(el, home.nextSibling);
+              if (item.nextSibling !== slot) slot.parentNode.insertBefore(item, slot);
+            } else if (home.nextSibling !== item) home.parentNode.insertBefore(item, home.nextSibling);
           });
         }
       }
@@ -2090,6 +2116,7 @@ ${body}`;
       }
     };
   }
+  var MD_READER_KEY = "i360.mdReader";
 
   // src/reader/state.js
   var state = {
@@ -2212,7 +2239,7 @@ ${body}`;
     statusIcon.innerHTML = `${online ? ICON.globeCheck : ICON.globeX}<span class="status-text"></span>`;
     statusIcon.lastChild.textContent = label;
     statusIcon.classList.toggle("offline", !online);
-    setTitle(statusIcon, label);
+    setLabel(statusIcon, label);
   }
   var { toWestern: toWestern2, stripComments: stripComments2, hasVisibleContent: hasVisibleContent2, parseBook: parseBook2, splitFootnotes: splitFootnotes2 } = book_format_exports;
   var nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
@@ -2234,10 +2261,6 @@ ${body}`;
     const latin = (sample.match(/[A-Za-z\u00C0-\u024F]/g) || []).length;
     if (latin > arabic) return "ltr";
     return "rtl";
-  }
-  function setTitle(el, text) {
-    el.title = text;
-    el.setAttribute("aria-label", text);
   }
   function wireState() {
     window.addEventListener("online", () => {
@@ -3907,17 +3930,15 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     const frag = document.createDocumentFragment();
     for (let i = 0; i < shown; i++) {
       const m = search.matches[i];
-      const li = document.createElement("li");
-      const btn = document.createElement("button");
+      const li = el("li");
+      const btn = el("button");
       btn.type = "button";
       btn.className = "i360-list-item";
-      const page = document.createElement("span");
-      page.className = "res-page";
-      page.textContent = state.format === "plain" ? "" : pageLabelText(state.pages[m.page.idx], tr);
-      const text = document.createElement("span");
+      const page = el("span", "res-page", state.format === "plain" ? "" : pageLabelText(state.pages[m.page.idx], tr));
+      const text = el("span");
       text.dir = "auto";
       const sn = snippet(m, SNIPPET_CHARS);
-      const mark = document.createElement("mark");
+      const mark = el("mark");
       mark.textContent = sn.hit;
       text.append(document.createTextNode(sn.before), mark, document.createTextNode(sn.after));
       btn.append(page, text);
@@ -3926,9 +3947,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
       frag.appendChild(li);
     }
     if (search.matches.length > shown) {
-      const li = document.createElement("li");
-      li.className = "res-more";
-      li.textContent = fmtNum(tr.moreResults(search.matches.length - shown));
+      const li = el("li", "res-more", fmtNum(tr.moreResults(search.matches.length - shown)));
       frag.appendChild(li);
     }
     searchResults.appendChild(frag);
@@ -4023,37 +4042,31 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     btnPanel.setAttribute("aria-expanded", "false");
     btnPanel.setAttribute("aria-pressed", "false");
   }
-  async function jumpToElement(idx, el) {
+  async function jumpToElement(idx, target) {
     scrollToSheet(idx);
-    if (el) {
+    if (target) {
       await nextFrame();
       await nextFrame();
       const v = viewerContainer.getBoundingClientRect();
-      viewerContainer.scrollTop += el.getBoundingClientRect().top - v.top - remPx(0.75);
-      pinElement(el, remPx(0.75));
+      viewerContainer.scrollTop += target.getBoundingClientRect().top - v.top - remPx(0.75);
+      pinElement(target, remPx(0.75));
     }
     updateCounter(true);
     if (panelCoversPage()) closePanel();
   }
   function panelItem(text, pageText, onClick, extraClass) {
-    const btn = document.createElement("button");
+    const btn = el("button");
     btn.type = "button";
     btn.className = "i360-list-item panel-item" + (extraClass ? " " + extraClass : "");
-    const s1 = document.createElement("span");
-    s1.className = "item-text";
-    s1.textContent = text;
+    const s1 = el("span", "item-text", text);
     s1.dir = "auto";
-    const s2 = document.createElement("span");
-    s2.className = "item-page";
-    s2.textContent = pageText;
+    const s2 = el("span", "item-page", pageText);
     btn.append(s1, s2);
     btn.addEventListener("click", onClick);
     return btn;
   }
   function emptyNote(text) {
-    const div = document.createElement("div");
-    div.className = "panel-empty";
-    div.textContent = text;
+    const div = el("div", "panel-empty", text);
     return div;
   }
   function pageSummary(idx) {
@@ -4071,14 +4084,13 @@ Please report this to https://github.com/markedjs/marked.`, e) {
       panelBody.appendChild(emptyNote(tr.emptyHint));
       return;
     }
-    const ul = document.createElement("ul");
-    ul.className = "panel-list";
+    const ul = el("ul", "panel-list");
     if (state.panelTab === "contents") {
       state.sheets.forEach((sheet, idx) => {
         for (const h2 of sheet.querySelectorAll(".markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4")) {
           const text = h2.textContent.replace(/\s+/g, " ").trim();
           if (!text) continue;
-          const li = document.createElement("li");
+          const li = el("li");
           li.appendChild(panelItem(
             text,
             state.format === "plain" ? "" : pageLabelText(state.pages[idx], tr),
@@ -4095,15 +4107,14 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     } else {
       const indices = [...bookmarkedSet()].sort((a, b) => a - b);
       for (const idx of indices) {
-        const li = document.createElement("li");
-        li.className = "bm-row";
+        const li = el("li", "bm-row");
         const label = state.format === "plain" ? fmtNum(idx + 1) : pageLabelText(state.pages[idx], tr);
         li.appendChild(panelItem(pageSummary(idx) || label, label, () => jumpToElement(idx, null)));
-        const del = document.createElement("button");
+        const del = el("button");
         del.type = "button";
         del.className = "toolbar-btn";
         del.innerHTML = ICON.trash;
-        setTitle(del, tr.removeBookmark);
+        setLabel(del, tr.removeBookmark);
         del.addEventListener("click", () => removeBookmarkAt(idx));
         li.appendChild(del);
         ul.appendChild(li);
@@ -4122,9 +4133,9 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     closeMore();
     document.body.classList.add("reading");
     restoreAnchor(anchor);
-    const el = document.documentElement;
-    if (el.requestFullscreen && !document.fullscreenElement) {
-      el.requestFullscreen().catch(() => {
+    const page = document.documentElement;
+    if (page.requestFullscreen && !document.fullscreenElement) {
+      page.requestFullscreen().catch(() => {
       });
     }
     btnExitReading.focus();
@@ -4298,7 +4309,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     volSelect.hidden = !state.multiVolume;
     if (!state.multiVolume) return;
     for (const v of state.volumes) {
-      const opt = document.createElement("option");
+      const opt = el("option");
       opt.value = v;
       opt.textContent = fmtNum(`${t().vol} ${v}`);
       volSelect.appendChild(opt);
@@ -4314,7 +4325,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
       pageNumInput.value = "";
       totalPagesLabel.textContent = fmtNum("0");
       pagePos.textContent = "";
-      setTitle(pageNumInput, t().pageInput);
+      setLabel(pageNumInput, t().pageInput);
       updateBookmarkButton();
       return;
     }
@@ -4333,7 +4344,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
       pagePos.textContent = pos;
       if (grew) queueFitToolbar();
     }
-    setTitle(pageNumInput, `${t().pageInput}
+    setLabel(pageNumInput, `${t().pageInput}
 ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     if (state.multiVolume && p.vol != null && document.activeElement !== volSelect) volSelect.value = p.vol;
     updateBookmarkButton();
@@ -4343,9 +4354,9 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     updateCounter(false);
   });
   var pin = null;
-  function pinElement(el, offset, frac = 0) {
+  function pinElement(target, offset, frac = 0) {
     const now = performance.now();
-    const p = { el, offset, frac, started: now, until: now + PIN_MS };
+    const p = { el: target, offset, frac, started: now, until: now + PIN_MS };
     pin = p;
     if (document.fonts && document.fonts.status === "loading") {
       document.fonts.ready.then(() => {
@@ -4510,47 +4521,44 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     searchPopup.dir = state.dir;
     missingPagesBanner.dir = state.dir;
     moreMenu.dir = state.dir;
-    setTitle(btnPanel, tr.panel);
-    setTitle(btnZoomIn, tr.zoomIn);
-    setTitle(btnZoomOut, tr.zoomOut);
-    setTitle(btnFitWidth, tr.fitWidth);
-    setTitle(btnFitPage, tr.fitPage);
-    setTitle(btnTextSmaller, tr.textSmaller);
-    setTitle(btnTextLarger, tr.textLarger);
+    setLabel(btnPanel, tr.panel);
+    setLabel(btnZoomIn, tr.zoomIn);
+    setLabel(btnZoomOut, tr.zoomOut);
+    setLabel(btnFitWidth, tr.fitWidth);
+    setLabel(btnFitPage, tr.fitPage);
+    setLabel(btnTextSmaller, tr.textSmaller);
+    setLabel(btnTextLarger, tr.textLarger);
     btnTextSmaller.innerHTML = `${tr.textLetter}<small>−</small>`;
     btnTextLarger.innerHTML = `${tr.textLetter}<small>+</small>`;
-    setTitle(btnNavLeft, isRtl ? tr.nextPage("←") : tr.prevPage("←"));
-    setTitle(btnNavRight, isRtl ? tr.prevPage("→") : tr.nextPage("→"));
-    setTitle(btnDirToggle, isRtl ? tr.dirRTL : tr.dirLTR);
+    setLabel(btnNavLeft, isRtl ? tr.nextPage("←") : tr.prevPage("←"));
+    setLabel(btnNavRight, isRtl ? tr.prevPage("→") : tr.nextPage("→"));
+    setLabel(btnDirToggle, isRtl ? tr.dirRTL : tr.dirLTR);
     btnDirToggle.innerHTML = isRtl ? ICON.stepForward : ICON.stepBack;
-    btnNumerals.textContent = NUMERALS_SAMPLE[state.numerals];
-    setTitle(btnNumerals, numeralsLabel(state.numerals, lang()));
-    btnTheme.innerHTML = THEME_ICONS[state.theme];
-    setTitle(btnTheme, themeLabel(state.theme, lang()));
-    setTitle(btnScan, tr.scan);
-    setTitle(btnReading, tr.reading);
-    setTitle(btnExitReading, tr.exitReading);
-    setTitle(btnMore, tr.more);
-    setTitle(btnSearchToggle, btnSearchToggle.disabled ? tr.searchWait : tr.search);
+    drawSettingsButtons(btnTheme, btnNumerals, lang());
+    setLabel(btnScan, tr.scan);
+    setLabel(btnReading, tr.reading);
+    setLabel(btnExitReading, tr.exitReading);
+    setLabel(btnMore, tr.more);
+    setLabel(btnSearchToggle, btnSearchToggle.disabled ? tr.searchWait : tr.search);
     searchInput.placeholder = tr.searchInput;
     searchInput.setAttribute("aria-label", tr.search);
-    setTitle(btnSearchPrev, tr.prevMatch);
-    setTitle(btnSearchNext, tr.nextMatch);
-    setTitle(btnSearchList, tr.showResults);
-    setTitle(btnSearchClose, tr.closeSearch);
+    setLabel(btnSearchPrev, tr.prevMatch);
+    setLabel(btnSearchNext, tr.nextMatch);
+    setLabel(btnSearchList, tr.showResults);
+    setLabel(btnSearchClose, tr.closeSearch);
     optDiacritics.querySelector(".chip-label").textContent = tr.matchDiacritics;
     optWord.querySelector(".chip-label").textContent = tr.wholeWord;
     tabContents.textContent = tr.contentsTab;
     tabBookmarks.textContent = tr.bookmarksTab;
-    setTitle(btnCopyLink, tr.copyLink);
-    setTitle(btnPanelClose, tr.closePanel);
-    setTitle(volSelect, tr.volume);
+    setLabel(btnCopyLink, tr.copyLink);
+    setLabel(btnPanelClose, tr.closePanel);
+    setLabel(volSelect, tr.volume);
     document.getElementById("open-file-label").textContent = tr.openFile;
-    setTitle(btnOpenFile, tr.openFile);
+    setLabel(btnOpenFile, tr.openFile);
     lblOf.textContent = tr.ofLabel;
-    setTitle(pageNumInput, tr.pageInput);
+    setLabel(pageNumInput, tr.pageInput);
     tbTitle.textContent = tr.barTitle;
-    setTitle(btnClose, tr.close);
+    setLabel(btnClose, tr.close);
     updateConnection();
     emptyState.textContent = fmtNum(tr.emptyHint);
     emptyState.classList.toggle("visible", state.sheets.length === 0);
@@ -4667,9 +4675,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
       updateCounter(true);
       if (sidePanel.classList.contains("open")) renderPanel();
     });
-    btnNumerals.addEventListener("click", () => {
-      cycleNumerals();
-    });
+    wireSettingsButtons(btnTheme, btnNumerals);
     onNumeralsChange(({ numerals }) => {
       if (numerals === state.numerals) return;
       state.numerals = numerals;
@@ -4689,9 +4695,6 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
       if (choice === state.theme) return;
       state.theme = choice;
       applyLocalization();
-    });
-    btnTheme.addEventListener("click", () => {
-      cycle();
     });
     btnTextSmaller.addEventListener("click", () => stepTextScale(-1));
     btnTextLarger.addEventListener("click", () => stepTextScale(1));
@@ -4781,7 +4784,6 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
       }
     }
   }
-  var MD_READER_KEY = "i360.mdReader";
   var appStore = createStore();
   function readerBase() {
     const v = appStore.get(MD_READER_KEY, null);
@@ -4980,7 +4982,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     const tr = t();
     missingPagesText.textContent = "";
     for (const n of state.notices) {
-      const line = document.createElement("div");
+      const line = el("div");
       if (n.type === "gaps") {
         const count = n.gaps.reduce((s, g) => s + g.count, 0);
         const ranges = n.gaps.map((g) => {
@@ -5031,25 +5033,25 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     const seg = map.segs[ans];
     return { node: seg.node, offset: i - seg.start };
   }
-  function wrapRange(map, start, end, el) {
+  function wrapRange(map, start, end, wrapper) {
     const a = locate(map, start);
     const b = locate(map, end - 1);
     if (a.node === b.node) {
       const mid = a.node.splitText(a.offset);
       mid.splitText(b.offset + 1 - a.offset);
-      mid.parentNode.replaceChild(el, mid);
-      el.appendChild(mid);
-      return el;
+      mid.parentNode.replaceChild(wrapper, mid);
+      wrapper.appendChild(mid);
+      return wrapper;
     }
     const range = document.createRange();
     range.setStart(a.node, a.offset);
     range.setEnd(b.node, b.offset + 1);
-    el.appendChild(range.extractContents());
-    range.insertNode(el);
-    return el;
+    wrapper.appendChild(range.extractContents());
+    range.insertNode(wrapper);
+    return wrapper;
   }
   function leafBlocks(root2) {
-    return [...root2.querySelectorAll(BLOCK_SEL)].filter((el) => !el.querySelector(BLOCK_SEL));
+    return [...root2.querySelectorAll(BLOCK_SEL)].filter((node) => !node.querySelector(BLOCK_SEL));
   }
   function firstStrongDir(text) {
     const m = /[A-Za-z\u00C0-\u024F\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/.exec(text);
@@ -5057,10 +5059,10 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     return /[A-Za-z\u00C0-\u024F]/.test(m[0]) ? "ltr" : "rtl";
   }
   function applyBlockDirs(root2, mode, fallback) {
-    for (const el of leafBlocks(root2)) el.setAttribute("dir", mode);
-    for (const el of root2.querySelectorAll("ul,ol,li,blockquote")) {
-      if (el.querySelector(BLOCK_SEL) == null && el.matches(BLOCK_SEL)) continue;
-      el.setAttribute("dir", mode === "auto" ? firstStrongDir(el.textContent) || fallback : mode);
+    for (const node of leafBlocks(root2)) node.setAttribute("dir", mode);
+    for (const node of root2.querySelectorAll("ul,ol,li,blockquote")) {
+      if (node.querySelector(BLOCK_SEL) == null && node.matches(BLOCK_SEL)) continue;
+      node.setAttribute("dir", mode === "auto" ? firstStrongDir(node.textContent) || fallback : mode);
     }
     for (const table of root2.querySelectorAll("table")) {
       const head = table.tHead ? table.tHead.textContent : "";
@@ -5090,8 +5092,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
       }
       if (open2 != null) spans.push([open2, txt.length]);
       for (let k2 = spans.length - 1; k2 >= 0; k2--) {
-        const span = document.createElement("span");
-        span.className = "quran";
+        const span = el("span", "quran");
         wrapRange(map, spans[k2][0], spans[k2][1], span);
       }
     }
@@ -5114,8 +5115,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
       }
       for (let k2 = found.length - 1; k2 >= 0; k2--) {
         const f = found[k2];
-        const a = document.createElement("a");
-        a.className = "fn-ref";
+        const a = el("a", "fn-ref");
         a.href = `#fn-${idx}-${f.n}`;
         a.dataset.target = `fn-${idx}-${f.n}`;
         wrapRange(map, f.start, f.end, a);
@@ -5131,8 +5131,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
   var FIGURE_RE = /^\s*\[\s*شكل\s*(?::[^\]]*)?\]\s*$/;
   function enhanceBody(root2) {
     for (const table of root2.querySelectorAll("table")) {
-      const wrap = document.createElement("div");
-      wrap.className = "table-wrap";
+      const wrap = el("div", "table-wrap");
       table.parentNode.insertBefore(wrap, table);
       wrap.appendChild(table);
       const head = table.tHead;
@@ -5140,16 +5139,15 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
         table.classList.add("no-head");
       }
     }
-    for (const el of root2.querySelectorAll("p")) {
-      if (FIGURE_RE.test(el.textContent)) el.classList.add("figure-label");
+    for (const para of root2.querySelectorAll("p")) {
+      if (FIGURE_RE.test(para.textContent)) para.classList.add("figure-label");
     }
     for (const list of root2.querySelectorAll("li > ul, li > ol")) {
       list.classList.add("sublist");
     }
   }
   function sheetShell(idx) {
-    const sheet = document.createElement("article");
-    sheet.className = "page-sheet";
+    const sheet = el("article", "page-sheet");
     sheet.id = `page-${idx}`;
     sheet.dataset.idx = String(idx);
     sheet.dir = state.dir;
@@ -5157,8 +5155,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     return sheet;
   }
   function pageFooter(p) {
-    const footer = document.createElement("footer");
-    footer.className = "page-number-footer";
+    const footer = el("footer", "page-number-footer");
     if (state.format !== "plain" && p.kind !== "front") footer.textContent = pageLabelText(p, t());
     return footer;
   }
@@ -5166,41 +5163,32 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     const tr = t();
     sheet.dir = state.dir;
     sheet.textContent = "";
-    const content = document.createElement("div");
-    content.className = "page-content";
+    const content = el("div", "page-content");
     const { body, notes } = state.format === "plain" ? { body: p.md, notes: [] } : splitFootnotes2(p.md);
-    const bodyEl = document.createElement("div");
-    bodyEl.className = "markdown-body";
+    const bodyEl = el("div", "markdown-body");
     if (hasVisibleContent2(body)) bodyEl.innerHTML = renderBlock(body);
     enhanceBody(bodyEl);
     content.appendChild(bodyEl);
     if (p.kind === "untranscribed" && !hasVisibleContent2(body)) {
-      const ph = document.createElement("div");
-      ph.className = "page-placeholder";
-      ph.textContent = tr.untranscribedPage;
+      const ph = el("div", "page-placeholder", tr.untranscribedPage);
       content.appendChild(ph);
     }
     const noteNumbers = /* @__PURE__ */ new Set();
     if (notes.length > 0) {
-      const fnWrap = document.createElement("section");
-      fnWrap.className = "footnotes";
-      const list = document.createElement("div");
-      list.className = "footnotes-list";
+      const fnWrap = el("section", "footnotes");
+      const list = el("div", "footnotes-list");
       for (const note of notes) {
-        const div = document.createElement("div");
-        div.className = "fn-note";
+        const div = el("div", "fn-note");
         if (note.n != null) {
           div.id = `fn-${idx}-${note.n}`;
           noteNumbers.add(note.n);
-          const back = document.createElement("a");
-          back.className = "fn-back";
+          const back = el("a", "fn-back");
           back.href = `#ref-fn-${idx}-${note.n}`;
           back.dataset.target = `ref-fn-${idx}-${note.n}`;
           back.textContent = `(${note.n})`;
           div.appendChild(back);
         }
-        const text = document.createElement("span");
-        text.className = "fn-text";
+        const text = el("span", "fn-text");
         text.innerHTML = renderInline(note.md);
         div.appendChild(text);
         list.appendChild(div);
@@ -5213,9 +5201,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     linkFootnoteRefs(bodyEl, idx, noteNumbers);
     sheet.appendChild(content);
     if (state.format !== "plain" && p.kind !== "front") {
-      const footer = document.createElement("footer");
-      footer.className = "page-number-footer";
-      footer.textContent = pageLabelText(p, tr);
+      const footer = el("footer", "page-number-footer", pageLabelText(p, tr));
       sheet.appendChild(footer);
     }
     applyNumerals2(content);
@@ -5302,7 +5288,6 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
   var pauseForInput = () => {
     inputPauseUntil = performance.now() + INPUT_PAUSE_MS;
   };
-  var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   async function buildSheets(run, onReady, center) {
     const n = state.sheets.length;
     const filled = new Uint8Array(n);
@@ -5316,7 +5301,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     let k2 = 0, ready = false;
     while (run === buildRun && state.built < n) {
       if (ready && (pointerIsDown || performance.now() < inputPauseUntil)) {
-        await sleep(50);
+        await wait(50);
         continue;
       }
       const top = ready ? sheetAtTop() : 0;
@@ -5370,7 +5355,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
   }
   function setSearchReady(ready) {
     btnSearchToggle.disabled = !ready;
-    setTitle(btnSearchToggle, ready ? t().search : t().searchWait);
+    setLabel(btnSearchToggle, ready ? t().search : t().searchWait);
   }
   async function renderDocument(rawText, extraNotices, key, parsedAlready) {
     const run = ++buildRun;

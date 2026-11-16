@@ -30,6 +30,7 @@ const state = () => {
     twoCols: document.body.classList.contains('two-cols'),
     langOpen: !document.getElementById('lang-list').hidden, picker: !document.getElementById('city-picker').classList.contains('hidden'),
     cityResults: document.querySelectorAll('[data-target="city-results"] button').length,
+    settings: ['btn-theme', 'btn-numerals'].map((id) => { const b = document.getElementById(id); return [b.querySelector('svg')?.dataset.lucide || b.textContent.trim(), b.title, b.getAttribute('aria-label')]; }),
     madhab: [0, 1].map((i) => document.getElementById('school-' + i).getAttribute('aria-pressed') === 'true'),
     conv: {
       dir: text('conv-dir'), d: document.getElementById('conv-d').value, m: document.getElementById('conv-m').value, y: document.getElementById('conv-y').value,

@@ -1,10 +1,10 @@
 // The Reader: interface language and direction; numerals, theme and text size; page width
 // and zoom.
 import * as i360Theme from '../../theme/site/theme-loader.js';
-import { THEME_ICONS } from '../page-chrome.js';
+import { drawSettingsButtons, setLabel, wireSettingsButtons } from '../page-chrome.js';
 import { oncePerFrame } from '../frame.js';
 import { ICON, TEXT_SCALES, ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from './text.js';
-import { btnClose, btnCopyLink, btnDirToggle, btnExitReading, btnFitPage, btnFitWidth, btnMore, btnNavLeft, btnNavRight, btnNumerals, btnOpenFile, btnPanel, btnPanelClose, btnReading, btnScan, btnSearchClose, btnSearchList, btnSearchNext, btnSearchPrev, btnSearchToggle, btnTextLarger, btnTextSmaller, btnTheme, btnZoomIn, btnZoomOut, emptyState, fmtNum, lang, lblOf, missingPagesBanner, moreMenu, optDiacritics, optWord, pageNumInput, pagesWrapper, search, searchInput, searchPopup, setTitle, sidePanel, state, storeSet, t, tabBookmarks, tabContents, tbTitle, updateConnection, viewerContainer, volSelect } from './state.js';
+import { btnClose, btnCopyLink, btnDirToggle, btnExitReading, btnFitPage, btnFitWidth, btnMore, btnNavLeft, btnNavRight, btnNumerals, btnOpenFile, btnPanel, btnPanelClose, btnReading, btnScan, btnSearchClose, btnSearchList, btnSearchNext, btnSearchPrev, btnSearchToggle, btnTextLarger, btnTextSmaller, btnTheme, btnZoomIn, btnZoomOut, emptyState, fmtNum, lang, lblOf, missingPagesBanner, moreMenu, optDiacritics, optWord, pageNumInput, pagesWrapper, search, searchInput, searchPopup, sidePanel, state, storeSet, t, tabBookmarks, tabContents, tbTitle, updateConnection, viewerContainer, volSelect } from './state.js';
 import { applyBlockDirs, applyNumerals, pageLabelText, queueNear, renderNotices } from './pages.js';
 import { updateBookmarkButton } from './position.js';
 import { buildVolumeSelect, findCurrentIdx, pinElement, scrollToSheet, updateCounter } from './nav.js';
@@ -25,49 +25,46 @@ function applyLocalization() {
   missingPagesBanner.dir = state.dir;
   moreMenu.dir = state.dir;
 
-  setTitle(btnPanel, tr.panel);
-  setTitle(btnZoomIn, tr.zoomIn);
-  setTitle(btnZoomOut, tr.zoomOut);
-  setTitle(btnFitWidth, tr.fitWidth);
-  setTitle(btnFitPage, tr.fitPage);
-  setTitle(btnTextSmaller, tr.textSmaller);
-  setTitle(btnTextLarger, tr.textLarger);
+  setLabel(btnPanel, tr.panel);
+  setLabel(btnZoomIn, tr.zoomIn);
+  setLabel(btnZoomOut, tr.zoomOut);
+  setLabel(btnFitWidth, tr.fitWidth);
+  setLabel(btnFitPage, tr.fitPage);
+  setLabel(btnTextSmaller, tr.textSmaller);
+  setLabel(btnTextLarger, tr.textLarger);
   btnTextSmaller.innerHTML = `${tr.textLetter}<small>−</small>`;
   btnTextLarger.innerHTML = `${tr.textLetter}<small>+</small>`;
   // In an RTL book the next page is to the left, as when turning an Arabic book's pages.
-  setTitle(btnNavLeft, isRtl ? tr.nextPage('←') : tr.prevPage('←'));
-  setTitle(btnNavRight, isRtl ? tr.prevPage('→') : tr.nextPage('→'));
-  setTitle(btnDirToggle, isRtl ? tr.dirRTL : tr.dirLTR);
+  setLabel(btnNavLeft, isRtl ? tr.nextPage('←') : tr.prevPage('←'));
+  setLabel(btnNavRight, isRtl ? tr.prevPage('→') : tr.nextPage('→'));
+  setLabel(btnDirToggle, isRtl ? tr.dirRTL : tr.dirLTR);
   btnDirToggle.innerHTML = isRtl ? ICON.stepForward : ICON.stepBack;
-  btnNumerals.textContent = i360Theme.NUMERALS_SAMPLE[state.numerals];
-  setTitle(btnNumerals, i360Theme.numeralsLabel(state.numerals, lang()));
-  btnTheme.innerHTML = THEME_ICONS[state.theme];
-  setTitle(btnTheme, i360Theme.themeLabel(state.theme, lang()));
-  setTitle(btnScan, tr.scan);
-  setTitle(btnReading, tr.reading);
-  setTitle(btnExitReading, tr.exitReading);
-  setTitle(btnMore, tr.more);
-  setTitle(btnSearchToggle, btnSearchToggle.disabled ? tr.searchWait : tr.search);
+  drawSettingsButtons(btnTheme, btnNumerals, lang());
+  setLabel(btnScan, tr.scan);
+  setLabel(btnReading, tr.reading);
+  setLabel(btnExitReading, tr.exitReading);
+  setLabel(btnMore, tr.more);
+  setLabel(btnSearchToggle, btnSearchToggle.disabled ? tr.searchWait : tr.search);
   searchInput.placeholder = tr.searchInput;
   searchInput.setAttribute('aria-label', tr.search);
-  setTitle(btnSearchPrev, tr.prevMatch);
-  setTitle(btnSearchNext, tr.nextMatch);
-  setTitle(btnSearchList, tr.showResults);
-  setTitle(btnSearchClose, tr.closeSearch);
+  setLabel(btnSearchPrev, tr.prevMatch);
+  setLabel(btnSearchNext, tr.nextMatch);
+  setLabel(btnSearchList, tr.showResults);
+  setLabel(btnSearchClose, tr.closeSearch);
   optDiacritics.querySelector('.chip-label').textContent = tr.matchDiacritics;
   optWord.querySelector('.chip-label').textContent = tr.wholeWord;
   tabContents.textContent = tr.contentsTab;
   tabBookmarks.textContent = tr.bookmarksTab;
-  setTitle(btnCopyLink, tr.copyLink);
-  setTitle(btnPanelClose, tr.closePanel);
-  setTitle(volSelect, tr.volume);
+  setLabel(btnCopyLink, tr.copyLink);
+  setLabel(btnPanelClose, tr.closePanel);
+  setLabel(volSelect, tr.volume);
   document.getElementById('open-file-label').textContent = tr.openFile;
-  setTitle(btnOpenFile, tr.openFile);
+  setLabel(btnOpenFile, tr.openFile);
   lblOf.textContent = tr.ofLabel;
-  setTitle(pageNumInput, tr.pageInput);
+  setLabel(pageNumInput, tr.pageInput);
 
   tbTitle.textContent = tr.barTitle;
-  setTitle(btnClose, tr.close);
+  setLabel(btnClose, tr.close);
   updateConnection();
 
   emptyState.textContent = fmtNum(tr.emptyHint);
@@ -214,7 +211,7 @@ function wireView() {
   });
   // Numerals: the shared i360 choice (0123 · ٠١٢٣ · ۰۱۲۳), also followed when
   // another i360 app or tab changes it.
-  btnNumerals.addEventListener('click', () => { i360Theme.cycleNumerals(); });
+  wireSettingsButtons(btnTheme, btnNumerals);
   i360Theme.onNumeralsChange(({ numerals }) => {
     if (numerals === state.numerals) return;
     state.numerals = numerals;
@@ -236,8 +233,6 @@ function wireView() {
     state.theme = choice;
     applyLocalization();
   });
-
-  btnTheme.addEventListener('click', () => { i360Theme.cycle(); });
 
   btnTextSmaller.addEventListener('click', () => stepTextScale(-1));
   btnTextLarger.addEventListener('click', () => stepTextScale(1));

@@ -18,7 +18,7 @@ interface AppStateContextType {
 }
 
 const defaultState: AppState = {
-  // Platform — useWeb defaults TRUE on all OS (manual toggle via OS_WebToggle, Sprint 6b)
+  // Platform — useWeb defaults TRUE on all OS (manual toggle via OS_WebToggle)
   useWeb: true,
   isChina: false,
   useHMS: false,

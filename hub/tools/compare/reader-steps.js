@@ -25,6 +25,7 @@ const state = () => {
     panel: $('side-panel').classList.contains('open') || !$('side-panel').hidden,
     items: document.querySelectorAll('#panel-body .panel-item').length, count: $('search-count').textContent,
     hash: window.location.hash, sheets: document.querySelectorAll('.page-sheet').length,
+    settings: ['btn-theme', 'btn-numerals'].map((id) => { const b = document.getElementById(id); return [b.querySelector('svg')?.dataset.lucide || b.textContent.trim(), b.title, b.getAttribute('aria-label')]; }),
     overflow: document.documentElement.scrollWidth > window.innerWidth
   };
 };
@@ -59,6 +60,8 @@ async function run(browser, v) {
     await step('bookmarks tab', async () => { if (!(await p.locator('#tab-bookmarks').isVisible())) await p.click('#btn-panel'); await p.click('#tab-bookmarks'); });
     await step('close panel', () => p.keyboard.press('Escape'));
     await step('#p=2 (ignored: a device file)', async () => { await p.evaluate(() => { window.location.hash = '#p=2'; }); await p.waitForTimeout(600); });
+    await step('theme button', () => press('#btn-theme'));
+    await step('numerals button', () => press('#btn-numerals'));
     await step('text larger', async () => { await press('#btn-text-larger'); await p.keyboard.press('Escape'); });
     await step('reopen', async () => { await p.reload(); await p.waitForTimeout(500); await open(); });
     log.push(['page errors', errors]);

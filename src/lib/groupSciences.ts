@@ -11,11 +11,11 @@ interface MajorGroup {
   children: MajorChild[]
 }
 
-// Builds one ordered `children` list per major, instead of separate
-// "intermediates" and "direct items" arrays — the old two-array approach
-// meant direct items always rendered after every intermediate group,
-// regardless of their true relative position by ScienceMinorId (the
-// table's primary key, which the data's actual insertion order respects).
+// Builds one ordered `children` list per major, not separate
+// "intermediates" and "direct items" arrays — two arrays would always put
+// direct items after every intermediate group, regardless of their true
+// relative position by ScienceMinorId (the table's primary key, which the
+// data's actual insertion order respects).
 // Here, an intermediate group's position is set by its FIRST-encountered
 // item; later items for that same intermediate append to the existing
 // entry rather than creating a new position — this genuinely interleaves

@@ -1,11 +1,13 @@
 // The Reader: from book text to pages — Markdown rendering (src/book-format.js), the integrity
 // check, footnotes, text maps, building the pages in slices, and rendering a book.
+import { el, setLabel } from '../page-chrome.js';
+import { wait } from '../net.js';
 import * as BookFormat from '../book-format.js';
 import * as marked from 'marked';
 import * as i360Theme from '../../theme/site/theme-loader.js';
 import { oncePerFrame } from '../frame.js';
 import { BLOCK_SEL, QURAN_CLOSE, QURAN_OPEN } from './text.js';
-import { btnSearchToggle, detectDirection, emptyState, fmtNum, hasVisibleContent, missingPagesBanner, missingPagesText, nextFrame, pagesWrapper, parseBook, progressEl, progressFill, progressText, search, searchInput, searchPopup, setTitle, sidePanel, splitFootnotes, state, storeGet, stripComments, t, viewerContainer } from './state.js';
+import { btnSearchToggle, detectDirection, emptyState, fmtNum, hasVisibleContent, missingPagesBanner, missingPagesText, nextFrame, pagesWrapper, parseBook, progressEl, progressFill, progressText, search, searchInput, searchPopup, sidePanel, splitFootnotes, state, storeGet, stripComments, t, viewerContainer } from './state.js';
 import { applyBookmarkRibbons, hashNamesPage, hashTargetIdx, isLinkable, queueSave, restorePosition, saveNow } from './position.js';
 import { updateScanButton } from './library.js';
 import { applyLocalization } from './view.js';
@@ -74,7 +76,7 @@ function renderNotices() {
   const tr = t();
   missingPagesText.textContent = '';
   for (const n of state.notices) {
-    const line = document.createElement('div');
+    const line = el('div');
     if (n.type === 'gaps') {
       const count = n.gaps.reduce((s, g) => s + g.count, 0);
       const ranges = n.gaps.map((g) => {
@@ -137,7 +139,7 @@ function locate(map, i) {
   return { node: seg.node, offset: i - seg.start };
 }
 
-function wrapRange(map, start, end, el) {
+function wrapRange(map, start, end, wrapper) {
   const a = locate(map, start);
   const b = locate(map, end - 1);
   if (a.node === b.node) {
@@ -145,20 +147,20 @@ function wrapRange(map, start, end, el) {
     // on each DOM change, which made long books build in quadratic time.
     const mid = a.node.splitText(a.offset);
     mid.splitText(b.offset + 1 - a.offset);
-    mid.parentNode.replaceChild(el, mid);
-    el.appendChild(mid);
-    return el;
+    mid.parentNode.replaceChild(wrapper, mid);
+    wrapper.appendChild(mid);
+    return wrapper;
   }
   const range = document.createRange();
   range.setStart(a.node, a.offset);
   range.setEnd(b.node, b.offset + 1);
-  el.appendChild(range.extractContents());
-  range.insertNode(el);
-  return el;
+  wrapper.appendChild(range.extractContents());
+  range.insertNode(wrapper);
+  return wrapper;
 }
 
 function leafBlocks(root) {
-  return [...root.querySelectorAll(BLOCK_SEL)].filter((el) => !el.querySelector(BLOCK_SEL));
+  return [...root.querySelectorAll(BLOCK_SEL)].filter((node) => !node.querySelector(BLOCK_SEL));
 }
 
 // Direction from the first letter that has one (Arabic/Hebrew → rtl, Latin → ltr).
@@ -174,10 +176,10 @@ function firstStrongDir(text) {
 // LTR and its bullet moved to the wrong side. They get an explicit direction
 // from their own text instead. mode: 'auto', or 'rtl'/'ltr' to force one.
 function applyBlockDirs(root, mode, fallback) {
-  for (const el of leafBlocks(root)) el.setAttribute('dir', mode);
-  for (const el of root.querySelectorAll('ul,ol,li,blockquote')) {
-    if (el.querySelector(BLOCK_SEL) == null && el.matches(BLOCK_SEL)) continue;  // a leaf <li>
-    el.setAttribute('dir', mode === 'auto' ? (firstStrongDir(el.textContent) || fallback) : mode);
+  for (const node of leafBlocks(root)) node.setAttribute('dir', mode);
+  for (const node of root.querySelectorAll('ul,ol,li,blockquote')) {
+    if (node.querySelector(BLOCK_SEL) == null && node.matches(BLOCK_SEL)) continue;  // a leaf <li>
+    node.setAttribute('dir', mode === 'auto' ? (firstStrongDir(node.textContent) || fallback) : mode);
   }
   // A table's column order follows its own language (header first): an
   // English table in an Arabic book reads left to right, and vice versa.
@@ -217,8 +219,7 @@ function wrapQuran(root) {
     // An opening bracket with no closing one: the quote continues on the next page.
     if (open != null) spans.push([open, txt.length]);
     for (let k = spans.length - 1; k >= 0; k--) {
-      const span = document.createElement('span');
-      span.className = 'quran';
+      const span = el('span', 'quran');
       wrapRange(map, spans[k][0], spans[k][1], span);
     }
   }
@@ -243,8 +244,7 @@ function linkFootnoteRefs(bodyRoot, idx, noteNumbers) {
     }
     for (let k = found.length - 1; k >= 0; k--) {
       const f = found[k];
-      const a = document.createElement('a');
-      a.className = 'fn-ref';
+      const a = el('a', 'fn-ref');
       a.href = `#fn-${idx}-${f.n}`;
       a.dataset.target = `fn-${idx}-${f.n}`;
       wrapRange(map, f.start, f.end, a);
@@ -271,8 +271,7 @@ const FIGURE_RE = /^\s*\[\s*شكل\s*(?::[^\]]*)?\]\s*$/;
 
 function enhanceBody(root) {
   for (const table of root.querySelectorAll('table')) {
-    const wrap = document.createElement('div');
-    wrap.className = 'table-wrap';
+    const wrap = el('div', 'table-wrap');
     table.parentNode.insertBefore(wrap, table);
     wrap.appendChild(table);
     const head = table.tHead;
@@ -280,8 +279,8 @@ function enhanceBody(root) {
       table.classList.add('no-head');
     }
   }
-  for (const el of root.querySelectorAll('p')) {
-    if (FIGURE_RE.test(el.textContent)) el.classList.add('figure-label');
+  for (const para of root.querySelectorAll('p')) {
+    if (FIGURE_RE.test(para.textContent)) para.classList.add('figure-label');
   }
   for (const list of root.querySelectorAll('li > ul, li > ol')) {
     list.classList.add('sublist');
@@ -291,8 +290,7 @@ function enhanceBody(root) {
 // An empty page, sized like a printed sheet until fillSheet() gives it its text.
 // Its page number shows until its text arrives.
 function sheetShell(idx) {
-  const sheet = document.createElement('article');
-  sheet.className = 'page-sheet';
+  const sheet = el('article', 'page-sheet');
   sheet.id = `page-${idx}`;
   sheet.dataset.idx = String(idx);
   sheet.dir = state.dir;
@@ -301,8 +299,7 @@ function sheetShell(idx) {
 }
 
 function pageFooter(p) {
-  const footer = document.createElement('footer');
-  footer.className = 'page-number-footer';
+  const footer = el('footer', 'page-number-footer');
   if (state.format !== 'plain' && p.kind !== 'front') footer.textContent = pageLabelText(p, t());
   return footer;
 }
@@ -312,45 +309,36 @@ function fillSheet(sheet, p, idx) {
   sheet.dir = state.dir;
   sheet.textContent = '';
 
-  const content = document.createElement('div');
-  content.className = 'page-content';
+  const content = el('div', 'page-content');
 
   const { body, notes } = state.format === 'plain' ? { body: p.md, notes: [] } : splitFootnotes(p.md);
 
-  const bodyEl = document.createElement('div');
-  bodyEl.className = 'markdown-body';
+  const bodyEl = el('div', 'markdown-body');
   if (hasVisibleContent(body)) bodyEl.innerHTML = renderBlock(body);
   enhanceBody(bodyEl);
   content.appendChild(bodyEl);
 
   if (p.kind === 'untranscribed' && !hasVisibleContent(body)) {
-    const ph = document.createElement('div');
-    ph.className = 'page-placeholder';
-    ph.textContent = tr.untranscribedPage;
+    const ph = el('div', 'page-placeholder', tr.untranscribedPage);
     content.appendChild(ph);
   }
 
   const noteNumbers = new Set();
   if (notes.length > 0) {
-    const fnWrap = document.createElement('section');
-    fnWrap.className = 'footnotes';
-    const list = document.createElement('div');
-    list.className = 'footnotes-list';
+    const fnWrap = el('section', 'footnotes');
+    const list = el('div', 'footnotes-list');
     for (const note of notes) {
-      const div = document.createElement('div');
-      div.className = 'fn-note';
+      const div = el('div', 'fn-note');
       if (note.n != null) {
         div.id = `fn-${idx}-${note.n}`;
         noteNumbers.add(note.n);
-        const back = document.createElement('a');
-        back.className = 'fn-back';
+        const back = el('a', 'fn-back');
         back.href = `#ref-fn-${idx}-${note.n}`;
         back.dataset.target = `ref-fn-${idx}-${note.n}`;
         back.textContent = `(${note.n})`;
         div.appendChild(back);
       }
-      const text = document.createElement('span');
-      text.className = 'fn-text';
+      const text = el('span', 'fn-text');
       text.innerHTML = renderInline(note.md);
       div.appendChild(text);
       list.appendChild(div);
@@ -368,9 +356,7 @@ function fillSheet(sheet, p, idx) {
   sheet.appendChild(content);
 
   if (state.format !== 'plain' && p.kind !== 'front') {
-    const footer = document.createElement('footer');
-    footer.className = 'page-number-footer';
-    footer.textContent = pageLabelText(p, tr);
+    const footer = el('footer', 'page-number-footer', pageLabelText(p, tr));
     sheet.appendChild(footer);
   }
   applyNumerals(content);
@@ -469,7 +455,6 @@ const INPUT_PAUSE_MS = 400;
 let inputPauseUntil = 0;
 let pointerIsDown = false;
 const pauseForInput = () => { inputPauseUntil = performance.now() + INPUT_PAUSE_MS; };
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function buildSheets(run, onReady, center) {
   const n = state.sheets.length;
@@ -483,7 +468,7 @@ async function buildSheets(run, onReady, center) {
   };
   let k = 0, ready = false;
   while (run === buildRun && state.built < n) {
-    if (ready && (pointerIsDown || performance.now() < inputPauseUntil)) { await sleep(50); continue; }
+    if (ready && (pointerIsDown || performance.now() < inputPauseUntil)) { await wait(50); continue; }
     const top = ready ? sheetAtTop() : 0;
     const anchor = ready && !NATIVE_ANCHOR ? viewAnchor() : null;
     const start = performance.now();
@@ -537,7 +522,7 @@ function hideProgress() { progressEl.hidden = true; }
 
 function setSearchReady(ready) {
   btnSearchToggle.disabled = !ready;
-  setTitle(btnSearchToggle, ready ? t().search : t().searchWait);
+  setLabel(btnSearchToggle, ready ? t().search : t().searchWait);
 }
 
 /* ================================================================

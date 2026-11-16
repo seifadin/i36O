@@ -1,5 +1,6 @@
 // The Reader: search within the book (src/search-core.js).
 import * as SearchCore from '../search-core.js';
+import { el } from '../page-chrome.js';
 import { BLOCK_SEL, SEARCH_DEBOUNCE_MS, SEARCH_LIST_MAX, SEARCH_MAX_MATCHES, SEARCH_MIN_CHARS, SNIPPET_CHARS } from './text.js';
 import { btnSearchClose, btnSearchList, btnSearchNext, btnSearchPrev, btnSearchToggle, fmtNum, nextFrame, optDiacritics, optWord, search, searchCount, searchInput, searchPopup, searchResults, state, storeSet, t, viewerContainer } from './state.js';
 import { isBuilding, pageLabelText } from './pages.js';
@@ -165,17 +166,15 @@ function renderResultsList() {
   const frag = document.createDocumentFragment();
   for (let i = 0; i < shown; i++) {
     const m = search.matches[i];
-    const li = document.createElement('li');
-    const btn = document.createElement('button');
+    const li = el('li');
+    const btn = el('button');
     btn.type = 'button';
     btn.className = 'i360-list-item';
-    const page = document.createElement('span');
-    page.className = 'res-page';
-    page.textContent = state.format === 'plain' ? '' : pageLabelText(state.pages[m.page.idx], tr);
-    const text = document.createElement('span');
+    const page = el('span', 'res-page', state.format === 'plain' ? '' : pageLabelText(state.pages[m.page.idx], tr));
+    const text = el('span');
     text.dir = 'auto';
     const sn = SearchCore.snippet(m, SNIPPET_CHARS);
-    const mark = document.createElement('mark');
+    const mark = el('mark');
     mark.textContent = sn.hit;
     text.append(document.createTextNode(sn.before), mark, document.createTextNode(sn.after));
     btn.append(page, text);
@@ -184,9 +183,7 @@ function renderResultsList() {
     frag.appendChild(li);
   }
   if (search.matches.length > shown) {
-    const li = document.createElement('li');
-    li.className = 'res-more';
-    li.textContent = fmtNum(tr.moreResults(search.matches.length - shown));
+    const li = el('li', 'res-more', fmtNum(tr.moreResults(search.matches.length - shown)));
     frag.appendChild(li);
   }
   searchResults.appendChild(frag);

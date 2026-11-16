@@ -8,25 +8,22 @@ import {
   Resource,
   QuranEntry,
 } from '@/api/dataSource'
-import { getStoredItem, setStoredItem } from '@/lib/deviceStorage'
+import { MD_READER_KEY } from '@i360/storage'
+import { deviceStore } from '@/lib/deviceStorage'
 import { hasChanged, commitBaseline } from '@/lib/changeBaseline'
 
 export const LOAD_ERROR = 'تعذّر تحميل البيانات'
 
+// A missing or unreadable cache is treated as absent: a fresh fetch.
 function loadCached<T>(cacheKey: string): T[] | null {
-  const raw = getStoredItem(cacheKey)
-  if (raw === null) return null
-  try {
-    return JSON.parse(raw) as T[]
-  } catch {
-    return null // corrupted cache — treat as absent, forces a fresh fetch
-  }
+  const cached = deviceStore.get<T[] | null>(cacheKey, null)
+  return Array.isArray(cached) ? cached : null
 }
 
-// setStoredItem() already swallows storage errors (full/unavailable) — the
+// deviceStore.set() already swallows storage errors (full/unavailable) — the
 // next mount just refetches.
 function saveCached<T>(cacheKey: string, data: T[]): void {
-  setStoredItem(cacheKey, JSON.stringify(data))
+  deviceStore.set(cacheKey, data)
 }
 
 export const CACHE_KEY_SCIENCES = 'i360CacheSciences'
@@ -42,7 +39,7 @@ export const FEEDBACK_MAILTO_KEY = 'i360FeedbackMailto'
 function cacheFeedbackMailto(sciences: Science[]): void {
   const feedbackRow = sciences.find(s => s.ScienceMinor_En === 'Feedback')
   if (feedbackRow?.Web?.toLowerCase().startsWith('mailto:')) {
-    setStoredItem(FEEDBACK_MAILTO_KEY, feedbackRow.Web)
+    deviceStore.set(FEEDBACK_MAILTO_KEY, feedbackRow.Web)
   }
   // Deliberately no else/removal branch: if the Feedback row is temporarily
   // absent from a given fetch (a transient Baserow hiccup, a momentary
@@ -57,11 +54,10 @@ function cacheFeedbackMailto(sciences: Science[]): void {
 // Reader checks the value before using it. Kept when a load lacks it, like the feedback link.
 // Stored as JSON, the format the hub pages' settings use (hub/src/storage.js): the Reader reads it
 // through the same helper.
-const MD_READER_KEY = 'i360.mdReader'
 
 function cacheMdReader(resource: Resource | null): void {
   if (resource && typeof resource.MdReader === 'string' && resource.MdReader.trim()) {
-    setStoredItem(MD_READER_KEY, JSON.stringify(resource.MdReader.trim()))
+    deviceStore.set(MD_READER_KEY, resource.MdReader.trim())
   }
 }
 
@@ -81,9 +77,8 @@ function collectIconNamesByTier(sciences: Science[]): Record<IconTier, Set<strin
   return tiers
 }
 
-// Generic cache-or-fetch resolver — extracted after resolveSciences/
-// resolveQuran (below) were found to be identical except for their
-// type/cache-key/fetcher. Reuse the cache unless `changed` is true or no
+// Cache-or-fetch for the sciences and the Quran index (they differ only in
+// type, cache key and fetcher). Reuse the cache unless `changed` is true or no
 // cache exists yet; either way, whatever's returned becomes the new
 // cache baseline.
 async function resolveCached<T>(

@@ -37,15 +37,10 @@ export function preloadIcons(names: Iterable<string>) {
   }
 }
 
-// requestIdleCallback has never shipped in Safari/WebKit — meaning
-// Capacitor's iOS app, which renders through WKWebView, would silently
-// never defer anything scheduled this way without a fallback (the same
-// "don't assume a standard API behaves the same in this app's WebView"
-// caution as §12.16's existing bug class, just for WebKit specifically
-// rather than Android's WebView). 200ms is a reasonable "the browser has
-// likely settled by now" guess where requestIdleCallback isn't available,
-// not a precise substitute for it.
-// WebKit has no requestIdleCallback; a short timeout stands in.
+// WebKit (Safari, the iOS app's WKWebView) has no requestIdleCallback, so
+// without a fallback nothing scheduled this way would ever run there (§12.16:
+// standard APIs differ in this app's web views). A short timeout stands in —
+// "the page has likely settled by now", not a precise substitute.
 const IDLE_FALLBACK_MS = 200
 
 export function scheduleIdle(callback: () => void): void {

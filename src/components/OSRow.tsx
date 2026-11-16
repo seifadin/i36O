@@ -64,15 +64,13 @@ function ToggleItem({
   tooltipAlign?: 'center' | 'left'
   // When defined, renders a THREE-position track instead of the binary
   // switch — same h-5 w-9 footprint and knob, three stops instead of two
-  // (deliberate visual siblinghood with OS_WebToggle beside it). Physical
-  // knob stops follow RTL first-is-right: 0=right (Google), 1=center
-  // (Huawei), 2=left (Apple); each tap advances the cycle, so the knob
-  // slides leftward and wraps. Track stays brand-green — a target is
-  // always selected; gray would read as disabled. Replaces the earlier
-  // icon-only cycle button (showSwitch=false), which gave no clickable
-  // affordance and no position feedback. Generalized here rather than
-  // duplicated as a sibling — the tooltip-flash machinery is identical
-  // either way (§12 rule 12).
+  // (a sibling of OS_WebToggle beside it). Knob stops follow RTL
+  // first-is-right: 0=right (Google), 1=center (Huawei), 2=left (Apple);
+  // each tap advances the cycle, so the knob slides leftward and wraps.
+  // Track stays brand-green — a target is always selected; gray would read
+  // as disabled. The track itself shows the control is tappable and where
+  // it stands (i360-instructions.md §4). One component for both switches:
+  // the tooltip-flash machinery is the same (§12 rule 12).
   triPosition?: 0 | 1 | 2
 }) {
   // Mobile has no real :hover — tapping already toggles the switch, so the
@@ -192,17 +190,15 @@ export default function OSRow() {
 
   // Middle slot, two distinct controls (never both):
   //
-  // Real Android device — the original binary Google/Huawei switch,
-  // byte-identical behavior to before the simulator cycle existed. Real
-  // iOS still shows nothing (exactly one store, no choice to make).
+  // Real Android device — the binary Google/Huawei switch. Real iOS shows
+  // nothing (exactly one store, no choice to make).
   const realOS = detectOS()
   const showBinaryServicesToggle = !state.useWeb && realOS === 'android'
   const hmsIcon = state.useHMS ? <HuaweiIcon /> : <GoogleIcon />
   const hmsAriaLabel = state.useHMS ? 'هواوي' : 'جوجل'
 
   // Desktop simulator — a three-way cycle: Google → Huawei → Apple → …
-  // (first tap matches the old binary toggle's Google→Huawei exactly; Apple
-  // is the new third stop). Each state is an explicit PAIR write so no
+  // (the first tap does what the binary switch does). Each state is an explicit PAIR write so no
   // stale flag survives a transition — cycling into Apple clears useHMS,
   // otherwise Huawei bot/search variants would silently leak into the
   // Apple simulation (the same stale-flag class computeUseHuawei's !useWeb
@@ -272,8 +268,7 @@ export default function OSRow() {
 
       {/* Middle — desktop simulator: three-way store-target cycle rendered
           as a THREE-position switch (same footprint/knob as the binary
-          toggle beside it — deliberate visual siblinghood, and the track
-          itself signals clickability the earlier icon-only design lacked).
+          toggle beside it; the track shows it can be tapped and where it stands).
           Simulator-blue bar stays on throughout (isSimulating above),
           keeping the simulation visually honest regardless of target. */}
       {isSimulating && (

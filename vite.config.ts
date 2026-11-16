@@ -146,6 +146,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@i360/theme-loader': THEME_LOADER,
       '@i360/net': fileURLToPath(new URL('./hub/src/net.js', import.meta.url)),
+      '@i360/storage': fileURLToPath(new URL('./hub/src/storage.js', import.meta.url)),
     },
   },
   build: { target: BUILD_TARGETS },

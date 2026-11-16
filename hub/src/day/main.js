@@ -8,7 +8,7 @@ import * as i360Theme from '../../theme/site/theme-loader.js';
 import * as HijriCalc from '../../hijri/calc.js';
 import * as HijriClient from '../../hijri/client.js';
 import DAY_CITIES from '../day-cities.json';
-import { $, setupClose, THEME_ICONS } from '../page-chrome.js';
+import { $, drawSettingsButtons, el, setLabel, setupClose, wireSettingsButtons } from '../page-chrome.js';
 import { oncePerFrame } from '../frame.js';
 import { createStore } from '../storage.js';
 import { fetchJson } from '../net.js';
@@ -82,12 +82,6 @@ function minutesNowIn(tz) {
     return parseInt(p.find(x => x.type === 'hour').value, 10) * 60 + parseInt(p.find(x => x.type === 'minute').value, 10);
   } catch (e) { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); }
 }
-function mk(tag, cls, text) {
-  const el = document.createElement(tag);
-  if (cls) el.className = cls;
-  if (text !== undefined) el.textContent = text;
-  return el;
-}
 // Lucide icons shown from script (the hourglass beside a provisional Hijri date).
 const HOURGLASS = '<svg data-lucide="hourglass" class="icon-inline me-xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>';
 function svgIcon(markup) {
@@ -99,7 +93,6 @@ function svgIcon(markup) {
 const DataStore = createStore();   // src/storage.js — keys as they are (CONFIG.S)
 
 /* ---------- Network: timeout, no retry on 4xx, bounded retries on network/5xx (src/net.js) ---------- */
-const Net = { fetch: fetchJson };
 
 /* ---------- Hijri date: the shared files (hijri/calc.js, hijri/client.js; i360-hub.md §8) ----------
    The date comes from the dar-hijri Worker (Dar al-Ifta's), or is calculated here when the Worker
@@ -138,12 +131,12 @@ const Hijri = {
 const HE = {
   per: 20,
   async list(lang, cat, page) {
-    const r = await Net.fetch(`${CONFIG.API.HE}/hadeeths/list/?language=${lang}&category_id=${cat}&page=${page}&per_page=${this.per}`);
+    const r = await fetchJson(`${CONFIG.API.HE}/hadeeths/list/?language=${lang}&category_id=${cat}&page=${page}&per_page=${this.per}`);
     const m = r.meta || {};
     return { items: Array.isArray(r) ? r : (r.data || []), total: Number(m.total_items ?? m.total ?? m.count) || 0, lastPage: Number(m.last_page) || 0 };
   },
   async pickId(lang) {
-    const r = await Net.fetch(`${CONFIG.API.HE}/categories/roots/?language=${lang}`);
+    const r = await fetchJson(`${CONFIG.API.HE}/categories/roots/?language=${lang}`);
     const roots = (Array.isArray(r) ? r : (r.data || [])).filter(c => !CONFIG.HADEETH_EXCLUDE_ROOTS.includes(String(c.id)));
     if (!roots.length) throw new Error('HadeethEnc: no root categories');
     const counts = roots.map(c => Number(c.hadeeths_count) || 0), total = counts.reduce((a, b) => a + b, 0);
@@ -164,7 +157,7 @@ const HE = {
     if (!res.items.length) throw new Error('HadeethEnc: empty page');
     return String(res.items[Math.min(idx % this.per, res.items.length - 1)].id);
   },
-  one(lang, id, opts) { return Net.fetch(`${CONFIG.API.HE}/hadeeths/one/?id=${id}&language=${lang}`, opts); },
+  one(lang, id, opts) { return fetchJson(`${CONFIG.API.HE}/hadeeths/one/?id=${id}&language=${lang}`, opts); },
   async daily(lang) {
     const day = ymdKey(localYMD()), c = DataStore.get(CONFIG.S.H);
     let id = (c && c.day === day && c.lang === lang) ? c.id : null;
@@ -226,7 +219,7 @@ const City = {
   },
   async search(q, lang) {
     const lists = await Promise.all(this.variants(q).map(v =>
-      Net.fetch(`${CONFIG.API.CITY}?name=${encodeURIComponent(v)}&count=10&language=${lang}&format=json`).then(r => r.results || [])));
+      fetchJson(`${CONFIG.API.CITY}?name=${encodeURIComponent(v)}&count=10&language=${lang}&format=json`).then(r => r.results || [])));
     const seen = new Map();
     lists.flat().forEach(p => { if (p && p.id != null && !seen.has(p.id) && typeof p.latitude === 'number' && p.timezone && p.country_code) seen.set(p.id, p); });
     return [...seen.values()].sort((a, b) => (b.population || 0) - (a.population || 0)).slice(0, 10);
@@ -276,7 +269,7 @@ const App = {
       const day = ymdKey(localYMD());
       let rec = DataStore.get(CONFIG.S.Q);
       if (!rec || rec.day !== day) { rec = { day, id: Math.floor(Math.random() * 6236) + 1 }; DataStore.set(CONFIG.S.Q, rec); }
-      return Net.fetch(`${CONFIG.API.Q}/${rec.id}/editions/quran-uthmani,${CONFIG.EDITIONS.quran[lang]}`);
+      return fetchJson(`${CONFIG.API.Q}/${rec.id}/editions/quran-uthmani,${CONFIG.EDITIONS.quran[lang]}`);
     },
     hadith: lang => HE.daily(lang),
     async prayer() { return Prayer.times(City.get(), App.school); }   // on the device: nothing is sent
@@ -324,9 +317,9 @@ function cityLabel(c, lang) {
 const Picker = {
   open: false, token: 0, results: [], state: '', timer: 0,
   init() {
-    this.box = document.getElementById('city-picker');
-    this.input = document.getElementById('city-search');
-    this.btn = document.getElementById('city-change');
+    this.box = $('city-picker');
+    this.input = $('city-search');
+    this.btn = $('city-change');
     this.btn.addEventListener('click', () => this.toggle());
     this.input.addEventListener('input', () => { clearTimeout(this.timer); this.timer = setTimeout(() => this.search(), 500); });
     this.input.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.toggle(false); });
@@ -357,9 +350,9 @@ const Picker = {
     this.input.placeholder = L.citySearch; this.input.setAttribute('aria-label', L.citySearch);
     UI.set('city-status', { loading: L.loading, none: L.cityNone, error: L.loadError }[this.state] || '');
     const row = (label, sub, on, pick) => {
-      const b = mk('button', `i360-list-item${on ? ' active-btn' : ''}`);
+      const b = el('button', `i360-list-item${on ? ' active-btn' : ''}`);
       b.type = 'button'; b.setAttribute('role', 'option'); b.setAttribute('aria-selected', on);
-      b.append(mk('span', 'font-bold', label)); if (sub) b.append(mk('span', 'text-sm ms-sm', sub));
+      b.append(el('span', 'font-bold', label)); if (sub) b.append(el('span', 'text-sm ms-sm', sub));
       b.addEventListener('click', pick);
       return b;
     };
@@ -378,7 +371,7 @@ const Picker = {
 const LANG_SHORT = { ar: 'ع', ur: 'ار', id: 'ID', tr: 'TR', en: 'EN' };
 const LangMenu = {
   init() {
-    this.btn = document.getElementById('btn-lang'); this.list = document.getElementById('lang-list');
+    this.btn = $('btn-lang'); this.list = $('lang-list');
     this.btn.addEventListener('click', () => (this.list.hidden ? this.open() : this.close(true)));
     document.addEventListener('click', e => { if (!this.list.hidden && !e.target.closest('.lang-wrap')) this.close(false); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !this.list.hidden) this.close(true); });
@@ -397,12 +390,12 @@ const LangMenu = {
 /* ---------- Two columns, where they fit (see the .cards styles) ---------- */
 const Cols = {
   init() {
-    this.a = document.getElementById('col-a'); this.b = document.getElementById('col-b');
-    this.prayer = document.getElementById('prayer-card');
+    this.a = $('col-a'); this.b = $('col-b');
+    this.prayer = $('prayer-card');
     this.grid = this.prayer.querySelector('[data-target="prayer-grid"]');
     if (window.ResizeObserver) {
       const ro = new ResizeObserver(() => this.queue());
-      [document.getElementById('cards'), this.a, this.prayer].forEach(e => ro.observe(e));
+      [$('cards'), this.a, this.prayer].forEach(e => ro.observe(e));
     }
     window.addEventListener('resize', () => this.queue());
     this.queue();
@@ -512,26 +505,26 @@ const Conv = {
   // fields = false while typing in the year box: its text is left as typed.
   render(fields = true) {
     if (!this.el) return;
-    const L = this.L, lang = App.lang, el = this.el, num = i360Theme.getNumerals();
+    const L = this.L, lang = App.lang, box = this.el, num = i360Theme.getNumerals();
     UI.set('conv-dir', this.g ? L.convG2H : L.convH2G);
     const sw = $('conv-swap'); sw.title = L.convSwap; sw.setAttribute('aria-label', `${L.convSwap}: ${this.g ? L.convG2H : L.convH2G}`);
     $('conv-fields').setAttribute('aria-label', this.g ? L.convG2H : L.convH2G);
-    const option = (value, text, placeholder) => { const o = mk('option', '', text); o.value = value; if (placeholder) { o.disabled = true; } return o; };
+    const option = (value, text, placeholder) => { const o = el('option', '', text); o.value = value; if (placeholder) { o.disabled = true; } return o; };
     const days = this.days();
     if (this.d > days) this.d = days;
-    el.d.replaceChildren(option('', L.convDay, true), ...Array.from({ length: days }, (_, i) => option(i + 1, String(i + 1))));
-    el.d.value = this.d ? String(this.d) : '';
-    el.m.replaceChildren(option('', L.convMonth, true), ...this.monthNames(lang).map((n, i) => option(i + 1, `${i + 1}. ${n}`)));
-    el.m.value = this.m ? String(this.m) : '';
-    el.y.placeholder = i360Theme.toNumerals(this.g ? L.convYearHintG : L.convYearHintH, num);
-    if (fields) el.y.value = i360Theme.toNumerals(this.y, num);
-    el.pick.hidden = !(this.g && this.canPick);
-    el.pickBtn.title = L.convPick; el.pickBtn.setAttribute('aria-label', L.convPick);
+    box.d.replaceChildren(option('', L.convDay, true), ...Array.from({ length: days }, (_, i) => option(i + 1, String(i + 1))));
+    box.d.value = this.d ? String(this.d) : '';
+    box.m.replaceChildren(option('', L.convMonth, true), ...this.monthNames(lang).map((n, i) => option(i + 1, `${i + 1}. ${n}`)));
+    box.m.value = this.m ? String(this.m) : '';
+    box.y.placeholder = i360Theme.toNumerals(this.g ? L.convYearHintG : L.convYearHintH, num);
+    if (fields) box.y.value = i360Theme.toNumerals(this.y, num);
+    box.pick.hidden = !(this.g && this.canPick);
+    setLabel(box.pickBtn, L.convPick);
     const r = this.result(lang), isoBox = UI.targets['conv-iso'], err = UI.targets['conv-error'];
-    if (this.g) { const y = this.year(); el.native.value = (r && r.carry && y !== null) ? `${String(y).padStart(4, '0')}-${pad(this.m)}-${pad(this.d)}` : ''; }
+    if (this.g) { const y = this.year(); box.native.value = (r && r.carry && y !== null) ? `${String(y).padStart(4, '0')}-${pad(this.m)}-${pad(this.d)}` : ''; }
     UI.set('conv-alpha', r && !r.error ? r.alpha : '');
     // The numeric date left to right (year first) and the mark after it, at the line's end.
-    if (r && !r.error) { const b = mk('bdi', '', r.iso); b.dir = 'ltr'; isoBox.replaceChildren(b, ` ${r.mark}`); } else isoBox.replaceChildren();
+    if (r && !r.error) { const b = el('bdi', '', r.iso); b.dir = 'ltr'; isoBox.replaceChildren(b, ` ${r.mark}`); } else isoBox.replaceChildren();
     err.hidden = !(r && r.error); err.textContent = r && r.error ? r.error : '';
     // The label and the note on one line: the label ends its sentence (Urdu: «۔»).
     UI.set('conv-label', `${HijriCalc.label(HijriCalc.SOURCES.CALC, lang)}${lang === 'ur' ? '۔' : '.'}`);
@@ -545,21 +538,20 @@ const UI = {
   targets: {}, shown: false,
   get L() { return LOCALES[App.lang] || LOCALES.ar; },
   init() {
-    document.querySelectorAll('[data-target]').forEach(el => this.targets[el.dataset.target] = el);
-    document.querySelectorAll('[data-status]').forEach(el => {
-      el.querySelector('[data-retry]').addEventListener('click', () => App.retry(el.dataset.status));
+    document.querySelectorAll('[data-target]').forEach(node => this.targets[node.dataset.target] = node);
+    document.querySelectorAll('[data-status]').forEach(node => {
+      node.querySelector('[data-retry]').addEventListener('click', () => App.retry(node.dataset.status));
     });
     document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => { LangMenu.close(true); App.setLang(b.dataset.lang); }));
     LangMenu.init();
     document.querySelectorAll('[data-school]').forEach(b => b.addEventListener('click', () => App.setSchool(+b.dataset.school)));
     Picker.init();
-    setupClose(document.getElementById('btn-close'));   // in the installed app, ✕ returns home (src/page-chrome.js)
-    document.getElementById('btn-theme').addEventListener('click', () => i360Theme.cycle());
-    i360Theme.onChange(() => this.theme());
-    document.getElementById('btn-numerals').addEventListener('click', () => i360Theme.cycleNumerals());
-    i360Theme.onNumeralsChange(() => { this.numeralsButton(); Conv.render(); });
+    setupClose($('btn-close'));   // in the installed app, ✕ returns home (src/page-chrome.js)
+    wireSettingsButtons($('btn-theme'), $('btn-numerals'));
+    i360Theme.onChange(() => this.settingsButtons());
+    i360Theme.onNumeralsChange(() => { this.settingsButtons(); Conv.render(); });
     i360Theme.watchNumerals(document.body, NUMERALS_SKIP);   // converts the page now and on every change, after the button
-    this.theme();
+    this.settingsButtons();
     i360Theme.init();   // fresh theme.css in the background; the saved copy is already shown
     Cols.init();
     Conv.init();
@@ -567,18 +559,7 @@ const UI = {
     setInterval(() => App.tick(), 30000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) App.tick(); });
   },
-  numeralsButton() {   // label and tooltip for the shared numerals choice, in the page's language
-    const n = i360Theme.getNumerals(), btn = document.getElementById('btn-numerals');
-    btn.textContent = i360Theme.NUMERALS_SAMPLE[n];
-    btn.title = i360Theme.numeralsLabel(n, App.lang);
-    btn.setAttribute('aria-label', btn.title);
-  },
-  theme() {   // the theme button: icon and tooltip for the shared choice, in the page's language
-    const c = i360Theme.getChoice(), btn = document.getElementById('btn-theme');
-    btn.innerHTML = THEME_ICONS[c];
-    btn.title = i360Theme.themeLabel(c, App.lang);
-    btn.setAttribute('aria-label', btn.title);
-  },
+  settingsButtons() { drawSettingsButtons($('btn-theme'), $('btn-numerals'), App.lang); },   // in the page's language
   set(t, v) { if (this.targets[t]) this.targets[t].textContent = v; },
   status(name, kind) {
     const box = document.querySelector(`[data-status="${name}"]`); if (!box) return;
@@ -591,20 +572,19 @@ const UI = {
   reveal() {
     if (this.shown) return; this.shown = true;
     ['quran-card', 'hadith-card', 'prayer-card', 'converter-card', 'events-card'].forEach((id, i) => setTimeout(() => {
-      const e = document.getElementById(id); if (e) { e.style.opacity = 1; e.style.transform = 'translateY(0)'; }
+      const e = $(id); if (e) { e.style.opacity = 1; e.style.transform = 'translateY(0)'; }
     }, i * 120));
   },
   render() {
     const L = this.L, lang = App.lang;
     document.documentElement.lang = lang; document.documentElement.dir = L.dir;
-    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = L[el.dataset.i18n] || LOCALES.en[el.dataset.i18n]; });
-    document.querySelectorAll('[data-lang]').forEach(el => { const on = el.dataset.lang === lang; el.classList.toggle('active-btn', on); el.setAttribute('aria-pressed', on); });
-    const lb = document.getElementById('btn-lang'), cur = document.getElementById(`lang-${lang}`);
-    document.getElementById('lang-short').textContent = LANG_SHORT[lang];
-    lb.title = `${L.language}: ${cur.textContent}`; lb.setAttribute('aria-label', lb.title);
-    this.theme();            // their tooltips are in the page's language
-    this.numeralsButton();
-    const x = document.getElementById('btn-close'); x.title = L.close; x.setAttribute('aria-label', L.close);
+    document.querySelectorAll('[data-i18n]').forEach(node => { node.textContent = L[node.dataset.i18n] || LOCALES.en[node.dataset.i18n]; });
+    document.querySelectorAll('[data-lang]').forEach(node => { const on = node.dataset.lang === lang; node.classList.toggle('active-btn', on); node.setAttribute('aria-pressed', on); });
+    const lb = $('btn-lang'), cur = $(`lang-${lang}`);
+    $('lang-short').textContent = LANG_SHORT[lang];
+    setLabel(lb, `${L.language}: ${cur.textContent}`);
+    this.settingsButtons();   // their tooltips are in the page's language
+    setLabel($('btn-close'), L.close);
     document.title = L.title;   // the tab name follows the language too
     this.renderSchool();
     this.renderHijri();
@@ -618,14 +598,14 @@ const UI = {
   // Credits (Open-Meteo and GeoNames: CC BY 4.0; Adhan: MIT), in the page's language, on two lines.
   renderCredits() {
     const L = this.L, box = this.targets.credits; if (!box) return;
-    const link = (text, href) => { const a = mk('a', 'underline', text); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; };
+    const link = (text, href) => { const a = el('a', 'underline', text); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; };
     box.replaceChildren(
       document.createTextNode(`${L.creditCities}: `), link('Open-Meteo', 'https://open-meteo.com/'), document.createTextNode(' · '),
       link('GeoNames', 'https://www.geonames.org/'), document.createElement('br'), document.createTextNode(`${L.creditPrayer}: `),
       link('Adhan', 'https://github.com/batoulapps/adhan-js'));
   },
   renderSchool() {
-    [0, 1].forEach(s => { const b = document.getElementById(`school-${s}`); if (!b) return; const on = App.school === s; b.setAttribute('aria-pressed', on); });
+    [0, 1].forEach(s => { const b = $(`school-${s}`); if (!b) return; const on = App.school === s; b.setAttribute('aria-pressed', on); });
   },
   renderHijri() {
     const L = this.L, h = App.state.hijri; if (!h) return;
@@ -651,10 +631,10 @@ const UI = {
   },
   renderHadith() {
     const h = App.state.hadith, L = this.L, lang = App.lang;
-    const hide = (el, on) => { if (el) el.classList.toggle('hidden', on); };
+    const hide = (node, on) => { if (node) node.classList.toggle('hidden', on); };
     if (!h) {
       ['hadith-title', 'hadith-narrator', 'hadith-text', 'hadith-grade', 'hadith-ref'].forEach(t => this.set(t, ''));
-      hide(this.targets['hadith-narrator'], true); hide(document.getElementById('hadith-refs'), true); return;
+      hide(this.targets['hadith-narrator'], true); hide($('hadith-refs'), true); return;
     }
     this.set('hadith-title', h.title || '');
     /* HadeethEnc returns the opening line naming the Companion (the highest narrator) as `hadeeth_intro`.
@@ -671,7 +651,7 @@ const UI = {
     this.set('hadith-grade', [h.grade ? `${L.gradeLabel}: ${h.grade}` : '', h.attribution || ''].filter(Boolean).join(' · '));
     /* `reference` is HadeethEnc's bibliography (editions used), Arabic only. Kept in full, collapsed by default. */
     const refs = (h.reference || '').trim();
-    this.set('hadith-ref', refs); hide(document.getElementById('hadith-refs'), !refs);
+    this.set('hadith-ref', refs); hide($('hadith-refs'), !refs);
     const a = this.targets['hadith-link']; if (a) a.href = `https://hadeethenc.com/${lang}/browse/hadith/${encodeURIComponent(h.id)}`;
   },
   renderPrayers() {
@@ -686,11 +666,11 @@ const UI = {
     if (!next) next = 'Fajr';                                 // after Isha the next prayer is tomorrow's Fajr
     grid.replaceChildren(...CONFIG.P_KEYS.map((k, i) => {
       const isNext = k === next, m = /(\d{1,2}):(\d{2})/.exec(t[k] || '');
-      const box = mk('div', `flex flex-col items-center p-sm transition-all ${isNext ? 'next-prayer-highlight' : 'i360-inset'}`);
+      const box = el('div', `flex flex-col items-center p-sm transition-all ${isNext ? 'next-prayer-highlight' : 'i360-inset'}`);
       box.append(
-        mk('span', `text-sm font-bold ${isNext ? 'text-accent' : 'text-custom-secondary'}`, L.prayers[i]),
-        mk('span', `text-base font-bold mt-xs ${isNext ? 'text-accent' : 'text-custom-secondary'}`, m ? m[0] : '—'));
-      if (isNext) box.append(mk('span', 'text-sm mt-xs font-bold text-accent animate-pulse', L.next));
+        el('span', `text-sm font-bold ${isNext ? 'text-accent' : 'text-custom-secondary'}`, L.prayers[i]),
+        el('span', `text-base font-bold mt-xs ${isNext ? 'text-accent' : 'text-custom-secondary'}`, m ? m[0] : '—'));
+      if (isNext) box.append(el('span', 'text-sm mt-xs font-bold text-accent animate-pulse', L.next));
       return box;
     }));
     const names = METHOD_NAMES[p.method];
@@ -705,20 +685,20 @@ const UI = {
     if (!h || !list) return;
     const note = this.targets['events-note'];
     if (note) {
-      const a = mk('a', 'underline', L.sourceLabel);
+      const a = el('a', 'underline', L.sourceLabel);
       a.href = CONFIG.DAY_NOTE_SOURCE; a.target = '_blank'; a.rel = 'noopener noreferrer';
       note.replaceChildren(`${L.eventsNote} (`, a, ')');
     }
     list.replaceChildren(...Hijri.events(h).map(e => {
-      const row = mk('div', `flex justify-between items-center gap-md p-md transition-all ${e.isT ? 'border-2 border-event bg-event-bg rounded-lg' : 'i360-inset'}`);
-      const left = mk('div', 'flex-1'), title = mk('div', 'flex items-center gap-sm');
-      title.append(mk('span', 'text-base font-bold text-custom-secondary', L.events[e.id]));
-      if (e.isT) title.append(mk('span', 'bg-event text-page text-sm font-bold px-sm rounded-full', L.todayLabel));
-      left.append(title, mk('span', 'text-sm text-custom-secondary font-bold', `${e.d} ${L.months[e.m]} ${e.year}`));
-      const right = mk('div', 'text-end');
+      const row = el('div', `flex justify-between items-center gap-md p-md transition-all ${e.isT ? 'border-2 border-event bg-event-bg rounded-lg' : 'i360-inset'}`);
+      const left = el('div', 'flex-1'), title = el('div', 'flex items-center gap-sm');
+      title.append(el('span', 'text-base font-bold text-custom-secondary', L.events[e.id]));
+      if (e.isT) title.append(el('span', 'bg-event text-page text-sm font-bold px-sm rounded-full', L.todayLabel));
+      left.append(title, el('span', 'text-sm text-custom-secondary font-bold', `${e.d} ${L.months[e.m]} ${e.year}`));
+      const right = el('div', 'text-end');
       right.append(
-        mk('span', 'text-sm uppercase font-bold text-event block', L.expected),
-        mk('span', 'text-sm font-bold text-custom-secondary', e.date.toLocaleDateString(lang, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })));
+        el('span', 'text-sm uppercase font-bold text-event block', L.expected),
+        el('span', 'text-sm font-bold text-custom-secondary', e.date.toLocaleDateString(lang, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })));
       row.append(left, right);
       return row;
     }));

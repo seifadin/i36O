@@ -22,6 +22,7 @@ const state = () => {
     visibleHits: [...document.querySelectorAll('.hit')].filter((h) => h.offsetParent).length,
     more: document.querySelectorAll('.group-foot button').length, bar: !$('bar-btns').hidden,
     exact: $('opt-exact').getAttribute('aria-pressed'), word: $('opt-word').getAttribute('aria-pressed'),
+    settings: ['btn-theme', 'btn-numerals'].map((id) => { const b = document.getElementById(id); return [b.querySelector('svg')?.dataset.lucide || b.textContent.trim(), b.title, b.getAttribute('aria-label')]; }),
     theme: document.documentElement.dataset.theme, about: $('about').textContent.trim().slice(0, 120), q: window.location.search,
     overflow: document.documentElement.scrollWidth > window.innerWidth
   };

@@ -55,10 +55,9 @@ export interface Resource {
   // the app itself: saved on the device for the Reader's "copy link" (dataCache.tsx).
   MdReader: string
   // i360dbqEOF exists in the Baserow table but is deliberately NOT typed
-  // here — its app-state consumer was removed as written-but-never-read
-  // long ago (§5), and an interface field with zero readers only implies
-  // a dependency that doesn't exist. The column itself stays in Baserow
-  // untouched (same live-fetch backward-compat reasoning as IconName).
+  // here: nothing reads it (§5), and an interface field with zero readers
+  // only implies a dependency that doesn't exist. The column itself stays
+  // in Baserow (old installs read it, like IconName).
 }
 
 export interface QuranEntry {
@@ -78,8 +77,8 @@ interface BaserowResponse<T> {
 
 // ─── Pagination helper ────────────────────────────────────────────────────────
 
-// Why timeout + retry (§14): one transient network failure, from any source,
-// used to break data loading for the whole session — a plain fetch() has neither.
+// Why timeout + retry (§14): without them, one transient network failure, from any
+// source, could break data loading for the whole session.
 const FETCH_TIMEOUT_MS = 10000
 const MAX_RETRIES = 2 // 1 initial attempt + 2 retries = 3 total tries
 const RETRY_BACKOFF_MS = [1000, 2000]
@@ -152,7 +151,7 @@ export async function fetchQuran(): Promise<QuranEntry[]> {
   )
 }
 
-// Local lookup — mirrors old fExegesis: match chapter exactly, verse within
+// Local lookup: match chapter exactly, verse within
 // [QuranVerseMin, QuranVerseMax], take first match. Returns null if unmapped.
 // Explicit Number() coercion: Baserow's API commonly serializes Number-type
 // fields as strings in JSON despite QuranEntry declaring them as `number` —

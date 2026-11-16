@@ -4,7 +4,7 @@ import { READER as LOCALES } from '../locales.js';
 import * as LibCopy from '../lib-copy.js';
 import * as BookFormat from '../book-format.js';
 import * as i360Theme from '../../theme/site/theme-loader.js';
-import { $ } from '../page-chrome.js';
+import { $, setLabel } from '../page-chrome.js';
 import { createStore } from '../storage.js';
 import { fetchWithTimeout } from '../net.js';
 import { ICON } from './text.js';
@@ -127,7 +127,7 @@ function updateConnection() {
   statusIcon.innerHTML = `${online ? ICON.globeCheck : ICON.globeX}<span class="status-text"></span>`;
   statusIcon.lastChild.textContent = label;
   statusIcon.classList.toggle('offline', !online);
-  setTitle(statusIcon, label);
+  setLabel(statusIcon, label);
 }
 
 /* ================================================================
@@ -162,10 +162,6 @@ function detectDirection(text) {
   return 'rtl';
 }
 
-function setTitle(el, text) {
-  el.title = text;
-  el.setAttribute('aria-label', text);
-}
 
 // What this part hooks up as the page loads; main.js calls it, in the page's order.
 function wireState() {
@@ -175,4 +171,4 @@ function wireState() {
   setInterval(() => { if (!document.hidden) void checkConnection(); }, CONNECTION_CHECK_MS);
 }
 
-export { btnBookmark, btnClose, btnCopyLink, btnDirToggle, btnExitReading, btnFitPage, btnFitWidth, btnMore, btnNavLeft, btnNavRight, btnNumerals, btnOpenFile, btnPanel, btnPanelClose, btnReading, btnScan, btnSearchClose, btnSearchList, btnSearchNext, btnSearchPrev, btnSearchToggle, btnTextLarger, btnTextSmaller, btnTheme, btnZoomIn, btnZoomOut, checkConnection, detectDirection, emptyState, fileInput, fmtNum, hasVisibleContent, hashText, lang, lblOf, missingPagesBanner, missingPagesText, moreMenu, nextFrame, optDiacritics, optWord, pageNumInput, pagePos, pagesWrapper, panelBody, parseBook, progressEl, progressFill, progressText, search, searchCount, searchInput, searchPopup, searchResults, setTitle, sidePanel, splitFootnotes, state, storeGet, storeSet, stripComments, t, tabBookmarks, tabContents, tbEnd, tbTitle, toWestern, toastEl, toolbar, totalPagesLabel, updateConnection, viewerContainer, volSelect, wireState };
+export { btnBookmark, btnClose, btnCopyLink, btnDirToggle, btnExitReading, btnFitPage, btnFitWidth, btnMore, btnNavLeft, btnNavRight, btnNumerals, btnOpenFile, btnPanel, btnPanelClose, btnReading, btnScan, btnSearchClose, btnSearchList, btnSearchNext, btnSearchPrev, btnSearchToggle, btnTextLarger, btnTextSmaller, btnTheme, btnZoomIn, btnZoomOut, checkConnection, detectDirection, emptyState, fileInput, fmtNum, hasVisibleContent, hashText, lang, lblOf, missingPagesBanner, missingPagesText, moreMenu, nextFrame, optDiacritics, optWord, pageNumInput, pagePos, pagesWrapper, panelBody, parseBook, progressEl, progressFill, progressText, search, searchCount, searchInput, searchPopup, searchResults, sidePanel, splitFootnotes, state, storeGet, storeSet, stripComments, t, tabBookmarks, tabContents, tbEnd, tbTitle, toWestern, toastEl, toolbar, totalPagesLabel, updateConnection, viewerContainer, volSelect, wireState };

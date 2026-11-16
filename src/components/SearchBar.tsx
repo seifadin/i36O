@@ -270,9 +270,8 @@ export default function SearchBar() {
           onKeyDown={e => e.key === 'Enter' && handleSubmit()}
           placeholder="بحث ... أو الآية#.السورة#"
           aria-label="بحث"
-          // Standard form pattern found on closer review, alongside the
-          // three findings above: many screen readers announce "invalid
-          // entry" automatically when a focused field has aria-invalid
+          // The standard form pattern: many screen readers announce
+          // "invalid entry" when a focused field has aria-invalid
           // true. Only ever true for the same brief 500ms window the
           // invalid-input flash shows, then clears itself with it.
           aria-invalid={flash === 'invalid'}

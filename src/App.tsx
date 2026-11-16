@@ -3,7 +3,7 @@ import { AppStateProvider } from '@/store/appState'
 import { DataCacheProvider, useDataCache } from '@/store/dataCache'
 import { usePlatform } from '@/hooks/usePlatform'
 import { useOtaHealth } from '@/hooks/useOtaHealth'
-import { getStoredItem, setStoredItem } from '@/lib/deviceStorage'
+import { deviceStore } from '@/lib/deviceStorage'
 import { REPORT_SUBJECTS } from '@/lib/feedbackReport'
 import Dialog from '@/components/Dialog'
 import ReportNotice from '@/components/ReportNotice'
@@ -14,7 +14,7 @@ const Home = lazy(() => import('@/pages/Home'))
 // when the user actually dismisses the dialog (§14g).
 const PRIVACY_NOTICE_KEY = 'i360Privacy'
 function checkPrivacyNotice(): boolean {
-  return getStoredItem(PRIVACY_NOTICE_KEY) === null
+  return deviceStore.get<string | null>(PRIVACY_NOTICE_KEY, null) === null
 }
 
 // Edition/Version/Revision notices, shown one at a time.
@@ -42,7 +42,7 @@ function AppShell() {
   // needsPrivacyNotice is cleared too, or the effect above would reopen the
   // dialog on every retry cycle (§14m).
   const handlePrivacyClose = useCallback(() => {
-    setStoredItem(PRIVACY_NOTICE_KEY, '1')
+    deviceStore.set(PRIVACY_NOTICE_KEY, '1')
     setNeedsPrivacyNotice(false)
     setPrivacyOpen(false)
   }, [])

@@ -4,7 +4,7 @@
 
 import { Capacitor } from '@capacitor/core'
 import { OtaKit } from '@otakit/capacitor-updater'
-import { getStoredItem } from './deviceStorage'
+import { deviceStore } from './deviceStorage'
 import { FEEDBACK_MAILTO_KEY, CACHE_KEY_SCIENCES } from '@/store/dataCache'
 import { Science } from '@/api/dataSource'
 import { detectOS } from '@/hooks/usePlatform'
@@ -30,21 +30,13 @@ export const REPORT_SUBJECTS = {
 // unavoidable, narrow edge case each caller handles at its own render
 // level (see ErrorBoundary's and App.tsx's own comments).
 export function resolveFeedbackMailto(): string | null {
-  let feedbackMailto: string | null = getStoredItem(FEEDBACK_MAILTO_KEY)
-  if (!feedbackMailto) {
-    try {
-      const raw = getStoredItem(CACHE_KEY_SCIENCES)
-      const sciences: Science[] = raw ? JSON.parse(raw) : []
-      const feedbackRow = sciences.find(s => s.ScienceMinor_En === 'Feedback')
-      if (feedbackRow?.Web?.toLowerCase().startsWith('mailto:')) {
-        feedbackMailto = feedbackRow.Web
-      }
-    } catch {
-      // Corrupted cache — treat as absent, same stance as dataCache.tsx's
-      // own loadCached().
-    }
-  }
-  return feedbackMailto
+  const saved = deviceStore.get<unknown>(FEEDBACK_MAILTO_KEY, null)
+  if (typeof saved === 'string' && saved) return saved
+  const sciences = deviceStore.get<unknown>(CACHE_KEY_SCIENCES, null)
+  const feedbackRow = Array.isArray(sciences)
+    ? (sciences as Science[]).find(s => s?.ScienceMinor_En === 'Feedback')
+    : undefined
+  return feedbackRow?.Web?.toLowerCase().startsWith('mailto:') ? feedbackRow.Web : null
 }
 
 // Diagnostic context prepended to every report (§15d) — nothing personal:

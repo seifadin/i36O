@@ -1,11 +1,20 @@
 // What the frame of every hub page shares (Daily Reflection, the Reader, the CSE;
-// claude/i360-hub.md §10 "Toolbars"): `$`, whether it runs inside the installed i360إ app,
-// the ✕ that returns to the app's home, the theme button's icons, and the toolbar that fits
-// by measurement (fittingToolbar, below; its style: src/page-chrome.css). Bundled into each
-// page by scripts/build.js.
+// claude/i360-hub.md §10 "Toolbars"): `$` and `el`, whether it runs inside the installed i360إ
+// app, the ✕ that returns to the app's home, the theme and numerals buttons, and the toolbar
+// that fits by measurement (fittingToolbar, below; its style: src/page-chrome.css). Bundled into
+// each page by scripts/build.js.
+import * as i360Theme from '../theme/site/theme-loader.js';
 
 // A page element by its id.
 export const $ = (id) => document.getElementById(id);
+
+// A new element with an optional class and text.
+export function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
 
 // Inside the installed i360إ app: Capacitor's bridge is in every page it serves.
 export const IN_APP = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
@@ -25,7 +34,7 @@ export function setupClose(button, stepsBack = () => 1) {
 }
 
 // The theme button's icon for each choice (Lucide; npm run icons checks them).
-export const THEME_ICONS = Object.freeze({
+const THEME_ICONS = Object.freeze({
   system: '<svg data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>',
   light: '<svg data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>',
   sepia: '<svg data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>',
@@ -46,13 +55,36 @@ export const THEME_ICONS = Object.freeze({
    A bar without `fold` only widens its buttons. */
 
 // An element that takes part in the row: shown, and not floating over it (a menu, a popup).
-function inRow(el) {
-  if (el.hidden) return false;
-  const cs = getComputedStyle(el);
+function inRow(node) {
+  if (node.hidden) return false;
+  const cs = getComputedStyle(node);
   return cs.display !== 'none' && cs.position !== 'absolute' && cs.position !== 'fixed';
 }
 
 // Returns fit(); call it whenever the bar's width or contents change (at most once a frame).
+// The theme and numerals buttons of every page (the app's are in its OSRow.tsx): drawn with the
+// shared choices' icon or sample, tooltip and aria-label in the page's language (`lang`; Arabic
+// when left out); a tap cycles the shared choice. Each page redraws them on the loader's change
+// events, beside its own work for that change.
+export function drawSettingsButtons(themeBtn, numeralsBtn, lang) {
+  const theme = i360Theme.getChoice(), numerals = i360Theme.getNumerals();
+  themeBtn.innerHTML = THEME_ICONS[theme];
+  setLabel(themeBtn, i360Theme.themeLabel(theme, lang));
+  numeralsBtn.textContent = i360Theme.NUMERALS_SAMPLE[numerals];
+  setLabel(numeralsBtn, i360Theme.numeralsLabel(numerals, lang));
+}
+
+export function wireSettingsButtons(themeBtn, numeralsBtn) {
+  themeBtn.addEventListener('click', () => { i360Theme.cycle(); });
+  numeralsBtn.addEventListener('click', () => { i360Theme.cycleNumerals(); });
+}
+
+// A control's tooltip and its name for screen readers, the same text.
+export function setLabel(control, text) {
+  control.title = text;
+  control.setAttribute('aria-label', text);
+}
+
 export function fittingToolbar({ bar, fold = [] }) {
   const DENSE = ['toolbar-dense', 'toolbar-densest'];
   // Each entry's changes, made once here: (folded) => void.
@@ -62,12 +94,12 @@ export function fittingToolbar({ bar, fold = [] }) {
       const slot = bar.querySelector(`template[data-slot="${to}"]`);
       if (!slot) throw new Error(`toolbar: no slot "${to}"`);
       for (const id of items) {
-        const el = document.getElementById(id);
+        const item = document.getElementById(id);
         const home = document.createComment(id);   // where the page has it
-        el.parentNode.insertBefore(home, el);
+        item.parentNode.insertBefore(home, item);
         changes.push((folded) => {
-          if (folded) { if (el.nextSibling !== slot) slot.parentNode.insertBefore(el, slot); }
-          else if (home.nextSibling !== el) home.parentNode.insertBefore(el, home.nextSibling);
+          if (folded) { if (item.nextSibling !== slot) slot.parentNode.insertBefore(item, slot); }
+          else if (home.nextSibling !== item) home.parentNode.insertBefore(item, home.nextSibling);
         });
       }
     }

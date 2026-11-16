@@ -28,10 +28,9 @@ export function resolveEffectiveOS(useWeb: boolean, simIOS: boolean): OSType {
 }
 
 // Plain, synchronous — no React state involved, so callers always get a
-// fresh answer with zero lag. There is no stored appState equivalent —
-// that copy (and the effect that wrote it) was removed as dead state in an
-// earlier round, since it could trail one render behind useWeb changing and
-// nothing safely depended on it. This function is the only source now.
+// fresh answer with zero lag. Deliberately not stored in appState: a stored
+// copy would trail one render behind useWeb changing (§5). This function is
+// the only source.
 export function computeIsGMSorApple(useWeb: boolean, isChina: boolean, useHMS: boolean, simIOS: boolean): boolean {
   const os = resolveEffectiveOS(useWeb, simIOS)
   return ((os === 'android' && !(isChina || useHMS)) || os === 'ios') && !useWeb
@@ -41,11 +40,9 @@ export function computeIsGMSorApple(useWeb: boolean, isChina: boolean, useHMS: b
 // should be used instead of their Google/default counterparts. Gated on
 // !useWeb because MobileServicesToggle — the only thing that sets useHMS —
 // is itself only visible when useWeb is off; without this gate, a stale
-// useHMS from an earlier native-mode session kept silently applying after
-// switching back to web. Extracted here (matching computeIsGMSorApple's
-// pattern) after this exact logic was found duplicated independently in
-// ScienceGrid.tsx and SearchBar.tsx, with only one of the two copies
-// actually including this gate.
+// useHMS from a native-mode session would keep applying after switching
+// back to web. The one copy of this decision, used by ScienceGrid.tsx and
+// SearchBar.tsx (§5: two copies had drifted apart).
 export function computeUseHuawei(useWeb: boolean, isChina: boolean, useHMS: boolean): boolean {
   return !useWeb && (isChina || useHMS)
 }

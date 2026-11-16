@@ -1,8 +1,9 @@
 // The Reader: the page counter and moving between pages (holding a jump in place), and
 // footnote links.
+import { el, setLabel } from '../page-chrome.js';
 import { oncePerFrame } from '../frame.js';
 import { CURRENT_PAGE_LINE, PIN_MAX_MS, PIN_MS, PIN_SETTLE_MS } from './text.js';
-import { btnNavLeft, btnNavRight, fmtNum, pageNumInput, pagePos, pagesWrapper, setTitle, state, t, toWestern, totalPagesLabel, viewerContainer, volSelect } from './state.js';
+import { btnNavLeft, btnNavRight, fmtNum, pageNumInput, pagePos, pagesWrapper, state, t, toWestern, totalPagesLabel, viewerContainer, volSelect } from './state.js';
 import { updateNear } from './pages.js';
 import { queueSave, updateBookmarkButton } from './position.js';
 import { remPx } from './view.js';
@@ -47,7 +48,7 @@ function buildVolumeSelect() {
   volSelect.hidden = !state.multiVolume;
   if (!state.multiVolume) return;
   for (const v of state.volumes) {
-    const opt = document.createElement('option');
+    const opt = el('option');
     opt.value = v;
     opt.textContent = fmtNum(`${t().vol} ${v}`);
     volSelect.appendChild(opt);
@@ -64,7 +65,7 @@ function updateCounter(force) {
     pageNumInput.value = '';
     totalPagesLabel.textContent = fmtNum('0');
     pagePos.textContent = '';
-    setTitle(pageNumInput, t().pageInput);
+    setLabel(pageNumInput, t().pageInput);
     updateBookmarkButton();
     return;
   }
@@ -81,7 +82,7 @@ function updateCounter(force) {
     pagePos.textContent = pos;
     if (grew) queueFitToolbar();
   }
-  setTitle(pageNumInput, `${t().pageInput}\n${fmtNum(t().position(idx + 1, state.pages.length))}`);
+  setLabel(pageNumInput, `${t().pageInput}\n${fmtNum(t().position(idx + 1, state.pages.length))}`);
   if (state.multiVolume && p.vol != null && document.activeElement !== volSelect) volSelect.value = p.vol;
   updateBookmarkButton();
 }
@@ -100,10 +101,10 @@ const queueScroll = oncePerFrame(() => { updateNear(); updateCounter(false); });
    ---------------------------------------------------------------- */
 let pin = null;
 
-// Keep el's top at (viewer top + offset − frac × el's height).
-function pinElement(el, offset, frac = 0) {
+// Keep the target's top at (viewer top + offset − frac × its height).
+function pinElement(target, offset, frac = 0) {
   const now = performance.now();
-  const p = { el, offset, frac, started: now, until: now + PIN_MS };
+  const p = { el: target, offset, frac, started: now, until: now + PIN_MS };
   pin = p;
   if (document.fonts && document.fonts.status === 'loading') {
     document.fonts.ready.then(() => {
