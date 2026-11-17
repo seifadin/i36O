@@ -35,6 +35,9 @@
       ],
       "@i360/sites": [
         "./hub/src/sites.js"
+      ],
+      "@i360/dates": [
+        "./hub/src/dates.js"
       ]
     },
     "noImplicitReturns": true,

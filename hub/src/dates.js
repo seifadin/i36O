@@ -19,6 +19,21 @@ export function numericDate(y, m, d) {
   return `${LRI}${String(y).padStart(4, '0')}${LRM}-${LRM}${pad2(m)}${LRM}-${LRM}${pad2(d)}${PDI}`;
 }
 
+// A text with every day-first date (d-m-yyyy, as the release hook writes them into Baserow's
+// Version field: «إصدار 0.14.0 @ 22-10-2026 م / 30-04-1448 هـ») rewritten as numericDate, year
+// first, so it keeps its order on screen like every other numeric date. Western digits only (the
+// stored text's); the numerals setting converts them afterwards. No lookbehind in the pattern:
+// Safari before 16.4 lacks it (hub/build-targets.json).
+export function dayFirstToNumeric(text) {
+  return String(text).replace(/(^|[^0-9])([0-9]{1,2})-([0-9]{1,2})-([0-9]{4})(?![0-9])/g,
+    (all, before, d, m, y) => before + numericDate(+y, +m, +d));
+}
+
+// A moment as plain ISO 8601 in UTC, with the time (2026-11-17T21:51:00.000Z): for text that is
+// copied or sent, not shown in Arabic text — the crash report. No direction marks (they would
+// travel along unseen in a copy), already year first and left to right.
+export const timestamp = (dt = new Date()) => dt.toISOString();
+
 // A Date's weekday in a language.
 export function weekdayName(dt, lang, timeZone = 'UTC') {
   return new Intl.DateTimeFormat(`${lang}-u-nu-latn`, { weekday: 'long', timeZone }).format(dt);

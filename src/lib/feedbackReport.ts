@@ -7,6 +7,7 @@ import { OtaKit } from '@otakit/capacitor-updater'
 import { deviceStore } from './deviceStorage'
 import { FEEDBACK_MAILTO_KEY, CACHE_KEY_SCIENCES } from '@/store/dataCache'
 import { Science, feedbackMailto } from '@/api/dataSource'
+import { timestamp } from '@i360/dates'
 import { detectOS } from '@/hooks/usePlatform'
 
 // Shared report wording — one definition for every report path.
@@ -77,7 +78,7 @@ function buildDiagnosticContext(): string {
     `Platform: ${platform}`,
     `App version: ${__APP_VERSION__}`,
     `OTA build: ${otaBuild}`,
-    `Time: ${new Date().toISOString()}`,
+    `Time: ${timestamp()}`,
     // Directly relevant here in a way it wouldn't be for most apps:
     // usePlatform.ts's own isChina heuristic already matches this exact
     // string (Shanghai/Urumqi) — §16's own "Next Up" documents a real,

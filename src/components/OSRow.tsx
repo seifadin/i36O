@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, CSSProperties } from 'react'
 import { Coffee, EllipsisVertical, Globe, Monitor, Moon, Sun } from 'lucide-react'
 import type { Numerals, ThemeChoice } from '@i360/theme-loader'
+import { dayFirstToNumeric } from '@i360/dates'
 import { getOtaBuild } from '@/lib/feedbackReport'
 import { i360Theme } from '@/lib/theme'
 import { useAppState } from '@/store/appState'
@@ -169,7 +170,9 @@ export default function OSRow() {
   // "0.13.2" would read as "٠٠١٣٠٢": between digits, "." becomes the Arabic
   // separator "٫" (§15t). The digits themselves are converted app-wide (lib/theme.ts).
   const versionDots = (text: string) => text.replace(/(\d)\.(?=\d)/g, numerals === 'western' ? '$1.' : '$1٫')
-  const appVersion = versionDots(resource?.Version || AppVersionFallback)
+  // Its release dates (written day first by the hook) shown year first and held in that order,
+  // like every numeric date in i360 (hub/src/dates.js).
+  const appVersion = versionDots(dayFirstToNumeric(resource?.Version || AppVersionFallback))
 
   // The OTA build line stays a code (its commit and time stay as they are), but
   // the app version inside it is shown like the line above: on phones it reads

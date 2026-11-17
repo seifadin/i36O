@@ -157,6 +157,7 @@ export default defineConfig(({ command }) => ({
       '@i360/net': fileURLToPath(new URL('./hub/src/net.js', import.meta.url)),
       '@i360/storage': fileURLToPath(new URL('./hub/src/storage.js', import.meta.url)),
       '@i360/sites': fileURLToPath(new URL('./hub/src/sites.js', import.meta.url)),
+      '@i360/dates': fileURLToPath(new URL('./hub/src/dates.js', import.meta.url)),
     },
   },
   build: { target: BUILD_TARGETS },

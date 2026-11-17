@@ -9,6 +9,8 @@ i360إ is an Arabic-only Islamic knowledge discovery app that organizes Islamic 
 ## [Unreleased] — live on the web and over the air (still version 0.14.0)
 
 ### Fixed
+- The release dates in «معلومات التطبيق» are held year first, like every numeric date in the encyclopedia, so the numerals setting or the device can no longer reorder them (2026-11-17)
+- With the ٠١٢٣ numerals, the Daily Reflection date converter's numeric date no longer shows reversed (2026-11-17)
 - On phones, the "last update was rolled back" notice no longer reappears at every start (it shows once per failure), and a slow connection no longer makes the app undo an update that works (2026-11-16)
 
 ### Changed
