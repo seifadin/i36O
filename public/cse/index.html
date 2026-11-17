@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-3Uks/l6zc+jEItytB85DPSJtY1iAwJcTkCXr3Y4Ch7I='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-UsHswNXiEMGOJXEMxjIyulkE6shaCuhL9WSDqvO7CYA='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -1525,6 +1525,15 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     }
   };
 
+  // src/dates.js
+  var LRI = "⁦";
+  var PDI = "⁩";
+  var LRM = "‎";
+  var pad2 = (n) => String(n).padStart(2, "0");
+  function numericDate(y, m, d) {
+    return `${LRI}${String(y).padStart(4, "0")}${LRM}-${LRM}${pad2(m)}${LRM}-${LRM}${pad2(d)}${PDI}`;
+  }
+
   // src/cse/main.js
   var DEFAULT_DATA = LIB;
   var BRAND = "⁦i360‎إ⁩";
@@ -1603,8 +1612,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   function buildDate(iso) {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return "";
-    const two = (n) => String(n).padStart(2, "0");
-    return `⁦${d.getFullYear()}‎-‎${two(d.getMonth() + 1)}‎-‎${two(d.getDate())}⁩`;
+    return numericDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
   }
   function newSearcher() {
     const base = `b/${state.catalog.buildId}/`;

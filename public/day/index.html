@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-qgu10WlG7JbH4crb8hhISVMHA4Dj+FLMl2BZmx7XZn0='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-fYJc3jAm9pOF4Qql0BxhMxxR0Ug59SK+jjAq9T86CqE='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -2324,6 +2324,39 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     };
   }
 
+  // src/dates.js
+  var LRI = "⁦";
+  var PDI = "⁩";
+  var LRM = "‎";
+  var pad2 = (n) => String(n).padStart(2, "0");
+  var listSep = (lang) => lang === "ar" || lang === "ur" ? "، " : ", ";
+  function numericDate(y, m, d) {
+    return `${LRI}${String(y).padStart(4, "0")}${LRM}-${LRM}${pad2(m)}${LRM}-${LRM}${pad2(d)}${PDI}`;
+  }
+  function weekdayName(dt, lang, timeZone = "UTC") {
+    return new Intl.DateTimeFormat(`${lang}-u-nu-latn`, { weekday: "long", timeZone }).format(dt);
+  }
+  function gregorianMonthNames(lang, second = null) {
+    const name = (loc) => new Intl.DateTimeFormat(`${loc}-u-ca-gregory-nu-latn`, { month: "long", timeZone: "UTC" });
+    const main = name(lang), extra = second ? name(second) : null;
+    return Array.from({ length: 12 }, (_, i) => {
+      const at = /* @__PURE__ */ new Date(0);
+      at.setUTCMonth(i, 15);
+      return extra ? `${main.format(at)} (${extra.format(at)})` : main.format(at);
+    });
+  }
+  function gregorianLong(dt, lang, { weekday = true, timeZone = "UTC", second = null, mark = "" } = {}) {
+    const opts = { day: "numeric", month: "long", year: "numeric", timeZone };
+    if (weekday) opts.weekday = "long";
+    const extra = second ? new Intl.DateTimeFormat(`${second}-u-ca-gregory-nu-latn`, { month: "long", timeZone }).format(dt) : null;
+    const text = new Intl.DateTimeFormat(`${lang}-u-ca-gregory-nu-latn`, opts).formatToParts(dt).map((p) => p.type === "month" && extra ? `${p.value} (${extra})` : p.value).join("");
+    return mark ? `${text} ${mark}` : text;
+  }
+  function hijriLong(h, months, { weekday = null, lang = "ar", mark = "" } = {}) {
+    const text = `${h.d} ${months[h.m - 1]} ${h.y}${mark ? ` ${mark}` : ""}`;
+    return weekday ? `${weekdayName(weekday, lang)}${listSep(lang)}${text}` : text;
+  }
+
   // src/locales.js
   var DAY = {
     ar: {
@@ -2797,7 +2830,6 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     n: { ar: "مكة المكرمة", en: "Makkah", tr: "Mekke", id: "Makkah", ur: "مکہ مکرمہ" }
   };
   var pad = (n) => String(n).padStart(2, "0");
-  var listSep = (lang) => lang === "ar" || lang === "ur" ? "، " : ", ";
   var ymdKey = (o) => `${o.y}-${pad(o.m)}-${pad(o.d)}`;
   var localYMD = (d = /* @__PURE__ */ new Date()) => ({ y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate() });
   function minutesNowIn(tz) {
@@ -3298,38 +3330,27 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       return Math.max(...[0, 1, 2, 3].map((i) => last(now + i)));
     },
     monthNames(lang) {
-      if (!this.g) return this.L.months;
-      const name = (loc) => new Intl.DateTimeFormat(`${loc}-u-ca-gregory-nu-latn`, { month: "long", timeZone: "UTC" });
-      const main = name(lang), second = CONFIG.CONV_SECOND_MONTHS[lang] ? name(CONFIG.CONV_SECOND_MONTHS[lang]) : null;
-      return Array.from({ length: 12 }, (_, i) => {
-        const at = /* @__PURE__ */ new Date(0);
-        at.setUTCMonth(i, 15);
-        return second ? `${main.format(at)} (${second.format(at)})` : main.format(at);
-      });
+      return this.g ? gregorianMonthNames(lang, CONFIG.CONV_SECOND_MONTHS[lang]) : this.L.months;
     },
     get L() {
       return UI.L;
     },
     // The answer: { alpha, iso, mark } or { error }, and the same date in the other calendar (carry).
     result(lang) {
-      const L = this.L, y = this.year(), sep = listSep(lang);
+      const L = this.L, y = this.year();
       if (this.y.trim() === "" || !this.d || !this.m) return null;
       if (y === null || y < 1) return { error: L.convRange };
-      const weekday = (dt2) => new Intl.DateTimeFormat(`${lang}-u-nu-latn`, { weekday: "long", timeZone: "UTC" }).format(dt2);
-      const iso = (yy, mm, dd) => `${String(yy).padStart(4, "0")}-${pad(mm)}-${pad(dd)}`;
       if (this.g) {
-        const civil2 = iso(y, this.m, this.d), dt2 = parseYMD(civil2);
+        const civil2 = `${String(y).padStart(4, "0")}-${pad(this.m)}-${pad(this.d)}`, dt2 = parseYMD(civil2);
         if (!dt2) return { error: L.convRange };
         const h2 = fromCivil(civil2, this.k);
         if (!h2 || h2.y < 1) return { error: L.convRange };
-        return { alpha: `${weekday(dt2)}${sep}${h2.d} ${L.months[h2.m - 1]} ${h2.y} ${L.markH}`, iso: iso(h2.y, h2.m, h2.d), mark: L.markH, carry: h2 };
+        return { alpha: hijriLong(h2, L.months, { weekday: dt2, lang, mark: L.markH }), iso: numericDate(h2.y, h2.m, h2.d), mark: L.markH, carry: h2 };
       }
       const h = { y, m: this.m, d: this.d }, civil = toCivil(h, this.k);
       if (!civil) return { error: this.d === 30 && toCivil({ ...h, d: 29 }, this.k) ? L.convNoDay : L.convRange };
-      const dt = parseYMD(civil), second = CONFIG.CONV_SECOND_MONTHS[lang];
-      const parts = new Intl.DateTimeFormat(`${lang}-u-ca-gregory-nu-latn`, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).formatToParts(dt);
-      const alpha = parts.map((p) => p.type === "month" && second ? `${p.value} (${new Intl.DateTimeFormat(`${second}-u-ca-gregory-nu-latn`, { month: "long", timeZone: "UTC" }).format(dt)})` : p.value).join("");
-      return { alpha: `${alpha} ${L.markG}`, iso: civil, mark: L.markG, carry: { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() } };
+      const dt = parseYMD(civil), g = { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() };
+      return { alpha: gregorianLong(dt, lang, { second: CONFIG.CONV_SECOND_MONTHS[lang], mark: L.markG }), iso: numericDate(g.y, g.m, g.d), mark: L.markG, carry: g };
     },
     swap() {
       const r = this.result(App.lang);
@@ -3374,11 +3395,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
         box.native.value = r && r.carry && y !== null ? `${String(y).padStart(4, "0")}-${pad(this.m)}-${pad(this.d)}` : "";
       }
       UI.set("conv-alpha", r && !r.error ? r.alpha : "");
-      if (r && !r.error) {
-        const b = el("bdi", "", r.iso);
-        b.dir = "ltr";
-        isoBox.replaceChildren(b, ` ${r.mark}`);
-      } else isoBox.replaceChildren();
+      if (r && !r.error) isoBox.replaceChildren(`${r.iso} ${r.mark}`);
+      else isoBox.replaceChildren();
       err.hidden = !(r && r.error);
       err.textContent = r && r.error ? r.error : "";
       UI.set("conv-label", `${label(SOURCES.CALC, lang)}${lang === "ur" ? "۔" : "."}`);
@@ -3513,8 +3531,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     renderHijri() {
       const L = this.L, h = App.state.hijri;
       if (!h) return;
-      this.set("current-date", (/* @__PURE__ */ new Date()).toLocaleDateString(App.lang, { weekday: "long", year: "numeric", month: "long", day: "numeric" }));
-      this.set("hijri-date", `${h.today.d} ${L.months[h.today.m - 1]} ${h.today.y}`);
+      this.set("current-date", gregorianLong(/* @__PURE__ */ new Date(), App.lang, { timeZone: void 0 }));
+      this.set("hijri-date", hijriLong(h.today, L.months));
       const src = this.targets["hijri-source"];
       if (src) {
         const icon = h.provisional ? [svgIcon(HOURGLASS)] : [];
@@ -3622,11 +3640,11 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
         const left = el("div", "flex-1"), title = el("div", "flex items-center gap-sm");
         title.append(el("span", "text-base font-bold text-custom-secondary", L.events[e.id]));
         if (e.isT) title.append(el("span", "bg-event text-page text-sm font-bold px-sm rounded-full", L.todayLabel));
-        left.append(title, el("span", "text-sm text-custom-secondary font-bold", `${e.d} ${L.months[e.m]} ${e.year}`));
+        left.append(title, el("span", "text-sm text-custom-secondary font-bold", hijriLong({ y: e.year, m: e.m + 1, d: e.d }, L.months)));
         const right = el("div", "text-end");
         right.append(
           el("span", "text-sm uppercase font-bold text-event block", L.expected),
-          el("span", "text-sm font-bold text-custom-secondary", e.date.toLocaleDateString(lang, { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }))
+          el("span", "text-sm font-bold text-custom-secondary", gregorianLong(e.date, lang))
         );
         row.append(left, right);
         return row;

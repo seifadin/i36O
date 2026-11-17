@@ -37,6 +37,9 @@ src/storage.js        createStore(prefix): get / set / remove settings on the de
 src/net.js            fetchWithTimeout(), fetchJson() (time limit, bounded retries), wait() — also used by
                       the app (@i360/net), the Hijri Worker, the CSE indexer and scripts/day-cities.js
 src/frame.js          oncePerFrame(): layout work at most once per frame
+src/dates.js          every date a page shows: numericDate() (year first, held in order in any direction and
+                      with any digits), gregorianLong(), gregorianMonthNames(), hijriLong(), weekdayName(), listSep()
+                      — Daily Reflection and the CSE
 src/digits.js         the digit converter (0123 · ٠١٢٣ · ۰۱۲۳): writeNumerals(), toWestern() — used by the theme
                       loader (a link beside it on the theme site, like net.js), book-format.js and the Hijri Worker
 src/sites.js          every i360 address (app site, forwarders, old book paths, lib, theme) — also the

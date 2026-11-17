@@ -12,6 +12,7 @@ import { $, drawSettingsButtons, el, setLabel, setupClose, wireSettingsButtons }
 import { oncePerFrame } from '../frame.js';
 import { createStore } from '../storage.js';
 import { fetchJson } from '../net.js';
+import { gregorianLong, gregorianMonthNames, hijriLong, listSep, numericDate } from '../dates.js';
 import { DAY as LOCALES } from '../locales.js';
 
 
@@ -72,8 +73,6 @@ const MAKKAH = { cc: 'SA', lat: 21.4225, lng: 39.8262, tz: 'Asia/Riyadh',
 
 /* ---------- Small helpers ---------- */
 const pad = n => String(n).padStart(2, '0');
-// The comma between two items in the page's language (Arabic and Urdu: «،»).
-const listSep = lang => (lang === 'ar' || lang === 'ur') ? '، ' : ', ';
 const ymdKey = o => `${o.y}-${pad(o.m)}-${pad(o.d)}`;
 const localYMD = (d = new Date()) => ({ y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate() });
 function minutesNowIn(tz) {
@@ -460,37 +459,26 @@ const Conv = {
     return Math.max(...[0, 1, 2, 3].map(i => last(now + i)));
   },
   monthNames(lang) {
-    if (!this.g) return this.L.months;
-    const name = loc => new Intl.DateTimeFormat(`${loc}-u-ca-gregory-nu-latn`, { month: 'long', timeZone: 'UTC' });
-    const main = name(lang), second = CONFIG.CONV_SECOND_MONTHS[lang] ? name(CONFIG.CONV_SECOND_MONTHS[lang]) : null;
-    return Array.from({ length: 12 }, (_, i) => {
-      const at = new Date(0); at.setUTCMonth(i, 15);
-      return second ? `${main.format(at)} (${second.format(at)})` : main.format(at);
-    });
+    return this.g ? gregorianMonthNames(lang, CONFIG.CONV_SECOND_MONTHS[lang]) : this.L.months;
   },
   get L() { return UI.L; },
   // The answer: { alpha, iso, mark } or { error }, and the same date in the other calendar (carry).
   result(lang) {
-    const L = this.L, y = this.year(), sep = listSep(lang);
+    const L = this.L, y = this.year();
     if (this.y.trim() === '' || !this.d || !this.m) return null;
     if (y === null || y < 1) return { error: L.convRange };
-    const weekday = dt => new Intl.DateTimeFormat(`${lang}-u-nu-latn`, { weekday: 'long', timeZone: 'UTC' }).format(dt);
-    const iso = (yy, mm, dd) => `${String(yy).padStart(4, '0')}-${pad(mm)}-${pad(dd)}`;
     if (this.g) {
-      const civil = iso(y, this.m, this.d), dt = HijriCalc.parseYMD(civil);
+      const civil = `${String(y).padStart(4, '0')}-${pad(this.m)}-${pad(this.d)}`, dt = HijriCalc.parseYMD(civil);
       if (!dt) return { error: L.convRange };                       // past the four-digit years
       const h = HijriCalc.fromCivil(civil, this.k);
       if (!h || h.y < 1) return { error: L.convRange };             // before 1 AH
-      return { alpha: `${weekday(dt)}${sep}${h.d} ${L.months[h.m - 1]} ${h.y} ${L.markH}`, iso: iso(h.y, h.m, h.d), mark: L.markH, carry: h };
+      return { alpha: hijriLong(h, L.months, { weekday: dt, lang, mark: L.markH }), iso: numericDate(h.y, h.m, h.d), mark: L.markH, carry: h };
     }
     const h = { y, m: this.m, d: this.d }, civil = HijriCalc.toCivil(h, this.k);
     if (!civil) return { error: this.d === 30 && HijriCalc.toCivil({ ...h, d: 29 }, this.k) ? L.convNoDay : L.convRange };
-    const dt = HijriCalc.parseYMD(civil), second = CONFIG.CONV_SECOND_MONTHS[lang];
+    const dt = HijriCalc.parseYMD(civil), g = { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() };
     // The browser's own long date in the page's language; Arabic adds the Levantine month name.
-    const parts = new Intl.DateTimeFormat(`${lang}-u-ca-gregory-nu-latn`, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).formatToParts(dt);
-    const alpha = parts.map(p => (p.type === 'month' && second)
-      ? `${p.value} (${new Intl.DateTimeFormat(`${second}-u-ca-gregory-nu-latn`, { month: 'long', timeZone: 'UTC' }).format(dt)})` : p.value).join('');
-    return { alpha: `${alpha} ${L.markG}`, iso: civil, mark: L.markG, carry: { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() } };
+    return { alpha: gregorianLong(dt, lang, { second: CONFIG.CONV_SECOND_MONTHS[lang], mark: L.markG }), iso: numericDate(g.y, g.m, g.d), mark: L.markG, carry: g };
   },
   swap() {
     const r = this.result(App.lang);
@@ -524,7 +512,7 @@ const Conv = {
     if (this.g) { const y = this.year(); box.native.value = (r && r.carry && y !== null) ? `${String(y).padStart(4, '0')}-${pad(this.m)}-${pad(this.d)}` : ''; }
     UI.set('conv-alpha', r && !r.error ? r.alpha : '');
     // The numeric date left to right (year first) and the mark after it, at the line's end.
-    if (r && !r.error) { const b = el('bdi', '', r.iso); b.dir = 'ltr'; isoBox.replaceChildren(b, ` ${r.mark}`); } else isoBox.replaceChildren();
+    if (r && !r.error) isoBox.replaceChildren(`${r.iso} ${r.mark}`); else isoBox.replaceChildren();
     err.hidden = !(r && r.error); err.textContent = r && r.error ? r.error : '';
     // The label and the note on one line: the label ends its sentence (Urdu: «۔»).
     UI.set('conv-label', `${HijriCalc.label(HijriCalc.SOURCES.CALC, lang)}${lang === 'ur' ? '۔' : '.'}`);
@@ -609,8 +597,8 @@ const UI = {
   },
   renderHijri() {
     const L = this.L, h = App.state.hijri; if (!h) return;
-    this.set('current-date', new Date().toLocaleDateString(App.lang, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
-    this.set('hijri-date', `${h.today.d} ${L.months[h.today.m - 1]} ${h.today.y}`);
+    this.set('current-date', gregorianLong(new Date(), App.lang, { timeZone: undefined }));   // today on this device
+    this.set('hijri-date', hijriLong(h.today, L.months));
     const src = this.targets['hijri-source'];
     if (src) {
       const icon = h.provisional ? [svgIcon(HOURGLASS)] : [];
@@ -694,11 +682,11 @@ const UI = {
       const left = el('div', 'flex-1'), title = el('div', 'flex items-center gap-sm');
       title.append(el('span', 'text-base font-bold text-custom-secondary', L.events[e.id]));
       if (e.isT) title.append(el('span', 'bg-event text-page text-sm font-bold px-sm rounded-full', L.todayLabel));
-      left.append(title, el('span', 'text-sm text-custom-secondary font-bold', `${e.d} ${L.months[e.m]} ${e.year}`));
+      left.append(title, el('span', 'text-sm text-custom-secondary font-bold', hijriLong({ y: e.year, m: e.m + 1, d: e.d }, L.months)));
       const right = el('div', 'text-end');
       right.append(
         el('span', 'text-sm uppercase font-bold text-event block', L.expected),
-        el('span', 'text-sm font-bold text-custom-secondary', e.date.toLocaleDateString(lang, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' })));
+        el('span', 'text-sm font-bold text-custom-secondary', gregorianLong(e.date, lang)));
       row.append(left, right);
       return row;
     }));

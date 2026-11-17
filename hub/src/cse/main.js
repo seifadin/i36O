@@ -8,6 +8,7 @@ import { fetchWithTimeout } from '../net.js';
 import { LIB } from '../sites.js';
 import { $, IN_APP, drawSettingsButtons, el, setupClose, wireSettingsButtons } from '../page-chrome.js';
 import { CSE as LOCALES } from '../locales.js';
+import { numericDate } from '../dates.js';
 
 const DEFAULT_DATA = LIB;   // src/sites.js
 const BRAND = '\u2066i360\u200Eإ\u2069';   // kept "i360إ" in Arabic text (left-to-right isolate)
@@ -101,16 +102,12 @@ async function loadCatalog() {
   return true;
 }
 
-// The build's date as year-month-day (2026-10-16), on this device's
-// calendar day. In Arabic text, digits joined by "-" are reordered (it
-// would show 16-10-2026): a left-to-right isolate (LRI … PDI, invisible)
-// keeps it as written.
+// The build's date as year-month-day (2026-10-16), on this device's calendar day (dates.js keeps
+// its order in Arabic text, with any digits).
 function buildDate(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
-  const two = (n) => String(n).padStart(2, '0');
-  // Left-to-right marks around each "-" hold the parts in place with Eastern digits too.
-  return `\u2066${d.getFullYear()}\u200E-\u200E${two(d.getMonth() + 1)}\u200E-\u200E${two(d.getDate())}\u2069`;
+  return numericDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
 }
 
 function newSearcher() {
