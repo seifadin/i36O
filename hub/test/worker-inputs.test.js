@@ -1,6 +1,6 @@
 // The pre-push hook publishes a hub Worker again when a file it uses changes
 // (scripts/hub-workers-pattern.sh). A Worker uses its own folder, the hub/src files its site
-// serves through a link, and — the Hijri Worker — the files its code bundles. Each of them must be
+// serves through a link, and — the Hijri and quran Workers — the files its code bundles. Each of them must be
 // covered by its pattern, or a change to it would leave the live Worker behind (§15az).
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -30,24 +30,27 @@ async function imports(entries) {
 }
 
 const patterns = () => {
-  const out = execFileSync('bash', ['-c', `source "${join(REPO, 'scripts/hub-workers-pattern.sh')}"; printf '%s\\n%s' "$THEME_WORKER_PATTERN" "$HIJRI_WORKER_PATTERN"`], { encoding: 'utf8' });
-  const [theme, hijri] = out.split('\n');
-  return { theme: new RegExp(theme), hijri: new RegExp(hijri) };
+  const out = execFileSync('bash', ['-c', `source "${join(REPO, 'scripts/hub-workers-pattern.sh')}"; printf '%s\\n%s\\n%s' "$THEME_WORKER_PATTERN" "$HIJRI_WORKER_PATTERN" "$QURAN_WORKER_PATTERN"`], { encoding: 'utf8' });
+  const [theme, hijri, quran] = out.split('\n');
+  return { theme: new RegExp(theme), hijri: new RegExp(hijri), quran: new RegExp(quran) };
 };
 
 test("each hub Worker's pattern covers every file it serves or bundles", async () => {
-  const { theme, hijri } = patterns();
-  const themeSite = join(REPO, 'hub/theme/site'), hijriDir = join(REPO, 'hub/hijri');
+  const { theme, hijri, quran } = patterns();
+  const themeSite = join(REPO, 'hub/theme/site'), hijriDir = join(REPO, 'hub/hijri'), quranDir = join(REPO, 'hub/quran');
   const themeUses = new Set([...files(themeSite), ...await imports(readdirSync(themeSite).filter((f) => f.endsWith('.js')).map((f) => join(themeSite, f)))]);
   const hijriUses = new Set([...files(hijriDir), ...await imports([join(hijriDir, 'worker/index.js'), ...readdirSync(join(hijriDir, 'site')).filter((f) => f.endsWith('.js')).map((f) => join(hijriDir, 'site', f))])]);
-  assert.ok(themeUses.has('hub/src/storage.js') && hijriUses.has('hub/src/digits.js'), 'the linked and bundled files were found');
+  const quranUses = new Set([...files(quranDir), ...await imports([join(quranDir, 'worker/index.js')])]);
+  assert.ok(themeUses.has('hub/src/storage.js') && hijriUses.has('hub/src/digits.js') && quranUses.has('hub/src/sites.js'), 'the linked and bundled files were found');
   for (const f of themeUses) assert.ok(theme.test(f), `the theme Worker uses ${f}, but a change to it would not publish the Worker`);
   for (const f of hijriUses) assert.ok(hijri.test(f), `the Hijri Worker uses ${f}, but a change to it would not publish the Worker`);
+  for (const f of quranUses) assert.ok(quran.test(f), `the quran Worker uses ${f}, but a change to it would not publish the Worker`);
 });
 
-test('a hub/src file neither Worker uses publishes neither', () => {
-  const { theme, hijri } = patterns();
-  for (const f of ['hub/src/reader/view.js', 'hub/src/page-chrome.css', 'hub/src/sites.js']) {
-    assert.ok(!theme.test(f) && !hijri.test(f), `${f} should not publish a Worker`);
+test('a hub/src file no Worker uses publishes none', () => {
+  const { theme, hijri, quran } = patterns();
+  for (const f of ['hub/src/reader/view.js', 'hub/src/page-chrome.css']) {
+    assert.ok(!theme.test(f) && !hijri.test(f) && !quran.test(f), `${f} should not publish a Worker`);
   }
+  assert.ok(!theme.test('hub/src/sites.js') && !hijri.test('hub/src/sites.js'), 'sites.js publishes only the quran Worker');
 });

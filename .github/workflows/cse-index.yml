@@ -22,7 +22,7 @@ on:
         options: [full, links]
         default: full
       refresh:
-        description: 'Download again: one link exactly as in Baserow, or "all" (optional)'
+        description: 'Download again: one link exactly as in Baserow, "quran" (tanzil texts), or "all" (optional)'
         type: string
         required: false
 

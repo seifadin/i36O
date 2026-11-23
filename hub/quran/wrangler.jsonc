@@ -1,0 +1,18 @@
+// The quran Worker (quran.i36o.workers.dev): tanzil's Quran Navigator from our own address, with
+// its two data scripts answered from the lib site (worker/index.js, worker/data.js).
+// Published by the i360 pre-push hook when a push to vite changes hub/quran/ or a hub/src file
+// its code bundles (scripts/hub-workers-pattern.sh), or by hand: npm run publish-quran, which
+// needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID.
+// Same name as the test Worker first made in the dashboard (2026-11-21), so its address stays.
+{
+  "name": "quran",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-01",
+  // The lib site (indexer/wrangler.jsonc) through a service binding: a plain fetch to another
+  // workers.dev Worker of this account is refused (error 1042), and a binding adds no request cost.
+  "services": [
+    { "binding": "LIB", "service": "lib" }
+  ],
+  "workers_dev": true,
+  "preview_urls": false
+}

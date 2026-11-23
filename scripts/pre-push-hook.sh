@@ -261,10 +261,11 @@ publish_hub_worker() {   # <name> <hub/package.json publish script> <check comma
 }
 
 if [ "$DIFF_UNKNOWN" = true ]; then
-  echo "→ Changed files unknown — the theme and Hijri Workers were not checked"
-  echo "  or published. If this push changes hub/theme/, hub/hijri/ or hub/src/(net|digits|storage).js, run:"
+  echo "→ Changed files unknown — the theme, Hijri and quran Workers were not checked"
+  echo "  or published. If this push changes hub/theme/, hub/hijri/, hub/quran/ or hub/src/(net|digits|storage|sites).js, run:"
   echo "    cd hub && node theme/fallbacks.js && set -a && source ../.env && set +a && npm run publish-theme"
   echo "    cd hub && node --test test/hijri-*.test.js && set -a && source ../.env && set +a && npm run publish-hijri"
+  echo "    cd hub && node --test test/quran-worker.test.js && set -a && source ../.env && set +a && npm run publish-quran"
 else
   source "$(git rev-parse --show-toplevel)/scripts/hub-workers-pattern.sh"
   if printf '%s\n' "$CHANGED_FILES" | grep -qE "$THEME_WORKER_PATTERN"; then
@@ -272,6 +273,9 @@ else
   fi
   if printf '%s\n' "$CHANGED_FILES" | grep -qE "$HIJRI_WORKER_PATTERN"; then
     publish_hub_worker "Hijri Worker (dar-hijri.i36o.workers.dev)" "publish-hijri" "node --test test/hijri-*.test.js"
+  fi
+  if printf '%s\n' "$CHANGED_FILES" | grep -qE "$QURAN_WORKER_PATTERN"; then
+    publish_hub_worker "quran Worker (quran.i36o.workers.dev)" "publish-quran" "node --test test/quran-worker.test.js"
   fi
 fi
 

@@ -12,6 +12,7 @@
     "publish-lib": "npx --yes wrangler@4.151.3 deploy --config indexer/wrangler.jsonc",
     "publish-theme": "npx --yes wrangler@4.151.3 deploy --config theme/wrangler.jsonc",
     "publish-hijri": "npx --yes wrangler@4.151.3 deploy --config hijri/wrangler.jsonc",
+    "publish-quran": "npx --yes wrangler@4.151.3 deploy --config quran/wrangler.jsonc",
     "deploy-forwarders": "firebase deploy --only hosting:hub,hosting:md,hosting:cse,hosting:day && firebase deploy --only hosting:e --project i360-e",
     "fonts-check": "node theme/fonts.js",
     "icons": "node scripts/icons.js",

@@ -21,7 +21,7 @@
 # Everything else in hub/ counts (the theme loader, early.js, page-chrome.css and the shared
 # files the app imports, and any new folder); test/release-checks.test.js fails if one of the
 # app's inputs is ever excluded (§15au).
-_HUB_UNAFFECTED='hub/(hijri|indexer|library|scripts|test|tools|forward)/|hub/(package\.json|package-lock\.json|eslint\.config\.js|firebase\.json|\.firebaserc|\.gitignore|[^/]+\.md)$|hub/theme/(fonts\.js|woff2\.js|fallbacks\.js|wrangler\.jsonc)$|hub/theme/site/(fonts/|botpress\.css$|theme\.css$|_headers$)'
+_HUB_UNAFFECTED='hub/(hijri|indexer|library|quran|scripts|test|tools|forward)/|hub/(package\.json|package-lock\.json|eslint\.config\.js|firebase\.json|\.firebaserc|\.gitignore|[^/]+\.md)$|hub/theme/(fonts\.js|woff2\.js|fallbacks\.js|wrangler\.jsonc)$|hub/theme/site/(fonts/|botpress\.css$|theme\.css$|_headers$)'
 _UNAFFECTED_COMMON="scripts/|android/|ios/|${_HUB_UNAFFECTED}|\\.github/|[^/]+\\.md\$|\\.gitignore\$|\\.env\\.example\$|eslint\\.config\\.js\$"
 HOSTING_UNAFFECTED_PATTERN="^(${_UNAFFECTED_COMMON})"
 OTA_UNAFFECTED_PATTERN="^(${_UNAFFECTED_COMMON}|firebase\.json\$|\.firebaserc\$|tsconfig[^/]*\.json\$|package\.json\$|package-lock\.json\$|capacitor\.config\.ts\$)"
