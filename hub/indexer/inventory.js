@@ -68,7 +68,9 @@ async function readRows(fetchFn, key, table, fields = [...LINK_FIELDS, ...GROUP_
     if (!res.ok) throw new Error(`Baserow answered HTTP ${res.status} for table ${table}: ${(await res.text()).slice(0, 200)}`);
     const data = await res.json();
     rows.push(...data.results);
-    url = data.next;
+    // Baserow's next-page link is http://; following it redirects to https://, and fetch drops
+    // the Authorization header on that redirect (401). The app's dataSource.ts does the same.
+    url = data.next ? data.next.replace(/^http:\/\//, 'https://') : null;
   }
   if (rows.length > 0) {
     const missing = fields.filter((f) => !(f in rows[0]));

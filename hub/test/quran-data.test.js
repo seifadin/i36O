@@ -29,9 +29,16 @@ function services(state) {
     if (url.startsWith(`https://api.baserow.io/api/database/rows/table/${Q.TABLE_RESOURCES}/`)) {
       return reply(200, { next: null, results: [{ id: 1, Revision: state.revision }] });
     }
+    // As Baserow does: a next-page link over http://, and a request without the key refused.
+    if (url.startsWith('http://')) return reply(401, { detail: 'Authentication credentials were not provided.' });
+    if (url.startsWith(`https://api.baserow.io/api/database/rows/table/${Q.TABLE_QURAN}/`) && url.includes('page=2')) {
+      return reply(200, { next: null, results: [
+        { id: 4, QuranChapter: 3, QuranVerseMin: 1, QuranVerseMax: 9, ExegesisURL: 'https://example.org/tafsir/3', ExegesisPage: 5 }
+      ] });
+    }
     if (url.startsWith(`https://api.baserow.io/api/database/rows/table/${Q.TABLE_QURAN}/`)) {
       state.exegesisReads++;
-      return reply(200, { next: null, results: [
+      return reply(200, { next: `http://api.baserow.io/api/database/rows/table/${Q.TABLE_QURAN}/?page=2&size=200&user_field_names=true`, results: [
         { id: 1, QuranChapter: '1', QuranVerseMin: '1', QuranVerseMax: 7, ExegesisURL: 'https://example.org/tafsir/1', ExegesisPage: 1 },
         { id: 2, QuranChapter: 2, QuranVerseMin: 1, QuranVerseMax: 5, ExegesisURL: ' https://example.org/tafsir/2 ', ExegesisPage: '3' },
         { id: 3, QuranChapter: 2, QuranVerseMin: 6, QuranVerseMax: 7, ExegesisURL: '', ExegesisPage: 4 }   // no address: dropped
@@ -74,7 +81,8 @@ test('first run: every Quran script and translation, verbatim with tanzil\'s not
   assert.equal(ex.revision, '1.0');
   assert.deepEqual(ex.rows, [
     { chapter: 1, verseMin: 1, verseMax: 7, url: 'https://example.org/tafsir/1', page: 1 },
-    { chapter: 2, verseMin: 1, verseMax: 5, url: 'https://example.org/tafsir/2', page: 3 }
+    { chapter: 2, verseMin: 1, verseMax: 5, url: 'https://example.org/tafsir/2', page: 3 },
+    { chapter: 3, verseMin: 1, verseMax: 9, url: 'https://example.org/tafsir/3', page: 5 }   // from page 2
   ]);
   assert.ok(existsSync(join(live.dir, 'quran', 'manifest.json')));
 });
