@@ -29,3 +29,7 @@ export const LIB = `https://${LIB_HOST}/`;
 
 /** The shared theme site (theme/wrangler.jsonc). */
 export const THEME_ORIGIN = 'https://theme.i36o.workers.dev';
+
+/** Tanzil (tanzil.net): the Quran Navigator the quran Worker serves, and the source of the Quran
+ * texts and translations the CSE workflow publishes on the lib site (indexer/quran-data.js). */
+export const TANZIL_ORIGIN = 'https://tanzil.net';

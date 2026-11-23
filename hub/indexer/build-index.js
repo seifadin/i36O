@@ -4,6 +4,7 @@
 //   npm run index -- --check links      only new or removed links (the daily run)
 //   npm run index -- --refresh <url>    download that source again (or: --refresh all)
 //   npm run index -- --previous dist    reuse text from indexer/dist/ instead of the lib site
+//   npm run index -- --refresh quran    download tanzil's texts again (quran-data.js)
 //
 // 1. Reads the links in BotKB and CustomSearchAIKBlessBotKB from Baserow
 //    (same rules as the inventory; whole-website links are skipped).
@@ -22,15 +23,18 @@
 // 4. Otherwise writes a complete build to indexer/dist/ (format in
 //    src/cse-index.js), within Cloudflare's file limits, with the lib
 //    site's _headers and robots.txt, ready for `wrangler deploy`.
+// 5. Every build also carries quran/ — tanzil's Quran texts and translations and the exegesis
+//    index, for the quran Worker (quran-data.js); a change there alone is also a reason to publish.
 //
 // Text is gathered in indexer/work/ during a run and removed afterwards;
 // indexer/dist/ and indexer/work/ are git-ignored.
 // Needs BASEROW_KEY in .env, like the inventory.
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, copyFileSync, rmSync, appendFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, copyFileSync, cpSync, rmSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as inventory from './inventory.js';
 import * as extract from './extract.js';
 import { writeBuild } from './index-writer.js';
+import * as QuranData from './quran-data.js';
 import * as BookFormat from '../src/book-format.js';
 import * as SearchCore from '../src/search-core.js';
 import * as CseIndex from '../src/cse-index.js';
@@ -56,6 +60,16 @@ function writeWork(dir, id, pages) {
 
 const versionsNow = () => ({ extractor: EXTRACTOR_VERSION, bookFormat: BookFormat.VERSION, searchCore: SearchCore.VERSION });
 
+// Reads one JSON file of the live build: from the lib site, or from a local build folder.
+function liveLoader(fetchFn, previous) {
+  if (previous && previous !== 'lib') return async (p) => JSON.parse(readFileSync(join(previous, p), 'utf8'));
+  return async (p) => {
+    const res = await inventory.fetchWithRetry(fetchFn, LIB_URL + p);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  };
+}
+
 /* ---------------- The previous build ----------------
    Read from the lib site (fetchFn) or a local build folder. null when there
    is none yet (first run) or it can't be read — then everything is
@@ -63,13 +77,7 @@ const versionsNow = () => ({ extractor: EXTRACTOR_VERSION, bookFormat: BookForma
    book format. */
 async function readPrevious({ fetchFn, previous, log }) {
   const fromDir = previous && previous !== 'lib';
-  const load = fromDir
-    ? async (p) => JSON.parse(readFileSync(join(previous, p), 'utf8'))
-    : async (p) => {
-      const res = await inventory.fetchWithRetry(fetchFn, LIB_URL + p);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    };
+  const load = liveLoader(fetchFn, previous);
   const where = fromDir ? previous : LIB_HOST;
   try {
     const { buildId } = await load('latest.json');
@@ -138,6 +146,12 @@ const LIB_HEADERS = `# Published with every build by indexer/build-index.js.
   Cache-Control: public, max-age=31536000, immutable
 /books/*
   Cache-Control: no-cache
+/quran/manifest.json
+  Cache-Control: no-cache
+/quran/t/*
+  Cache-Control: public, max-age=31536000, immutable
+/quran/exegesis/*
+  Cache-Control: public, max-age=31536000, immutable
 `;
 const LIB_ROBOTS = 'User-agent: *\nDisallow: /\n';
 
@@ -187,7 +201,7 @@ async function mapLimit(items, limit, fn) {
 async function run({
   fetchFn = fetch, key, table = inventory.DEFAULT_TABLE, rootDir = import.meta.dirname,
   refresh = [], archivePages = extract.archivePages, passes = 8, log = console.log, buildId,
-  check = 'full', previous = 'lib'
+  check = 'full', previous = 'lib', tables = {}, now = new Date()
 }) {
   if (!key) throw new Error('BASEROW_KEY is not set. Add it to .env (the read-only Baserow token) and run: npm run index');
   if (check !== 'full' && check !== 'links') throw new Error(`--check must be "full" or "links", not "${check}"`);
@@ -198,13 +212,13 @@ async function run({
   inventory.clearProbeCache();
   try {
     return await runIn({ fetchFn, key, table, refresh, archivePages, passes, log, buildId, check, workDir, distDir, libraryDir, rootDir,
-      previous: previous === 'dist' ? distDir : previous });
+      previous: previous === 'dist' ? distDir : previous, tables, now });
   } finally {
     rmSync(workDir, { recursive: true, force: true });
   }
 }
 
-async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, buildId, check, workDir, distDir, libraryDir, rootDir, previous }) {
+async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, buildId, check, workDir, distDir, libraryDir, rootDir, previous, tables, now }) {
   const prev = await readPrevious({ fetchFn, previous, log });
 
   log(`Reading Baserow table ${table}…`);
@@ -281,14 +295,23 @@ async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, 
   });
   log(`Text done in ${Math.round((Date.now() - started) / 1000)} s: ${status.reused.length} unchanged, ${status.fresh.length} downloaded, ${status.stale.length} unreachable (old text kept), ${status.failed.length} unreachable (not indexed).`);
 
+  // The Quran data (quran-data.js): tanzil's texts and the exegesis index, published with every build.
+  const quran = await QuranData.plan({ fetchFn, key, loadPrevious: liveLoader(fetchFn, previous), check, now, log, tables,
+    refresh: refreshAll || refresh.includes('quran') });
+
   // For the GitHub workflow: publish only when something changed.
   const output = (changed) => { if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `changed=${changed}\n`); };
   const ownBooks = libraryBooks(libraryDir);
-  if (prev && prev.usable && catalogSignature(prev.catalog) === plannedSignature(entries, ownBooks)) {
+  if (prev && prev.usable && !quran.changed && catalogSignature(prev.catalog) === plannedSignature(entries, ownBooks)) {
     log(`Nothing changed since build ${prev.catalog.buildId}: no build written, nothing to publish.`);
     output(false);
-    return { catalog: prev.catalog, report: { buildId: prev.catalog.buildId, status, changed: false }, changed: false };
+    return { catalog: prev.catalog, report: { buildId: prev.catalog.buildId, status, quran: quran.report, changed: false }, changed: false };
   }
+
+  // The Quran files are gathered in the work folder first: with --previous dist, the ones taken
+  // from the live build are read from the dist folder, which the build below replaces.
+  const quranDir = join(workDir, 'quran-out');
+  const quranFiles = await QuranData.write(quran, quranDir);
 
   const id = buildId || new Date().toISOString().replace(/[-:]/g, '').replace(/\..*$/, '').replace('T', '-');
   log(`Writing build ${id}…`);
@@ -297,6 +320,8 @@ async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, 
   const { catalog, stats } = await writeBuild({ sources: entries, outDir: distDir, buildId: id, passes, log, extractor: EXTRACTOR_VERSION, books: ownBooks });
   writeFileSync(join(distDir, '_headers'), LIB_HEADERS);
   writeFileSync(join(distDir, 'robots.txt'), LIB_ROBOTS);
+  cpSync(join(quranDir, 'quran'), join(distDir, 'quran'), { recursive: true });
+  log(`Quran data: ${quranFiles} files.`);
 
   // Our own books are published as they are, for the Reader (?file=…).
   if (ownBooks.length) {
@@ -304,7 +329,7 @@ async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, 
     for (const b of ownBooks) copyFileSync(join(libraryDir, b.name), join(distDir, 'books', b.name));
   }
 
-  const report = { buildId: id, stats, status };
+  const report = { buildId: id, stats, status, quran: quran.report };
   const books = [...status.fresh, ...status.reused, ...status.stale].filter((s) => s.how);
   const methods = {};
   for (const b of books) { const k = `${b.how.method}${b.how.labels ? ', printed page numbers' : ', no page numbers'}`; methods[k] = (methods[k] || 0) + 1; }
@@ -331,6 +356,7 @@ if (process.argv[1] === import.meta.filename) {
     else if (args[i] === '--check' && args[i + 1]) check = args[++i];
     else if (args[i] === '--previous' && args[i + 1]) previous = args[++i];
   }
-  run({ key: process.env.BASEROW_KEY, table: process.env.BASEROW_TABLE_SCIENCES || inventory.DEFAULT_TABLE, refresh, check, previous })
+  const tables = { resources: process.env.BASEROW_TABLE_RESOURCES || QuranData.TABLE_RESOURCES, quran: process.env.BASEROW_TABLE_QURAN || QuranData.TABLE_QURAN };
+  run({ key: process.env.BASEROW_KEY, table: process.env.BASEROW_TABLE_SCIENCES || inventory.DEFAULT_TABLE, refresh, check, previous, tables })
     .catch((err) => { console.error(`\nIndexer stopped: ${err.message}`); process.exitCode = 1; });
 }

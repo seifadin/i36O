@@ -53,7 +53,8 @@ function fieldText(v) {
   return String(v);
 }
 
-async function readRows(fetchFn, key, table) {
+// fields: the columns the caller needs (default: the sciences table's link and group fields).
+async function readRows(fetchFn, key, table, fields = [...LINK_FIELDS, ...GROUP_FIELDS]) {
   const rows = [];
   let url = `${BASEROW_ROWS}${table}/?user_field_names=true&size=200`;
   // Database tokens use "Token"; "Bearer" is tried once in case this key is a different kind.
@@ -70,7 +71,7 @@ async function readRows(fetchFn, key, table) {
     url = data.next;
   }
   if (rows.length > 0) {
-    const missing = [...LINK_FIELDS, ...GROUP_FIELDS].filter((f) => !(f in rows[0]));
+    const missing = fields.filter((f) => !(f in rows[0]));
     if (missing.length > 0) {
       throw new Error(`Field(s) not found in table ${table}: ${missing.join(', ')}.\nFields present: ${Object.keys(rows[0]).sort().join(', ')}`);
     }
