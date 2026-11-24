@@ -13,6 +13,10 @@
   "services": [
     { "binding": "LIB", "service": "lib" }
   ],
+  // The i360 page: site/i360/index.html (scripts/build.js writes it), served at /i360/ as a static
+  // file (free, not counted as a Worker request). Any other path goes to the Worker: tanzil's own
+  // files are all outside /i360/.
+  "assets": { "directory": "./site", "not_found_handling": "none" },
   "workers_dev": true,
   "preview_urls": false
 }

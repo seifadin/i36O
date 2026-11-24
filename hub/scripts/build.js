@@ -3,6 +3,8 @@
 //   ../public/md/index.html    the Reader    (from src/reader.src.html + src/reader/main.js)
 //   ../public/cse/index.html   the i360 CSE  (from src/cse.src.html + src/cse/main.js)
 //   ../public/day/index.html   Daily Reflection (from src/day.src.html + src/day/main.js)
+//   quran/site/i360/index.html the quran page, served by the quran Worker at
+//                              quran.i36o.workers.dev/i360/ (from src/quran.src.html + src/quran/main.js)
 //
 //   npm run build
 //
@@ -31,7 +33,7 @@ import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import * as esbuild from 'esbuild';
 import { fallbackCss } from '../theme/fallbacks.js';
-import { LIB_HOST, THEME_ORIGIN as THEME_SITE } from '../src/sites.js';
+import { LIB_HOST, TANZIL_ORIGIN, THEME_ORIGIN as THEME_SITE } from '../src/sites.js';
 import { WORKER as HIJRI_WORKER } from '../hijri/client.js';
 import { checkInlineScripts } from './check-scripts.js';
 
@@ -88,8 +90,9 @@ function fill(html, placeholder, value) {
 
 // Only the page's own inline scripts may run; no external scripts, plugins
 // or images; fonts from the theme site; fetches only where connectSrc allows
-// (plus theme.css from the theme site).
-function buildPage({ src, out, main, connectSrc, fills = [] }) {
+// (plus theme.css from the theme site). imgSrc / frameSrc: what a page may show
+// in <img> / <iframe> (none, unless it says).
+function buildPage({ src, out, main, connectSrc, fills = [], imgSrc = "'none'", frameSrc = "'none'" }) {
   let html = read(src);
   for (const [placeholder, value] of fills) html = fill(html, placeholder, value);
   html = fill(html, '/*@@PAGE_CHROME@@*/', pageChrome);
@@ -111,7 +114,8 @@ function buildPage({ src, out, main, connectSrc, fills = [] }) {
     "style-src 'unsafe-inline'",
     `font-src ${THEME_ORIGIN}`,
     `connect-src ${connectSrc}`,
-    "img-src 'none'",
+    `img-src ${imgSrc}`,
+    `frame-src ${frameSrc}`,
     "base-uri 'none'",
     "form-action 'none'",
     "object-src 'none'"
@@ -140,6 +144,18 @@ buildPage({
   out: '../public/cse/index.html',
   main: await bundle('src/cse/main.js'),
   connectSrc: `https://${LIB_HOST} http://localhost:* http://127.0.0.1:*`
+});
+
+// The quran page: its own Worker's address only — /i360/health, /i360/exegesis, tanzil's banner and
+// tanzil itself (served there by the Worker) — and, when the Worker can't serve tanzil's data,
+// tanzil's official embed from tanzil.net in the frame.
+buildPage({
+  src: 'src/quran.src.html',
+  out: 'quran/site/i360/index.html',
+  main: await bundle('src/quran/main.js'),
+  connectSrc: "'self'",
+  imgSrc: "'self'",
+  frameSrc: `'self' ${TANZIL_ORIGIN}`
 });
 
 // Daily Reflection («التأمل اليومي», at /day/): its Tailwind CSS (built here from src/day.tailwind.js:

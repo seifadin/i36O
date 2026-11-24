@@ -26,6 +26,7 @@ export function createStore({ libFetch, now = () => Date.now(), keep = KEEP, man
   let manifest = null;
   let manifestAt = 0;
   const texts = new Map();   // file → verses, oldest use first
+  let exegesisFile = null, exegesisRows = null;
 
   async function getManifest() {
     if (manifest && now() - manifestAt < manifestTtl) return manifest;
@@ -116,6 +117,20 @@ export function createStore({ libFetch, now = () => Date.now(), keep = KEEP, man
     return ayas + ':' + matches + '|' + lines + (lines ? '\n' : '');
   }
 
+  // The exegesis index (the app's, from i360dbq), in src/exegesis.js's shape, for the page's «تفسير».
+  async function exegesis() {
+    const m = await getManifest();
+    if (!m.exegesis) throw new Error('lib manifest: no exegesis index');
+    if (exegesisFile === m.exegesis.file) return exegesisRows;
+    const res = await libFetch(m.exegesis.file);
+    if (!res.ok) throw new Error(`lib ${m.exegesis.file}: HTTP ${res.status}`);
+    const { rows } = await res.json();
+    if (!Array.isArray(rows)) throw new Error(`lib ${m.exegesis.file}: no rows`);
+    exegesisFile = m.exegesis.file;
+    exegesisRows = rows;
+    return rows;
+  }
+
   // Whether the data can be served: the manifest is readable and has the Quran texts.
   async function health() {
     const m = await getManifest();
@@ -127,5 +142,5 @@ export function createStore({ libFetch, now = () => Date.now(), keep = KEEP, man
     };
   }
 
-  return { getAya, search, health, getManifest, kept: () => [...texts.keys()] };
+  return { getAya, search, exegesis, health, getManifest, kept: () => [...texts.keys()] };
 }

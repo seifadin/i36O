@@ -136,12 +136,6 @@ export async function fetchQuran(): Promise<QuranEntry[]> {
   )
 }
 
-// Local lookup: match chapter exactly, verse within
-// [QuranVerseMin, QuranVerseMax], take first match. Returns null if unmapped.
-// Explicit Number() coercion: Baserow's API commonly serializes Number-type
-// fields as strings in JSON despite QuranEntry declaring them as `number` —
-// that TS type is compile-time only and doesn't guarantee the runtime shape,
-// so strict equality against an un-coerced value would silently fail every lookup.
 // The feedback address: the Web field of the i360dbs row named 'Feedback' (§3, §14e), when it is
 // a mailto: link. Used for the saved copy (dataCache.tsx) and its fallback (feedbackReport.ts).
 export function feedbackMailto(sciences: readonly Science[]): string | null {
@@ -149,16 +143,3 @@ export function feedbackMailto(sciences: readonly Science[]): string | null {
   return row?.Web?.toLowerCase().startsWith('mailto:') ? row.Web : null
 }
 
-export function findExegesisUrl(
-  rows: QuranEntry[],
-  chapter: number,
-  verse: number
-): string | null {
-  const match = rows.find(
-    row =>
-      Number(row.QuranChapter) === chapter &&
-      verse >= Number(row.QuranVerseMin) &&
-      verse <= Number(row.QuranVerseMax)
-  )
-  return match?.ExegesisURL ?? null
-}

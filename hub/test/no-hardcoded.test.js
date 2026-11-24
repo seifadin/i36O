@@ -32,6 +32,7 @@ const ALLOWED = {
     '26rem': 'search pop-up width', '20rem': 'side panel width', '2.5rem': 'floating button size'
   },
   'src/cse.src.html': { '2.75rem': 'search box and button height', '1.5rem': 'status line height (one line)' },
+  'src/quran.src.html': { '48rem': 'tanzil\'s banner at most its own width (768 px)', '1px': 'the hidden status line for screen readers' },
   'src/day.src.html': { '0.875rem': 'the language button\'s caret', '11rem': 'language list narrowest' }
 };
 

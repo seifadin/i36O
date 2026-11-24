@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-d6Lxr+TbQzxLOyN/uf1QFJ0SHrwu7Xv2Xc3b4gY7YmY='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>القرآن الكريم — مشروع تنزيل</title>
+  <meta name="description" content="القرآن الكريم من مشروع تنزيل (tanzil.net)، مع زر لتفسير الآية الظاهرة من فهرس الموسوعة الإسلامية i360إ.">
+  <meta name="robots" content="noindex">
+
+  <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev):
+       1. built-in colours, used until theme.css arrives and when it can't;
+       2. the saved theme and the saved copy of theme.css, before anything is drawn;
+       3. the loader (bundled into the page's script). -->
+  <style id="i360-fallback">:root, [data-theme="light"] {
+  color-scheme: light;
+  --i360-bg: #FAF7F2;
+  --i360-frame: #F2EFEA;
+  --i360-surface: #FAF7F2;
+  --i360-toolbar: #FAF7F2;
+  --i360-border: #CBD5E1;
+  --i360-rule: #CBD5E1;
+  --i360-text: #0010CF;
+  --i360-heading: #0010CF;
+  --i360-muted: #5A62C9;
+  --i360-icon: #0010CF;
+  --i360-icon-hover: #0010CF;
+  --i360-hover: #EEF2FF;
+  --i360-active: #EEF2FF;
+  --i360-link: #2E8B57;
+  --i360-quran: #2E8B57;
+  --i360-note: #2A35C4;
+  --i360-code: #F1ECE2;
+  --i360-quote: #F4F0E8;
+  --i360-input: #FAF7F2;
+  --i360-focus: #0010CF;
+  --i360-accent: #0010CF;
+  --i360-on-accent: #FAF7F2;
+  --i360-banner-bg: #fef2f2;
+  --i360-banner-border: #fecaca;
+  --i360-banner-text: #991b1b;
+  --i360-highlight: #fef08a;
+  --i360-highlight-active: #fb923c;
+  --i360-ribbon: #dc2626;
+  --i360-page-shadow: 0 4px 6px -1px rgba(0, 16, 207, 0.08), 0 2px 4px -1px rgba(0, 16, 207, 0.05);
+  --i360-focus-ring: 0 0 0 3px rgba(0, 16, 207, 0.25);
+  --i360-danger: #b91c1c;
+  --i360-overlay: rgba(0, 0, 0, 0.4);
+  --i360-hadith: #d97706;
+  --i360-hadith-bg: #fef3c7;
+  --i360-prayer: #2563eb;
+  --i360-prayer-bg: #dbeafe;
+  --i360-event: #9333ea;
+  --i360-event-bg: #f3e8ff;
+  --i360-converter: #0f766e;
+  --i360-converter-bg: #ccfbf1;
+  --i360-font: 'Amiri', 'Traditional Arabic', serif;
+  --i360-font-quran: 'Amiri Quran', 'Amiri', serif;
+  --i360-toolbar-h: 2.5rem;
+  --i360-text-size-sm: 0.875rem;
+  --i360-text-size: 1rem;
+  --i360-text-size-lg: 1.25rem;
+  --i360-text-size-xl: 1.5rem;
+  --i360-line-height: 2;
+  --i360-line-height-ui: 1.6;
+  --i360-space-xs: 0.25rem;
+  --i360-space-sm: 0.5rem;
+  --i360-space-md: 1rem;
+  --i360-space-lg: 2rem;
+  --i360-gap: clamp(0.75rem, 2vw, 1.5rem);
+  --i360-cell-padding: 0.45em 0.7em;
+  --i360-radius-sm: 0.25rem;
+  --i360-radius-lg: 0.5rem;
+  --i360-radius-full: 999px;
+  --i360-line-width: 1px;
+  --i360-line-width-strong: 2px;
+  --i360-bar-width: 4px;
+  --i360-toolbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --i360-popup-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+  --i360-icon-size: 1.25rem;
+  --i360-icon-size-inline: 1em;
+  --i360-content-width: 50rem;
+  --i360-disabled-opacity: 0.4;
+  --i360-speed-quick: 0.15s;
+  --i360-speed: 0.2s;
+  --i360-layer-bar: 10;
+  --i360-layer-menu: 20;
+  --i360-layer-panel: 30;
+  --i360-layer-popup: 40;
+  --i360-layer-dialog: 50;
+  --i360-layer-toast: 60;
+}
+[data-theme="sepia"] {
+  color-scheme: light;
+  --i360-bg: #f8f1e1;
+  --i360-frame: #e6dcc6;
+  --i360-surface: #fbf5e8;
+  --i360-toolbar: #f6efdf;
+  --i360-border: #d6c7a6;
+  --i360-rule: #d6c7a6;
+  --i360-text: #3b2f1e;
+  --i360-heading: #2a2014;
+  --i360-muted: #7a6a50;
+  --i360-icon: #6b5a40;
+  --i360-icon-hover: #2a2014;
+  --i360-hover: #ebe0c6;
+  --i360-active: #eadbb8;
+  --i360-link: #8a4b0f;
+  --i360-quran: #2f5a1e;
+  --i360-note: #4a3c27;
+  --i360-code: #efe5cf;
+  --i360-quote: #f1e7d1;
+  --i360-input: #fffaf0;
+  --i360-focus: #a16207;
+  --i360-accent: #a16207;
+  --i360-on-accent: #fffaf0;
+  --i360-banner-bg: #f8e3d6;
+  --i360-banner-border: #e8c0a8;
+  --i360-banner-text: #7f2d12;
+  --i360-highlight: #f5d76e;
+  --i360-highlight-active: #e8913a;
+  --i360-ribbon: #b91c1c;
+  --i360-page-shadow: 0 4px 6px -1px rgba(60, 40, 10, 0.12), 0 2px 4px -1px rgba(60, 40, 10, 0.07);
+  --i360-focus-ring: 0 0 0 3px rgba(161, 98, 7, 0.25);
+  --i360-danger: #b91c1c;
+  --i360-overlay: rgba(0, 0, 0, 0.4);
+  --i360-hadith: #b45309;
+  --i360-hadith-bg: #fdecc8;
+  --i360-prayer: #1d4ed8;
+  --i360-prayer-bg: #dfe6f3;
+  --i360-event: #7e22ce;
+  --i360-event-bg: #efe2f3;
+  --i360-converter: #115e59;
+  --i360-converter-bg: #d9ebe3;
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --i360-bg: #1a2233;
+  --i360-frame: #0b1220;
+  --i360-surface: #111827;
+  --i360-toolbar: #111827;
+  --i360-border: #334155;
+  --i360-rule: #334155;
+  --i360-text: #e2e8f0;
+  --i360-heading: #f8fafc;
+  --i360-muted: #94a3b8;
+  --i360-icon: #cbd5e1;
+  --i360-icon-hover: #ffffff;
+  --i360-hover: #1f2937;
+  --i360-active: #1e3a5f;
+  --i360-link: #7dd3fc;
+  --i360-quran: #86efac;
+  --i360-note: #cbd5e1;
+  --i360-code: #0f172a;
+  --i360-quote: #111827;
+  --i360-input: #0f172a;
+  --i360-focus: #38bdf8;
+  --i360-accent: #38bdf8;
+  --i360-on-accent: #0b1220;
+  --i360-banner-bg: #3b0d0d;
+  --i360-banner-border: #7f1d1d;
+  --i360-banner-text: #fecaca;
+  --i360-highlight: #854d0e;
+  --i360-highlight-active: #c2410c;
+  --i360-ribbon: #f87171;
+  --i360-page-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  --i360-focus-ring: 0 0 0 3px rgba(56, 189, 248, 0.25);
+  --i360-danger: #f87171;
+  --i360-overlay: rgba(0, 0, 0, 0.55);
+  --i360-hadith: #fbbf24;
+  --i360-hadith-bg: rgba(120, 53, 15, 0.3);
+  --i360-prayer: #60a5fa;
+  --i360-prayer-bg: rgba(30, 58, 138, 0.3);
+  --i360-event: #c084fc;
+  --i360-event-bg: rgba(88, 28, 135, 0.3);
+  --i360-converter: #5eead4;
+  --i360-converter-bg: rgba(19, 78, 74, 0.3);
+}</style>
+  <script>// i360 theme, early part: inlined in each app's <head> (not served), after the
+// app's fallback colours and before anything is drawn. It shows the saved
+// theme and the saved copy of theme.css at once, so a repeat visit has no
+// flash of the wrong colours. theme-loader.js does the rest. Then, in a browser
+// too old for the pages, a note instead of a blank page (below).
+// Plain ES5 on purpose: it must run in any browser that can show the page.
+// Keep in step with CHOICE_KEY, CACHE_KEY and THEMES in site/theme-loader.js.
+
+// Device storage holds JSON only (every i360 page and the app write through hub/src/storage.js).
+// Before anything reads it: any i360 value that isn't JSON (plain text saved by older versions) is
+// removed, so it is chosen again rather than converted. Values starting like a JSON object, list
+// or string are ours and left unread (the caches are large). Other code's keys are left alone.
+(function () {
+  try {
+    for (var i = localStorage.length - 1; i >= 0; i--) {
+      var key = localStorage.key(i), v = key && key.indexOf('i360') === 0 ? localStorage.getItem(key) : null;
+      if (v === null || /^[[{"]/.test(v)) continue;
+      try { JSON.parse(v); } catch (e) { localStorage.removeItem(key); }
+    }
+  } catch (e) { /* storage unavailable: nothing to clear */ }
+})();
+
+(function () {
+  var root = document.documentElement, themes = ['system', 'light', 'sepia', 'dark'];
+  var c = root.getAttribute('data-i360-lock');
+  if (themes.indexOf(c) < 0) {
+    try { c = JSON.parse(localStorage.getItem('i360.theme')); } catch (e) { c = null; }
+  }
+  if (themes.indexOf(c) < 0) c = 'system';
+  if (c === 'system') {
+    c = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  root.setAttribute('data-theme', c);
+  try {
+    var k = JSON.parse(localStorage.getItem('i360.theme.css'));
+    if (k && typeof k.css === 'string') {
+      var s = document.createElement('style');
+      s.id = 'i360-theme';
+      s.textContent = k.css;
+      document.head.appendChild(s);
+    }
+  } catch (e) { /* no copy yet: the page's own colours */ }
+})();
+
+// A browser too old for these pages: the page's own code never runs there and the page would stay
+// blank. Instead: a note, in place of the page. "Too old": no JavaScript modules (Firefox before 60,
+// Chrome before 61, Safari before 11), or older than what the builds write for (hub/build-targets.json:
+// Firefox 104, Chrome 107, Safari 15 — late 2022). A script can't test syntax itself (the pages'
+// security policy forbids eval), so an API of that time stands in for it: structuredClone (Firefox 94,
+// Chrome 98, Safari 15.4 — also where Safari's dvh unit, which the app's layout needs, arrived). The
+// Reader's Markdown library (marked) uses lookbehind (Safari 16.4) only where the browser has it, with
+// a fallback otherwise, so it needs nothing more.
+// The note's link: i360dbc's Support (the support site), put here by the app's build in place of '/'
+// (vite.config.ts); on the hub pages it stays '/', the app's home, whose note has it.
+(function () {
+  if ('noModule' in document.createElement('script') && typeof window.structuredClone === 'function') return;
+  var SUPPORT_LINK = '/';
+  var hide = document.createElement('style');
+  hide.textContent = 'body > * { display: none !important; } body > #i360-old-browser { display: block !important; }';
+  document.head.appendChild(hide);
+  function show() {
+    var note = document.createElement('p'), name = document.createElement('bdi'), link = document.createElement('a');
+    note.id = 'i360-old-browser';
+    note.dir = 'rtl';
+    note.style.cssText = 'margin: 0; padding: 3rem 1.5rem; text-align: center; font-family: var(--i360-font, serif); font-size: 1.35rem; line-height: 2;'
+      + ' color: var(--i360-text, #0010CF); background: var(--i360-bg, #FAF7F2); min-height: 100vh; box-sizing: border-box;';
+    name.dir = 'ltr';                          // «i360إ» in place with any surrounding text (as the CSE's title)
+    name.textContent = 'i360‎إ';
+    link.href = SUPPORT_LINK;
+    link.textContent = 'للمزيد';
+    link.style.cssText = 'color: var(--i360-link, #2E8B57); font-weight: 700;';
+    note.appendChild(document.createTextNode('متصفحك قديم ولا يدعم الموسوعة الإسلامية '));
+    note.appendChild(name);
+    note.appendChild(document.createTextNode('؛ يُرجى استخدام متصفح أحدث. '));
+    note.appendChild(link);
+    document.body.insertBefore(note, document.body.firstChild);
+  }
+  if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
+})();
+</script>
+  <link rel="preconnect" href="https://theme.i36o.workers.dev" crossorigin>
+
+  <style>
+    /* Colours: the shared theme's own variables (--i360-…, hub/theme/site/theme.css). */
+    body {
+      font-family: var(--i360-font);
+      font-size: var(--i360-text-size);
+      background-color: var(--i360-bg);
+      color: var(--i360-text);
+      line-height: var(--i360-line-height-ui);
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------- Toolbar ---------- */
+    /* Every i360 toolbar: the hub pages' (the Reader, the i360 CSE, Daily Reflection) and the app's
+   bottom bar (i360-hub.md §10 "Toolbars"). scripts/build.js inlines this file into each page's own
+   <style>, before the page's rules; the app imports it (src/index.css). A page only places its bar
+   in the page (z-index, and its own content such as the Reader's page number); how a bar folds and
+   widens its buttons by measurement is fittingToolbar() in src/page-chrome.js.
+
+   A bar is class="toolbar", plus, where needed (modifiers, combined freely):
+     toolbar-bottom   at the bottom of the screen (no status bar to clear) — the app's
+     toolbar-sticky   stays at the top while the page scrolls — Daily Reflection's
+   and, as a value, --toolbar-row-w: the width its row lines up with (a page column); by default the
+   row spans the bar. Inside it: .tb-start (the settings: ⋮ where there is one · theme · numerals ·
+   language), .tb-main (a middle that grows, its groups centred), .tb-title, .tb-end; .tb-group (a
+   group of buttons), .divider, and .toolbar-menu (the ⋮ menu that opens from the bar). */
+/* The hub pages' base (<body class="i360-page">): every element sized the same way and with no
+   built-in spacing, and `hidden` always wins. :where() adds no weight, so each page's own rules still
+   win, exactly as when every page wrote these itself; Daily Reflection gets the same from Tailwind's
+   base. The app has no such class, so it never gets them. */
+:where(.i360-page), :where(.i360-page) * { box-sizing: border-box; margin: 0; padding: 0; }
+:where(.i360-page) [hidden] { display: none !important; }
+
+/* ---------- Clear of the screen's edges (every i360 page, the app's included) ---------- */
+/* Content keeps out of the parts of the screen the system uses — the status bar, the home indicator, a
+   camera notch in landscape, the iPhone Duo's status-bar strip down one side — by each side's inset, as
+   the device reports it (env(), 0 where there is none), plus one gap, the same on every page, from the
+   room there is: closer on a phone, wider on a big screen. Padding inside a control is not this gap
+   (it follows the text: .toolbar-btn, the pages' own fields).
+     safe-area          a page's content area: all four sides
+     safe-area-top-bar  …with a toolbar above it, which already clears the top (.toolbar)
+     safe-sides         a full-width row whose background reaches the edges: its content clears the
+                        sides; --safe-level (1 by default) multiplies the gap, for indented levels
+     safe-edges         a page made of such rows (the app's home): clears only the top and bottom
+   A page that takes one of these sets none of those paddings itself (its own rules come later and
+   would replace them). */
+:root { --safe-gap: var(--i360-gap, clamp(0.75rem, 2vw, 1.5rem)); }
+.safe-area {
+  padding: calc(var(--safe-gap) + env(safe-area-inset-top)) calc(var(--safe-gap) + env(safe-area-inset-right))
+           calc(var(--safe-gap) + env(safe-area-inset-bottom)) calc(var(--safe-gap) + env(safe-area-inset-left));
+}
+.safe-area-top-bar { padding-top: var(--safe-gap); }
+.safe-sides {
+  padding-left: calc(var(--safe-gap) * var(--safe-level, 1) + env(safe-area-inset-left));
+  padding-right: calc(var(--safe-gap) * var(--safe-level, 1) + env(safe-area-inset-right));
+}
+.safe-edges { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+
+:root {
+  /* The theme's values, with the light ones built in for when theme.css hasn't arrived (the pages
+     also carry the theme's own copy; the app only these, as with its colours in tailwind.config.ts). */
+  --toolbar-h: var(--i360-toolbar-h, 2.5rem);
+  --toolbar-bg: var(--i360-toolbar, #FAF7F2);
+  --toolbar-line: var(--i360-border, #CBD5E1);
+  --toolbar-icon: var(--i360-icon, #0010CF);
+  --toolbar-icon-hover: var(--i360-icon-hover, #0010CF);
+  --toolbar-hover: var(--i360-hover, #EEF2FF);
+  --toolbar-active: var(--i360-active, #EEF2FF);
+  --toolbar-title: var(--toolbar-icon);   /* one colour for a bar's text and icons, in every theme */
+  --toolbar-menu-bg: var(--i360-surface, #FAF7F2);
+  --toolbar-focus: var(--i360-focus, #0010CF);
+
+  --toolbar-btn-h: 2rem;    /* a button in the bar */
+  --toolbar-text: var(--i360-text-size, 1rem);   /* the text on every button: numerals, a language, a label */
+  --toolbar-btn-min: var(--toolbar-btn-h);   /* its narrowest width */
+  /* A button's width in a bar: as wide as the bar is high, unless fittingToolbar() sets less on the
+     bar (between --toolbar-btn-min and this, by the room the bar has). A button showing text is
+     never narrower than its text. */
+  --toolbar-btn-w: var(--toolbar-h);
+}
+
+/* ---------- The bar ---------- */
+/* One row; at the top of a page, clear of the status bar and, on an iPhone in landscape, of the
+   rounded corners and the notch (viewport-fit=cover). */
+.toolbar {
+  --toolbar-inset: env(safe-area-inset-top);
+  --toolbar-pad: var(--i360-space-sm, 0.5rem);
+  --toolbar-row-w: 100%;
+  position: relative;
+  box-sizing: border-box;
+  align-self: stretch;
+  min-height: calc(var(--toolbar-h) + var(--toolbar-inset));
+  padding-top: var(--toolbar-inset);
+  /* Its row: the page column's width where one is given, never closer to the edges than its padding. */
+  padding-left: max(calc(var(--toolbar-pad) + env(safe-area-inset-left)), calc((100% - var(--toolbar-row-w)) / 2 + var(--toolbar-pad)));
+  padding-right: max(calc(var(--toolbar-pad) + env(safe-area-inset-right)), calc((100% - var(--toolbar-row-w)) / 2 + var(--toolbar-pad)));
+  display: flex;
+  align-items: center;
+  gap: var(--i360-space-xs, 0.25rem);
+  user-select: none;
+  background-color: var(--toolbar-bg);
+  border-bottom: var(--i360-line-width, 1px) solid var(--toolbar-line);
+  box-shadow: var(--i360-toolbar-shadow, 0 1px 3px rgba(0, 0, 0, 0.05));
+}
+.toolbar-bottom { --toolbar-inset: 0px; }
+.toolbar-sticky { position: sticky; top: 0; }
+
+.tb-start, .tb-end { display: flex; align-items: center; gap: var(--i360-space-xs, 0.25rem); flex-shrink: 0; }
+.tb-main { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: var(--i360-space-xs, 0.25rem); }
+.tb-group { display: flex; align-items: center; gap: var(--i360-space-xs, 0.25rem); }
+.tb-main > .tb-group { padding: 0 var(--i360-space-xs, 0.25rem); }
+/* A thin line between two groups side by side in the middle (drawn at the end of the first, in its
+   own direction: a group may run left to right in a right-to-left bar, as the Reader's page arrows
+   do), and wherever a page puts .divider. Browsers without :has() (before 2022) draw no line. */
+.tb-main > .tb-group:has(+ .tb-group)::after,
+.toolbar .divider { content: ''; width: var(--i360-line-width, 1px); height: var(--i360-icon-size, 1.25rem); background-color: var(--toolbar-line); flex-shrink: 0; }
+.tb-main > .tb-group:has(+ .tb-group)::after { margin-inline-start: var(--i360-space-xs, 0.25rem); }
+.toolbar .divider { margin: 0 var(--i360-space-xs, 0.25rem); }
+/* The title: where it grows (a bar without a middle), it takes the free room and sits at the end. Its
+   line is tall enough for Amiri's marks above and below the letters (the hamza of «أ»): the «…» needs
+   overflow: hidden, which would otherwise cut them off. */
+.tb-title { font-weight: 700; font-size: var(--i360-text-size, 1rem); line-height: var(--i360-line-height, 2); color: var(--toolbar-title); padding: 0 var(--i360-space-xs, 0.25rem); min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toolbar > .tb-title { flex: 1; text-align: end; }
+
+/* ---------- Its buttons ---------- */
+.toolbar-btn {
+  position: relative;       /* for the tap area below */
+  box-sizing: border-box;
+  height: var(--toolbar-btn-h);
+  min-width: var(--toolbar-btn-min);
+  padding: 0 var(--i360-space-sm, 0.5rem);
+  border: none;
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  background: transparent;
+  color: var(--toolbar-icon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  flex-shrink: 0;
+  cursor: pointer;
+  font-size: var(--toolbar-text);
+  font-family: inherit;
+  transition: background-color var(--i360-speed-quick, 0.15s), color var(--i360-speed-quick, 0.15s);
+}
+.toolbar .toolbar-btn { min-width: var(--toolbar-btn-w); }
+.toolbar-menu .toolbar-btn { min-width: var(--toolbar-btn-min); }
+.toolbar-btn:hover:not(:disabled), .toolbar-btn[aria-expanded="true"] { background-color: var(--toolbar-hover); color: var(--toolbar-icon-hover); }
+.toolbar-btn[aria-pressed="true"] { background-color: var(--toolbar-active); color: var(--toolbar-icon-hover); }
+/* Keyboard focus: one ring, shown only when a control is reached by keyboard — a thin gap in the
+   page colour, then the focus colour, so it shows on a filled button too (a ring, not an outline:
+   some WebViews draw outlines square on rounded buttons). On every toolbar button, and on every
+   control of the hub pages (<body class="i360-page">) and on the shared components below in the
+   app too (text boxes show the field focus instead). */
+.toolbar-btn:focus-visible,
+:is(.i360-btn, .i360-chip, .i360-list-item):focus-visible,
+.i360-page :is(button, a, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 var(--i360-line-width-strong, 2px) var(--i360-bg, #FAF7F2), 0 0 0 calc(2 * var(--i360-line-width-strong, 2px)) var(--toolbar-focus);
+}
+.toolbar-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
+
+/* Icons: Lucide (lucide.dev, ISC licence), drawn inline and tagged data-lucide on every page;
+   checked by scripts/icons.js. Their drawing style, for every icon on every page (each page sets
+   only their sizes); a toolbar button's icon size. The app's icons come from lucide-react, which
+   draws them in the same style itself. */
+svg[data-lucide] {
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  flex-shrink: 0;
+}
+.toolbar-btn svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+
+/* The numerals button shows digits (٣ / 3). */
+.numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* A button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»): set off
+   from the icon-only buttons by a box and bold text. */
+.toolbar-btn-label {
+  background-color: var(--i360-input, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--toolbar-line);
+  font-weight: 700;
+}
+
+/* The tap area, not drawn: each button in the bar reaches from the bar's top edge to its bottom, so
+   it stays the bar's full height whatever the two heights above are. Sideways it is the button's
+   own width (the buttons sit close together). Not in the menu, whose rows are close together. */
+.toolbar .toolbar-btn::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--toolbar-btn-h) - var(--toolbar-h)) / 2) 0;
+}
+.toolbar-menu .toolbar-btn::after { content: none; }
+
+/* ---------- The ⋮ menu: under the bar, its groups boxed; what folds out of the bar goes here ---------- */
+.toolbar-menu {
+  position: absolute;
+  top: 100%;
+  left: calc(var(--toolbar-pad) + env(safe-area-inset-left));
+  right: calc(var(--toolbar-pad) + env(safe-area-inset-right));
+  margin-top: var(--i360-space-xs, 0.25rem);
+  background: var(--toolbar-menu-bg);
+  border: var(--i360-line-width, 1px) solid var(--toolbar-line);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
+  padding: var(--i360-space-sm, 0.5rem);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem);
+  z-index: var(--i360-layer-menu, 20);
+}
+.toolbar-menu[hidden] { display: none; }
+.toolbar-menu .tb-group { padding: var(--i360-space-xs, 0.25rem); border: var(--i360-line-width, 1px) solid var(--toolbar-line); border-radius: var(--i360-radius-lg, 0.5rem); }
+
+/* ---------- A bar's last levels, when nothing more can fold (fittingToolbar()) ---------- */
+/* Closer together, then the narrowest buttons and the least padding, with no divider. */
+.toolbar-dense { --toolbar-btn-min: 1.85rem; gap: 0; }
+.toolbar-dense :is(.tb-start, .tb-end, .tb-main) { gap: 0; }
+.toolbar-dense .tb-start > .divider { margin: 0; }
+.toolbar-dense .toolbar-btn { padding: 0 var(--i360-space-xs, 0.25rem); }
+.toolbar-densest { --toolbar-btn-min: 1.6rem; --toolbar-pad: var(--i360-space-xs, 0.25rem); }
+.toolbar-densest .toolbar-btn { padding: 0; }
+.toolbar-densest .tb-start > .divider { display: none; }
+
+/* ---------- Shared components (i360-hub.md §10 "Components") ----------
+   One look for each piece that more than one page has, in the hub pages and the app alike. A page
+   sets only where a piece sits and how big it is (width, height, outer spacing); never its look. */
+
+/* Text box. A search box is a pill (.i360-field-search), as on Android and iOS; other boxes take the
+   usual corners. Focus: the focus colour and the theme's focus glow — on the box itself, or on a box
+   that holds the input (the app's search bar). */
+.i360-field {
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  background: var(--i360-input, #FAF7F2);
+  color: var(--i360-text, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  outline: none;
+}
+.i360-field-search { border-radius: var(--i360-radius-full, 999px); }
+.i360-field::placeholder, .i360-field ::placeholder { color: var(--i360-muted, #5A62C9); }
+.i360-field:focus, .i360-field:focus-within { border-color: var(--i360-focus, #0010CF); box-shadow: var(--i360-focus-ring, 0 0 0 3px rgba(0, 16, 207, 0.25)); }
+
+/* An on/off option (or one of a set): a pill with a tick box, so its state shows by more than colour.
+   [type] alongside: Tailwind's reset (Daily Reflection, the app) clears [type="button"] backgrounds
+   after this file, at the same weight; the attribute keeps ours. */
+.i360-chip, .i360-chip[type] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--i360-space-xs, 0.25rem);
+  padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-full, 999px);
+  background: var(--i360-surface, #FAF7F2);
+  color: var(--i360-text, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  cursor: pointer;
+}
+.i360-chip[aria-pressed="true"] { background: var(--i360-active, #EEF2FF); border-color: var(--i360-focus, #0010CF); color: var(--i360-heading, #0010CF); }
+.i360-chip-box {
+  width: 0.9rem; height: 0.9rem; flex-shrink: 0;
+  border: var(--i360-line-width, 1px) solid currentColor; border-radius: var(--i360-radius-sm, 0.25rem);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; line-height: 1;
+}
+.i360-chip[aria-pressed="true"] .i360-chip-box::after { content: '✓'; }
+
+/* Buttons: pills, as on Android and iOS. Outlined by default; filled (.i360-btn-primary) for the main
+   action; .i360-btn-sm for small ones beside text (retry, more). */
+.i360-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-full, 999px);
+  background: transparent;
+  color: var(--i360-accent, #0010CF);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  font-weight: 700;
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-decoration: none;
+  cursor: pointer;
+}
+.i360-btn:hover:not(:disabled) { background: var(--i360-hover, #EEF2FF); }
+.i360-btn-primary, .i360-btn-primary[type], .i360-btn-primary:hover:not(:disabled) { background: var(--i360-accent, #0010CF); border-color: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
+.i360-btn-sm { padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem); font-size: var(--i360-text-size-sm, 0.875rem); }
+.i360-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
+
+/* A row in a list or menu. Hover (or the keyboard's current row, .active): the hover colour; the chosen
+   one (aria-selected, or Daily Reflection's .active-btn): the accent. */
+.i360-list-item {
+  display: block;
+  width: 100%;
+  text-align: start;
+  background: transparent;
+  border: 0;
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  color: var(--i360-text, #0010CF);
+  padding: var(--i360-space-sm, 0.5rem);
+  font-family: inherit;
+  font-size: var(--i360-text-size, 1rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-decoration: none;
+  cursor: pointer;
+}
+.i360-list-item:hover, .i360-list-item.active, .i360-list-item.current { background: var(--i360-hover, #EEF2FF); }
+.i360-list-item[aria-selected="true"], .i360-list-item.active-btn { background: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
+
+/* Floating surfaces: pop-ups, menus, dialogs, tooltips (the toolbar's ⋮ menu above has the same look). */
+.i360-popup {
+  background: var(--i360-surface, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--i360-border, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
+  padding: var(--i360-space-sm, 0.5rem);
+}
+
+/* A short message that comes and goes. */
+.i360-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  border-radius: var(--i360-radius-full, 999px);
+  background: var(--i360-accent, #0010CF);
+  color: var(--i360-on-accent, #FAF7F2);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  box-shadow: var(--i360-popup-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.15));
+  z-index: var(--i360-layer-toast, 60);
+}
+
+/* A notice (an error, missing pages). */
+.i360-banner {
+  background: var(--i360-banner-bg, #fef2f2);
+  border: var(--i360-line-width, 1px) solid var(--i360-banner-border, #fecaca);
+  color: var(--i360-banner-text, #991b1b);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  padding: var(--i360-space-sm, 0.5rem) var(--i360-space-md, 1rem);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+}
+
+/* A box around a section (.i360-card), and a box inside one (.i360-inset). */
+.i360-card {
+  background: var(--i360-bg, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--i360-rule, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+  box-shadow: var(--i360-page-shadow, 0 4px 6px -1px rgba(0, 16, 207, 0.08), 0 2px 4px -1px rgba(0, 16, 207, 0.05));
+}
+.i360-inset {
+  background: var(--i360-quote, #F4F0E8);
+  border: var(--i360-line-width, 1px) solid var(--i360-rule, #CBD5E1);
+  border-radius: var(--i360-radius-lg, 0.5rem);
+}
+
+/* Search matches. */
+mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); color: inherit; border-radius: var(--i360-radius-sm, 0.25rem); }
+    /* The bar and everything in it: src/page-chrome.css. Here: its place in the page. */
+    .toolbar { flex-shrink: 0; z-index: var(--i360-layer-bar); }
+
+    /* ---------- Tanzil ---------- */
+    /* Tanzil's own banner, linked to tanzil.net: its credit on every screen (its page shows its
+       header only on wide ones). At its own width at most, centred. */
+    .banner { flex-shrink: 0; display: block; border-bottom: var(--i360-line-width) solid var(--i360-border); }
+    .banner img { display: block; width: 100%; max-width: 48rem; height: auto; margin-inline: auto; }
+    .tanzil { flex: 1; min-height: 0; width: 100%; border: 0; display: block; background-color: var(--i360-bg); }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  </style>
+</head>
+<body class="i360-page">
+  <!-- In Arabic from the right: theme · numerals | «تفسير» … title (i360-hub.md §10 "Toolbars"). No ✕:
+       the app opens this page in the browser overlay, which has its own. -->
+  <header class="toolbar">
+    <div class="tb-start">
+      <button class="toolbar-btn" id="btn-theme" type="button"></button>
+      <button class="toolbar-btn numerals-btn" id="btn-numerals" type="button"></button>
+      <span class="divider" aria-hidden="true"></span>
+      <button class="toolbar-btn toolbar-btn-label" id="btn-tafsir" type="button" disabled><span id="tafsir-icon"></span><span id="tafsir-label">تفسير</span></button>
+    </div>
+    <div class="tb-title">القرآن الكريم</div>
+  </header>
+  <a class="banner" id="banner" href="https://tanzil.net/" target="_blank" rel="noopener"><img src="/img/header.png" width="768" height="72" alt="مشروع تنزيل — tanzil.net"></a>
+  <iframe class="tanzil" id="tanzil" title="مشروع تنزيل — القرآن الكريم"></iframe>
+  <div class="sr-only" id="announce" role="status" aria-live="polite"></div>
+
+  <script>"use strict";
+(() => {
+  // src/net.js
+  var DEFAULT_TIMEOUT_MS = 8e3;
+  var wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  async function fetchWithTimeout(url, { timeout = DEFAULT_TIMEOUT_MS, fetch: send = globalThis.fetch, ...options } = {}, read = (response) => (
+    /** @type {any} */
+    response
+  )) {
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    let timer, backstop;
+    const expired = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        if (controller) controller.abort();
+        backstop = setTimeout(() => {
+          const e = new Error("timeout");
+          e.name = "AbortError";
+          reject(e);
+        }, 0);
+      }, timeout);
+    });
+    const request = (async () => read(await send(url, { ...options, signal: controller ? controller.signal : void 0 })))();
+    request.catch(() => {
+    });
+    try {
+      return await Promise.race([request, expired]);
+    } finally {
+      clearTimeout(timer);
+      clearTimeout(backstop);
+    }
+  }
+  async function fetchJson(url, { timeout = DEFAULT_TIMEOUT_MS, retries = 1, backoff = 800, ...options } = {}) {
+    return retrying(() => fetchWithTimeout(url, { timeout, ...options }, (r) => {
+      if (!r.ok) throw httpError(r.status);
+      return r.json();
+    }), { retries, backoff });
+  }
+  var httpError = (status) => Object.assign(new Error("HTTP " + status), { status });
+  async function retrying(attempt, { retries = 1, backoff = 800 } = {}) {
+    for (let n = 0; ; n++) {
+      try {
+        return await attempt(n >= retries);
+      } catch (e) {
+        const status = (
+          /** @type {{ status?: number }} */
+          e.status
+        );
+        const permanent = status && status >= 400 && status < 500 && status !== 429;
+        if (permanent || n >= retries) throw e;
+        await wait(backoff * 2 ** n);
+      }
+    }
+  }
+
+  // src/storage.js
+  function createStore(prefix = "") {
+    return {
+      get(key, fallback) {
+        try {
+          const v = localStorage.getItem(prefix + key);
+          return v ? JSON.parse(v) : fallback;
+        } catch {
+          return fallback;
+        }
+      },
+      set(key, value) {
+        try {
+          localStorage.setItem(prefix + key, JSON.stringify(value));
+        } catch {
+        }
+      },
+      remove(key) {
+        try {
+          localStorage.removeItem(prefix + key);
+        } catch {
+        }
+      }
+    };
+  }
+
+  // theme/site/theme-loader.js
+  var THEMES = ["system", "light", "sepia", "dark"];
+  var NUMERALS = ["western", "arabic", "persian"];
+  var NUMERALS_KEY = "i360.numerals";
+  var CHOICE_KEY = "i360.theme";
+  var CACHE_KEY = "i360.theme.css";
+  var CSS_URL = new URL("theme.css", "https://theme.i36o.workers.dev/theme-loader.js").href;
+  var NUMERALS_SAMPLE = Object.freeze({ western: "456", arabic: "٤٥٦", persian: "۴۵۶" });
+  var LABELS = Object.freeze({
+    ar: {
+      theme: { system: "المظهر: حسب الجهاز (انقر للتبديل إلى فاتح)", light: "المظهر: فاتح (انقر للتبديل إلى ورقي)", sepia: "المظهر: ورقي (انقر للتبديل إلى داكن)", dark: "المظهر: داكن (انقر للتبديل إلى حسب الجهاز)" },
+      numerals: { western: "الأرقام: غربية 456 (انقر للتبديل إلى العربية المشرقية ٤٥٦)", arabic: "الأرقام: عربية مشرقية ٤٥٦ (انقر للتبديل إلى الفارسية/الأردية ۴۵۶)", persian: "الأرقام: فارسية/أردية ۴۵۶ (انقر للتبديل إلى الغربية 456)" }
+    },
+    en: {
+      theme: { system: "Theme: follows this device (click for light)", light: "Theme: light (click for sepia)", sepia: "Theme: sepia (click for dark)", dark: "Theme: dark (click to follow this device)" },
+      numerals: { western: "Numerals: Western 456 (click for Eastern Arabic ٤٥٦)", arabic: "Numerals: Eastern Arabic ٤٥٦ (click for Persian/Urdu ۴۵۶)", persian: "Numerals: Persian/Urdu ۴۵۶ (click for Western 456)" }
+    },
+    tr: {
+      theme: { system: "Tema: cihaza göre (açık için tıklayın)", light: "Tema: açık (sepya için tıklayın)", sepia: "Tema: sepya (koyu için tıklayın)", dark: "Tema: koyu (cihaza göre için tıklayın)" },
+      numerals: { western: "Rakamlar: Batı 456 (Doğu Arap ٤٥٦ için tıklayın)", arabic: "Rakamlar: Doğu Arap ٤٥٦ (Farsça/Urduca ۴۵۶ için tıklayın)", persian: "Rakamlar: Farsça/Urduca ۴۵۶ (Batı 456 için tıklayın)" }
+    },
+    id: {
+      theme: { system: "Tema: mengikuti perangkat (klik untuk terang)", light: "Tema: terang (klik untuk sepia)", sepia: "Tema: sepia (klik untuk gelap)", dark: "Tema: gelap (klik untuk mengikuti perangkat)" },
+      numerals: { western: "Angka: Barat 456 (klik untuk Arab Timur ٤٥٦)", arabic: "Angka: Arab Timur ٤٥٦ (klik untuk Persia/Urdu ۴۵۶)", persian: "Angka: Persia/Urdu ۴۵۶ (klik untuk Barat 456)" }
+    },
+    ur: {
+      theme: { system: "تھیم: آلے کے مطابق (روشن کے لیے کلک کریں)", light: "تھیم: روشن (سیپیا کے لیے کلک کریں)", sepia: "تھیم: سیپیا (تاریک کے لیے کلک کریں)", dark: "تھیم: تاریک (آلے کے مطابق کے لیے کلک کریں)" },
+      numerals: { western: "اعداد: مغربی 456 (مشرقی عربی ٤٥٦ کے لیے کلک کریں)", arabic: "اعداد: مشرقی عربی ٤٥٦ (فارسی/اردو ۴۵۶ کے لیے کلک کریں)", persian: "اعداد: فارسی/اردو ۴۵۶ (مغربی 456 کے لیے کلک کریں)" }
+    }
+  });
+  var labelsFor = (lang) => LABELS[
+    /** @type {keyof typeof LABELS} */
+    lang
+  ] || LABELS.ar;
+  function themeLabel(choice, lang = "ar") {
+    return labelsFor(lang).theme[choice] || "";
+  }
+  function numeralsLabel(numerals, lang = "ar") {
+    return labelsFor(lang).numerals[numerals] || "";
+  }
+  var STYLE_ID = "i360-theme";
+  var MAX_CSS = 256 * 1024;
+  var root = document.documentElement;
+  var darkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  var listeners = /* @__PURE__ */ new Set();
+  var numeralListeners = /* @__PURE__ */ new Set();
+  var started = false;
+  var store = createStore();
+  function lockedTheme() {
+    const t = root.getAttribute("data-i360-lock");
+    return THEMES.includes(t) ? t : null;
+  }
+  function getChoice() {
+    const lock = lockedTheme();
+    if (lock) return lock;
+    const c = store.get(CHOICE_KEY, null);
+    return THEMES.includes(c) ? c : "system";
+  }
+  function getTheme(choice = getChoice()) {
+    if (choice !== "system") return choice;
+    return darkQuery && darkQuery.matches ? "dark" : "light";
+  }
+  function apply() {
+    const choice = getChoice();
+    const theme = getTheme(choice);
+    const changed = root.getAttribute("data-theme") !== theme;
+    root.setAttribute("data-theme", theme);
+    for (const fn of listeners) {
+      try {
+        fn({ choice, theme, changed });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return { choice, theme };
+  }
+  function setChoice(choice) {
+    if (!THEMES.includes(choice)) throw new Error(`Unknown theme: ${choice}`);
+    if (!lockedTheme()) store.set(CHOICE_KEY, choice);
+    return apply();
+  }
+  function cycle() {
+    const c = getChoice();
+    return setChoice(THEMES[(THEMES.indexOf(c) + 1) % THEMES.length]);
+  }
+  function onChange(fn) {
+    listeners.add(fn);
+    return () => {
+      listeners.delete(fn);
+    };
+  }
+  function getNumerals() {
+    const n = store.get(NUMERALS_KEY, null);
+    return NUMERALS.includes(n) ? n : "western";
+  }
+  function applyNumerals() {
+    const numerals = getNumerals();
+    for (const fn of numeralListeners) {
+      try {
+        fn({ numerals });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return { numerals };
+  }
+  function setNumerals(numerals) {
+    if (!NUMERALS.includes(numerals)) throw new Error(`Unknown numerals: ${numerals}`);
+    store.set(NUMERALS_KEY, numerals);
+    return applyNumerals();
+  }
+  function cycleNumerals() {
+    const n = getNumerals();
+    return setNumerals(NUMERALS[(NUMERALS.indexOf(n) + 1) % NUMERALS.length]);
+  }
+  function onNumeralsChange(fn) {
+    numeralListeners.add(fn);
+    return () => {
+      numeralListeners.delete(fn);
+    };
+  }
+  function absolutize(css) {
+    return css.replace(
+      /url\(\s*(['"]?)(?![a-z][a-z0-9+.-]*:|\/|#)([^'")]+)\1\s*\)/gi,
+      (m, q, u) => `url(${q}${new URL(u, CSS_URL).href}${q})`
+    );
+  }
+  function styleElement() {
+    let el = document.getElementById(STYLE_ID);
+    if (!el) {
+      el = document.createElement("style");
+      el.id = STYLE_ID;
+      document.head.appendChild(el);
+    }
+    return el;
+  }
+  function cached() {
+    const c = store.get(CACHE_KEY, null);
+    return c && c.url === CSS_URL && typeof c.css === "string" ? c.css : null;
+  }
+  async function init() {
+    const state = apply();
+    if (!started) {
+      started = true;
+      if (darkQuery) darkQuery.addEventListener("change", () => {
+        if (getChoice() === "system") apply();
+      });
+      window.addEventListener("storage", (e) => {
+        if (e.key === CHOICE_KEY) apply();
+        if (e.key === NUMERALS_KEY) applyNumerals();
+      });
+    }
+    const copy = cached();
+    const existing = document.getElementById(STYLE_ID);
+    if (copy && (!existing || existing.textContent !== copy)) styleElement().textContent = copy;
+    let source = copy ? "cache" : "fallback";
+    try {
+      const res = await fetchWithTimeout(CSS_URL, { cache: "no-cache", mode: "cors", credentials: "omit" });
+      if (!res.ok) throw new Error(`theme.css: HTTP ${res.status}`);
+      const text = await res.text();
+      if (text.length > MAX_CSS || !text.includes("--i360-bg")) throw new Error("theme.css: unexpected content");
+      const css = absolutize(text);
+      const el = styleElement();
+      if (el.textContent !== css) el.textContent = css;
+      if (css !== copy) store.set(CACHE_KEY, { url: CSS_URL, css });
+      source = "network";
+    } catch (e) {
+      console.warn("i360 theme: using the", source === "cache" ? "saved copy" : "page's own colours", "—", e.message);
+    }
+    return { ...state, source };
+  }
+
+  // src/page-chrome.js
+  var $ = (id) => document.getElementById(id);
+  var IN_APP = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
+  var THEME_ICONS = Object.freeze({
+    system: '<svg data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>',
+    light: '<svg data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>',
+    sepia: '<svg data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>',
+    dark: '<svg data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>'
+  });
+  function drawSettingsButtons(themeBtn, numeralsBtn, lang) {
+    const theme = getChoice(), numerals = getNumerals();
+    themeBtn.innerHTML = THEME_ICONS[theme];
+    setLabel(themeBtn, themeLabel(theme, lang));
+    numeralsBtn.textContent = NUMERALS_SAMPLE[numerals];
+    setLabel(numeralsBtn, numeralsLabel(numerals, lang));
+  }
+  function wireSettingsButtons(themeBtn, numeralsBtn) {
+    themeBtn.addEventListener("click", () => {
+      cycle();
+    });
+    numeralsBtn.addEventListener("click", () => {
+      cycleNumerals();
+    });
+  }
+  function setLabel(control, text) {
+    control.title = text;
+    control.setAttribute("aria-label", text);
+  }
+
+  // src/exegesis.js
+  function findExegesisUrl(rows2, chapter, verse) {
+    const match = rows2.find((r) => r.chapter === chapter && verse >= r.verseMin && verse <= r.verseMax);
+    return match ? match.url : null;
+  }
+
+  // src/platform.js
+  function detectOS(userAgent = globalThis.navigator ? globalThis.navigator.userAgent : "") {
+    const ua = userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua)) return "ios";
+    if (/android/.test(ua)) return "android";
+    return "web";
+  }
+  function isDesktop(userAgent) {
+    return detectOS(userAgent) === "web";
+  }
+
+  // src/sites.js
+  var APP_HOST = "i36o.web.app";
+  var APP_ORIGIN = `https://${APP_HOST}`;
+  var SITE_FORWARDERS = Object.freeze(["i360-e.web.app", "i360-hub.web.app"]);
+  var TOOL_FORWARDERS = Object.freeze({ "i360-day.web.app": "day", "i360-md.web.app": "md", "i360-cse.web.app": "cse" });
+  var OLD_BOOK_PATHS = Object.freeze({
+    [APP_HOST]: "/md/books/",
+    ...Object.fromEntries(SITE_FORWARDERS.map((host) => [host, "/md/books/"])),
+    "i360-md.web.app": "/books/"
+  });
+  var LIB_HOST = "lib.i36o.workers.dev";
+  var LIB = `https://${LIB_HOST}/`;
+  var TANZIL_ORIGIN = "https://tanzil.net";
+
+  // src/locales.js
+  var QURAN = {
+    ar: {
+      tafsir: "تفسير",
+      tafsirTitle: "تفسير الآية الظاهرة",
+      noVerse: "تعذّرت قراءة الآية الظاهرة",
+      notFound: "لا يوجد تفسير لهذه الآية",
+      openFailed: "تعذّر فتح التفسير",
+      unavailable: "التفسير غير متاح الآن",
+      tanzil: "مشروع تنزيل — tanzil.net"
+    }
+  };
+
+  // src/quran/verse.js
+  function readVerse(frame2) {
+    let w;
+    try {
+      w = frame2.contentWindow;
+      if (!w || !w.document) return null;
+    } catch {
+      return null;
+    }
+    try {
+      const c = w.curr;
+      if (c && valid(c.sura, c.aya)) return { sura: c.sura, aya: c.aya, from: "curr" };
+    } catch {
+    }
+    try {
+      const m = String(w.document.title).match(/\[(\d{1,3}):(\d{1,3})\]/);
+      if (m && valid(+m[1], +m[2])) return { sura: +m[1], aya: +m[2], from: "title" };
+    } catch {
+    }
+    return null;
+  }
+  var valid = (sura, aya) => Number.isInteger(sura) && Number.isInteger(aya) && sura >= 1 && sura <= 114 && aya >= 1 && aya <= 286;
+  var ICONS = {
+    languages: '<svg data-lucide="languages" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>',
+    "circle-alert": '<svg data-lucide="circle-alert" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>',
+    "circle-question-mark": '<svg data-lucide="circle-question-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>',
+    "circle-x": '<svg data-lucide="circle-x" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>',
+    "database-x": '<svg data-lucide="database-x" viewBox="0 0 24 24" aria-hidden="true"><path d="m17 17 5 5"></path><path d="M19.323 13.744A9 3 0 0 0 21 12"></path><path d="M21 13.127V5"></path><path d="m22 17-5 5"></path><path d="M3 12A9 3 0 0 0 13.563 14.954"></path><path d="M3 5V19A9 3 0 0 0 13 21.981"></path><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse></svg>'
+  };
+
+  // src/quran/main.js
+  var T = QURAN.ar;
+  var EMBED = "/?embed=true&defTrans=ar.jalalayn";
+  var FLASH_MS = 1500;
+  var btnTheme = $("btn-theme");
+  var btnNumerals = $("btn-numerals");
+  var btnTafsir = $("btn-tafsir");
+  var tafsirIcon = $("tafsir-icon");
+  var frame = $("tanzil");
+  var announce = $("announce");
+  var rows = null;
+  var flashTimer = 0;
+  function showIcon(name) {
+    tafsirIcon.innerHTML = ICONS[name];
+  }
+  function rest() {
+    showIcon("languages");
+    setLabel(btnTafsir, T.tafsirTitle);
+    btnTafsir.disabled = !rows;
+  }
+  function flash(name, words) {
+    clearTimeout(flashTimer);
+    showIcon(name);
+    setLabel(btnTafsir, words);
+    announce.textContent = words;
+    flashTimer = setTimeout(rest, FLASH_MS);
+  }
+  function unavailable() {
+    rows = null;
+    clearTimeout(flashTimer);
+    showIcon("database-x");
+    setLabel(btnTafsir, T.unavailable);
+    btnTafsir.disabled = true;
+  }
+  function openExegesis(url) {
+    if (isDesktop()) {
+      const w = window.open(url, "_blank");
+      if (!w) {
+        flash("circle-x", T.openFailed);
+        return;
+      }
+      w.opener = null;
+    } else {
+      window.location.assign(url);
+    }
+  }
+  btnTafsir.addEventListener("click", () => {
+    if (!rows) return;
+    const verse = readVerse(frame);
+    if (!verse) {
+      flash("circle-alert", T.noVerse);
+      return;
+    }
+    const url = findExegesisUrl(rows, verse.sura, verse.aya);
+    if (!url) {
+      flash("circle-question-mark", T.notFound);
+      return;
+    }
+    openExegesis(url);
+  });
+  var redraw = () => drawSettingsButtons(btnTheme, btnNumerals);
+  wireSettingsButtons(btnTheme, btnNumerals);
+  onChange(redraw);
+  onNumeralsChange(redraw);
+  async function start() {
+    redraw();
+    init();
+    showIcon("languages");
+    setLabel(btnTafsir, T.tafsirTitle);
+    try {
+      const health = await fetchJson("/i360/health", { retries: 1 });
+      if (!health || !health.ok) throw new Error("not ok");
+      frame.src = EMBED;
+    } catch {
+      frame.src = TANZIL_ORIGIN + EMBED;
+      unavailable();
+      return;
+    }
+    try {
+      rows = await fetchJson("/i360/exegesis", { retries: 1 });
+      if (!Array.isArray(rows) || rows.length === 0) throw new Error("empty");
+      rest();
+    } catch {
+      unavailable();
+    }
+  }
+  void start();
+})();
+</script>
+</body>
+</html>

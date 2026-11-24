@@ -27,6 +27,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as inventory from './inventory.js';
 import { TANZIL_ORIGIN } from '../src/sites.js';
+import { exegesisRows } from '../src/exegesis.js';
 
 // Bump when the published files' shape changes: everything is redone.
 const FORMAT = 1;
@@ -105,16 +106,10 @@ async function readRevision(fetchFn, key, table) {
   return revision;
 }
 
-// The exegesis index: the rows the app matches against (Number() as the app does, §3).
+// The exegesis index, in the shape the app and the quran page look it up in (src/exegesis.js).
 async function readExegesis(fetchFn, key, table) {
   const { rows } = await inventory.readRows(fetchFn, key, table, [...EXEGESIS_FIELDS]);
-  return rows.map((r) => ({
-    chapter: Number(inventory.fieldText(r.QuranChapter)),
-    verseMin: Number(inventory.fieldText(r.QuranVerseMin)),
-    verseMax: Number(inventory.fieldText(r.QuranVerseMax)),
-    url: inventory.fieldText(r.ExegesisURL).trim(),
-    page: Number(inventory.fieldText(r.ExegesisPage)) || null
-  })).filter((r) => r.chapter > 0 && r.verseMin > 0 && r.verseMax >= r.verseMin && r.url);
+  return exegesisRows(rows.map((r) => Object.fromEntries(EXEGESIS_FIELDS.map((f) => [f, inventory.fieldText(r[f])]))));
 }
 
 async function mapLimit(items, limit, fn) {

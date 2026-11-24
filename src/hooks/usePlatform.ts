@@ -1,18 +1,10 @@
 import { useEffect } from 'react'
 import { useAppState } from '@/store/appState'
 
-type OSType = 'android' | 'ios' | 'web'
+import { detectOS, isDesktop, type OSType } from '@i360/platform'
 
-export function detectOS(): OSType {
-  const ua = navigator.userAgent.toLowerCase()
-  if (/iphone|ipad|ipod/.test(ua)) return 'ios'
-  if (/android/.test(ua)) return 'android'
-  return 'web'
-}
-
-export function isDesktop(): boolean {
-  return detectOS() === 'web'
-}
+// One copy of the device check, shared with the hub pages (hub/src/platform.js).
+export { detectOS, isDesktop }
 
 // On a genuine desktop browser there's no real "native app" identity to
 // resolve to — but toggling useWeb off is meant to let a desktop developer

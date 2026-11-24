@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!--@@CSP@@-->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>القرآن الكريم — مشروع تنزيل</title>
+  <meta name="description" content="القرآن الكريم من مشروع تنزيل (tanzil.net)، مع زر لتفسير الآية الظاهرة من فهرس الموسوعة الإسلامية i360إ.">
+  <meta name="robots" content="noindex">
+
+  <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev):
+       1. built-in colours, used until theme.css arrives and when it can't;
+       2. the saved theme and the saved copy of theme.css, before anything is drawn;
+       3. the loader (bundled into the page's script). -->
+  <style id="i360-fallback">/*@@THEME_FALLBACK@@*/</style>
+  <script>/*@@THEME_EARLY@@*/</script>
+  <link rel="preconnect" href="/*@@THEME_ORIGIN@@*/" crossorigin>
+
+  <style>
+    /* Colours: the shared theme's own variables (--i360-…, hub/theme/site/theme.css). */
+    body {
+      font-family: var(--i360-font);
+      font-size: var(--i360-text-size);
+      background-color: var(--i360-bg);
+      color: var(--i360-text);
+      line-height: var(--i360-line-height-ui);
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------- Toolbar ---------- */
+    /*@@PAGE_CHROME@@*/
+    /* The bar and everything in it: src/page-chrome.css. Here: its place in the page. */
+    .toolbar { flex-shrink: 0; z-index: var(--i360-layer-bar); }
+
+    /* ---------- Tanzil ---------- */
+    /* Tanzil's own banner, linked to tanzil.net: its credit on every screen (its page shows its
+       header only on wide ones). At its own width at most, centred. */
+    .banner { flex-shrink: 0; display: block; border-bottom: var(--i360-line-width) solid var(--i360-border); }
+    .banner img { display: block; width: 100%; max-width: 48rem; height: auto; margin-inline: auto; }
+    .tanzil { flex: 1; min-height: 0; width: 100%; border: 0; display: block; background-color: var(--i360-bg); }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  </style>
+</head>
+<body class="i360-page">
+  <!-- In Arabic from the right: theme · numerals | «تفسير» … title (i360-hub.md §10 "Toolbars"). No ✕:
+       the app opens this page in the browser overlay, which has its own. -->
+  <header class="toolbar">
+    <div class="tb-start">
+      <button class="toolbar-btn" id="btn-theme" type="button"></button>
+      <button class="toolbar-btn numerals-btn" id="btn-numerals" type="button"></button>
+      <span class="divider" aria-hidden="true"></span>
+      <button class="toolbar-btn toolbar-btn-label" id="btn-tafsir" type="button" disabled><span id="tafsir-icon"></span><span id="tafsir-label">تفسير</span></button>
+    </div>
+    <div class="tb-title">القرآن الكريم</div>
+  </header>
+  <a class="banner" id="banner" href="https://tanzil.net/" target="_blank" rel="noopener"><img src="/img/header.png" width="768" height="72" alt="مشروع تنزيل — tanzil.net"></a>
+  <iframe class="tanzil" id="tanzil" title="مشروع تنزيل — القرآن الكريم"></iframe>
+  <div class="sr-only" id="announce" role="status" aria-live="polite"></div>
+
+  <script>/*@@MAIN@@*/</script>
+</body>
+</html>

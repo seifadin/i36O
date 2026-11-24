@@ -3,13 +3,13 @@ import {
   fetchSciences,
   fetchResources,
   fetchQuran,
-  findExegesisUrl as findExegesisUrlFn,
   feedbackMailto,
   Science,
   Resource,
   QuranEntry,
 } from '@/api/dataSource'
 import { MD_READER_KEY } from '@i360/storage'
+import { exegesisRows, findExegesisUrl as findExegesisUrlFn } from '@i360/exegesis'
 import { deviceStore } from '@/lib/deviceStorage'
 import { hasChanged, commitBaseline } from '@/lib/changeBaseline'
 import { isNetworkFailure } from '@/lib/startupHealth'
@@ -240,10 +240,12 @@ export function DataCacheProvider({ children }: { children: ReactNode }): JSX.El
     }
   }, [])
 
+  // The lookup itself is shared with the quran page and the CSE indexer (hub/src/exegesis.js).
+  const exegesis = useMemo(() => exegesisRows(quran), [quran])
   const findExegesisUrl = useCallback(
     (chapter: number, verse: number): string | null =>
-      findExegesisUrlFn(quran, chapter, verse),
-    [quran]
+      findExegesisUrlFn(exegesis, chapter, verse),
+    [exegesis]
   )
 
   const value = useMemo(

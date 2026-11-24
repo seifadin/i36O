@@ -158,6 +158,8 @@ export default defineConfig(({ command }) => ({
       '@i360/storage': fileURLToPath(new URL('./hub/src/storage.js', import.meta.url)),
       '@i360/sites': fileURLToPath(new URL('./hub/src/sites.js', import.meta.url)),
       '@i360/dates': fileURLToPath(new URL('./hub/src/dates.js', import.meta.url)),
+      '@i360/exegesis': fileURLToPath(new URL('./hub/src/exegesis.js', import.meta.url)),
+      '@i360/platform': fileURLToPath(new URL('./hub/src/platform.js', import.meta.url)),
     },
   },
   build: { target: BUILD_TARGETS },

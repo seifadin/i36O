@@ -29,6 +29,19 @@ export const CSE = {
 };
 
 // The Reader: Arabic for a right-to-left book, else English.
+// The quran page (quran.i36o.workers.dev/i360/): Arabic only, like the app.
+export const QURAN = {
+  ar: {
+    tafsir: 'تفسير',
+    tafsirTitle: 'تفسير الآية الظاهرة',
+    noVerse: 'تعذّرت قراءة الآية الظاهرة',
+    notFound: 'لا يوجد تفسير لهذه الآية',
+    openFailed: 'تعذّر فتح التفسير',
+    unavailable: 'التفسير غير متاح الآن',
+    tanzil: 'مشروع تنزيل — tanzil.net'
+  }
+};
+
 export const READER = {
   ar: {
     appTitle: 'قارئ الماركداون',

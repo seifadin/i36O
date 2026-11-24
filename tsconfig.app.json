@@ -38,6 +38,12 @@
       ],
       "@i360/dates": [
         "./hub/src/dates.js"
+      ],
+      "@i360/exegesis": [
+        "./hub/src/exegesis.js"
+      ],
+      "@i360/platform": [
+        "./hub/src/platform.js"
       ]
     },
     "noImplicitReturns": true,

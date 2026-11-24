@@ -165,6 +165,14 @@ svg[data-lucide] {
 /* The numerals button shows digits (٣ / 3). */
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
 
+/* A button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»): set off
+   from the icon-only buttons by a box and bold text. */
+.toolbar-btn-label {
+  background-color: var(--i360-input, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--toolbar-line);
+  font-weight: 700;
+}
+
 /* The tap area, not drawn: each button in the bar reaches from the bar's top edge to its bottom, so
    it stays the bar's full height whatever the two heights above are. Sideways it is the button's
    own width (the buttons sit close together). Not in the menu, whose rows are close together. */

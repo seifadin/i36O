@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-fYJc3jAm9pOF4Qql0BxhMxxR0Ug59SK+jjAq9T86CqE='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-fYJc3jAm9pOF4Qql0BxhMxxR0Ug59SK+jjAq9T86CqE='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -449,6 +449,14 @@ svg[data-lucide] {
 
 /* The numerals button shows digits (٣ / 3). */
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* A button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»): set off
+   from the icon-only buttons by a box and bold text. */
+.toolbar-btn-label {
+  background-color: var(--i360-input, #FAF7F2);
+  border: var(--i360-line-width, 1px) solid var(--toolbar-line);
+  font-weight: 700;
+}
 
 /* The tap area, not drawn: each button in the bar reaches from the bar's top edge to its bottom, so
    it stays the bar's full height whatever the two heights above are. Sideways it is the button's

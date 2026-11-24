@@ -3,9 +3,12 @@
 //
 //   /php/get-aya.php, /php/search.php  answered here from the lib site (data.js) — tanzil's own
 //                                      scripts refuse requests from other sites, and are never called
+//   /i360/                             the i360 page (site/i360/index.html, built by scripts/build.js
+//                                      from src/quran.src.html; served as a static file, not by this code)
 //   /i360/health                       200 {ok, pageVersion, texts, exegesis} when the data can be
 //                                      served, 503 {ok: false, error} when not (the page then shows
 //                                      tanzil's official embed instead)
+//   /i360/exegesis                     the exegesis index (src/exegesis.js's rows) for «تفسير»
 //   anything else                      tanzil.net, passed through unchanged; a redirect to
 //                                      tanzil.net is pointed back at this address
 //
@@ -47,6 +50,13 @@ export default {
     if (url.pathname === '/i360/health') {
       try { return json(await s.health()); } catch (err) { return json({ ok: false, error: err.message }, 503); }
     }
+    if (url.pathname === '/i360/exegesis') {
+      try {
+        return new Response(JSON.stringify(await s.exegesis()), {
+          headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=300' }
+        });
+      } catch (err) { return failed(err); }
+    }
     if (request.method === 'POST' && url.pathname === '/php/get-aya.php') {
       try {
         return new Response(await s.getAya(await request.formData()), { headers: { 'Content-Type': 'application/json; charset=utf-8' } });
@@ -60,4 +70,3 @@ export default {
     return passThrough(request, url);
   }
 };
-
