@@ -27,6 +27,8 @@ src/reader.src.html + src/reader/*.js      the Reader        → ../public/md/in
                       (main.js wires its parts; fold.js: what its toolbar folds, in which order)
 src/cse.src.html + src/cse/main.js         the i360 CSE      → ../public/cse/index.html
 src/day.src.html + src/day/main.js         Daily Reflection «التأمل اليومي» → ../public/day/index.html
+src/quran.src.html + src/quran/*.js        the quran page (tanzil + «تفسير») → quran/site/i360/index.html
+                      (verse.js: which verse tanzil shows; served by the quran Worker at /i360/)
 src/locales.js        every page's interface text, one section per page, all its languages
 src/page-chrome.css   every toolbar (the app's too: it imports this file), the pages' base, the keyboard
                       focus ring, every Lucide icon's style — inlined into each page by the build
@@ -42,10 +44,16 @@ src/dates.js          every date a page shows: numericDate() (year first, held i
                       — Daily Reflection and the CSE
 src/digits.js         the digit converter (0123 · ٠١٢٣ · ۰۱۲۳): writeNumerals(), toWestern() — used by the theme
                       loader (a link beside it on the theme site, like net.js), book-format.js and the Hijri Worker
-src/sites.js          every i360 address (app site, forwarders, old book paths, lib, theme) — also the
-                      app's (@i360/sites); test/sites.test.js checks firebase.json against it
+src/sites.js          every i360 address (app site, forwarders, old book paths, lib, theme) and tanzil's — also
+                      the app's (@i360/sites); test/sites.test.js checks firebase.json against it
+src/exegesis.js       the exegesis lookup: exegesisRows(), findExegesisUrl() — the app (@i360/exegesis), the
+                      quran page and the indexer
+src/platform.js       detectOS(), isDesktop() — the app (@i360/platform) and the quran page
 library/books/        our own books     → lib.i36o.workers.dev/books/ (published by the CSE index workflow)
-indexer/wrangler.jsonc  the lib Worker (lib.i36o.workers.dev: the CSE build and our books, files only)
+indexer/wrangler.jsonc  the lib Worker (lib.i36o.workers.dev: the CSE build, our books and quran/, files only)
+indexer/quran-data.js tanzil's Quran texts and translations and the exegesis index → lib's quran/ (every CSE build)
+quran/                the quran Worker (quran.i36o.workers.dev): tanzil's Navigator from our address, its two
+                      data scripts answered from lib (worker/data.js), the page (site/i360/) — i360-quran.md
 forward/404.html      fallback for the forwarding sites
 tools/compare/        dev-only old-vs-new checks (Playwright, not run by npm test); `node run.js` runs only
                       the ones a change needs — its README
@@ -61,7 +69,8 @@ npm test && npm run build
 Every `.js` here is an ES module (`"type": "module"`, like the app). The build bundles each
 page's `main.js` with what it imports (shared files, marked, adhan, the theme loader) into
 one inline script, with esbuild (pinned).
-Then commit the app's `public/md|cse|day/index.html`; they reach users with the app's web + OTA release.
+Then commit the app's `public/md|cse|day/index.html` (they reach users with the app's web + OTA release) and
+`quran/site/i360/index.html` (published with the quran Worker).
 
 Never edit the built pages in `../public/` by hand: edit `src/`, then build. The pages'
 security policy allows only the exact scripts they were built with, so a hand edit makes
@@ -85,7 +94,8 @@ theme/wrangler.jsonc         the theme Worker (files only)
   One theme choice is shared by all of them.
 - **Publishing:** the i360 pre-push hook, on every push to `vite` that changes `hub/theme/`
   (colour check first; or by hand: `npm run publish-theme` with the Cloudflare values from
-  `.env`). The Hijri Worker (`hub/hijri/`) is published the same way.
+  `.env`). The Hijri Worker (`hub/hijri/`) and the quran Worker (`hub/quran/`, `npm run publish-quran`) are
+  published the same way.
 - **Colours:** after changing a colour that a `color-mix` is made from,
   `node theme/fallbacks.js --write` (`npm test` and the hook's colour check stop while one is stale).
 
