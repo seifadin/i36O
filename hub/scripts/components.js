@@ -10,6 +10,12 @@
 //   <!--@@SETTINGS_BUTTONS@@-->
 //   <!--@@DIVIDER@@-->
 //   <!--@@TOOLBAR_TITLE data-i18n="title"@@-->Daily Reflection<!--@@/TOOLBAR_TITLE@@-->
+//   <!--@@CHIP id="opt-word" text="كلمة كاملة" title="…"@@-->       (label-i18n: the label's words)
+//   <!--@@FIELD kind="search" id="q" name="q" aria-label="…"@@-->  (kind: search, number or select)
+//   <!--@@BUTTON id="btn-expand" icon="expandAll" label="…" small@@-->  (or text="…"; primary; type="submit")
+//   <!--@@LIST_ITEM id="lang-ar" lang="ar" data-lang="ar" text="العربية"@@-->
+//   <!--@@CARD id="quran-card" class="…"@@--> …the page's own contents… <!--@@/CARD@@-->
+//   (likewise INSET, POPUP, BANNER and TOAST; tag="…" where the container allows another element)
 //
 // A misspelled component, a missing field or an unknown meaning stops the build. A placeholder
 // with no attributes that isn't a component (<!--@@CSP@@-->) is build.js's own and is left for it;
@@ -19,7 +25,17 @@ import { svgFor } from './icons.js';
 import * as C from '../src/components.js';
 
 const PLACEHOLDER = /<!--@@([A-Z_]+)((?:\s+[a-z0-9-]+(?:="[^"]*")?)*)\s*@@-->/g;
-const TITLE = /<!--@@TOOLBAR_TITLE((?:\s+[a-z0-9-]+(?:="[^"]*")?)*)\s*@@-->([\s\S]*?)<!--@@\/TOOLBAR_TITLE@@-->/g;
+// Placeholders around the page's own contents: the title, and the containers.
+const PAIRED = Object.freeze({
+  TOOLBAR_TITLE: (a, inner) => C.toolbarTitle({ ...a, html: inner.trim() }),
+  CARD: (a, inner) => C.box('card', { ...a, html: inner }),
+  INSET: (a, inner) => C.box('inset', { ...a, html: inner }),
+  POPUP: (a, inner) => C.box('popup', { ...a, html: inner }),
+  BANNER: (a, inner) => C.box('banner', { ...a, html: inner }),
+  TOAST: (a, inner) => C.box('toast', { ...a, html: inner }),
+});
+// Its contents hold no opening of the same container, so the innermost pair is written first.
+const pairedPattern = (name) => new RegExp(`<!--@@${name}((?:\\s+[a-z0-9-]+(?:="[^"]*")?)*)\\s*@@-->((?:(?!<!--@@${name}[\\s@])[\\s\\S])*?)<!--@@\\/${name}@@-->`, 'g');
 
 function parse(text) {
   const a = {};
@@ -36,17 +52,28 @@ const COMPONENTS = Object.freeze({
   MENU_BUTTON: (a, draw) => C.menuButton({ ...a, icon: a.icon ? draw(a.icon) : undefined, textId: a['text-id'] }),
   SETTINGS_BUTTONS: () => C.settingsButtons(),
   DIVIDER: (a) => C.divider(a),
+  CHIP: (a) => C.chip(a),
+  FIELD: (a) => C.field(a),
+  BUTTON: (a, draw) => C.button({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
+  LIST_ITEM: (a) => C.listItem(a),
 });
 
 // The page's HTML with every component written out.
 function writeComponents(html, draw = svgFor) {
-  const titled = html.replace(TITLE, (_, attrs, inner) => C.toolbarTitle({ ...parse(attrs), html: inner.trim() }));
-  return titled.replace(PLACEHOLDER, (all, name, attrs) => {
+  // Innermost first, so a container may hold another (and any component).
+  let out = html, before;
+  do {
+    before = out;
+    for (const [name, make] of Object.entries(PAIRED)) {
+      out = out.replace(pairedPattern(name), (_, attrs, inner) => make(parse(attrs), inner));
+    }
+  } while (out !== before);
+  return out.replace(PLACEHOLDER, (all, name, attrs) => {
     const make = COMPONENTS[name];
     if (make) return make(parse(attrs), draw);
-    if (!attrs.trim() && name !== 'TOOLBAR_TITLE') return all;   // build.js's own; it fails on any left over
+    if (!attrs.trim() && !(name in PAIRED)) return all;   // build.js's own; it fails on any left over
     throw new Error(`unknown component <!--@@${name}…@@-->`);
   });
 }
 
-export { writeComponents, COMPONENTS };
+export { writeComponents, COMPONENTS, PAIRED };

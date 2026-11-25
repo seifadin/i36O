@@ -8,7 +8,8 @@ import * as i360Theme from '../../theme/site/theme-loader.js';
 import * as HijriCalc from '../../hijri/calc.js';
 import * as HijriClient from '../../hijri/client.js';
 import DAY_CITIES from '../day-cities.json';
-import { $, drawSettingsButtons, el, setLabel, setupClose, wireSettingsButtons } from '../page-chrome.js';
+import { $, drawSettingsButtons, el, fromMarkup, setLabel, setupClose, wireSettingsButtons } from '../page-chrome.js';
+import { box as componentBox, listItem } from '../components.js';
 import { oncePerFrame } from '../frame.js';
 import { createStore } from '../storage.js';
 import { fetchJson } from '../net.js';
@@ -349,8 +350,7 @@ const Picker = {
     this.input.placeholder = L.citySearch; this.input.setAttribute('aria-label', L.citySearch);
     UI.set('city-status', { loading: L.loading, none: L.cityNone, error: L.loadError }[this.state] || '');
     const row = (label, sub, on, pick) => {
-      const b = el('button', `i360-list-item${on ? ' active-btn' : ''}`);
-      b.type = 'button'; b.setAttribute('role', 'option'); b.setAttribute('aria-selected', on);
+      const b = fromMarkup(listItem({ class: on ? 'active-btn' : undefined, role: 'option', 'aria-selected': String(on) }));
       b.append(el('span', 'font-bold', label)); if (sub) b.append(el('span', 'text-sm ms-sm', sub));
       b.addEventListener('click', pick);
       return b;
@@ -654,7 +654,8 @@ const UI = {
     if (!next) next = 'Fajr';                                 // after Isha the next prayer is tomorrow's Fajr
     grid.replaceChildren(...CONFIG.P_KEYS.map((k, i) => {
       const isNext = k === next, m = /(\d{1,2}):(\d{2})/.exec(t[k] || '');
-      const box = el('div', `flex flex-col items-center p-sm transition-all ${isNext ? 'next-prayer-highlight' : 'i360-inset'}`);
+      const box = isNext ? el('div', 'flex flex-col items-center p-sm transition-all next-prayer-highlight')
+        : fromMarkup(componentBox('inset', { class: 'flex flex-col items-center p-sm transition-all' }));
       box.append(
         el('span', `text-sm font-bold ${isNext ? 'text-accent' : 'text-custom-secondary'}`, L.prayers[i]),
         el('span', `text-base font-bold mt-xs ${isNext ? 'text-accent' : 'text-custom-secondary'}`, m ? m[0] : '—'));
@@ -678,7 +679,8 @@ const UI = {
       note.replaceChildren(`${L.eventsNote} (`, a, ')');
     }
     list.replaceChildren(...Hijri.events(h).map(e => {
-      const row = el('div', `flex justify-between items-center gap-md p-md transition-all ${e.isT ? 'border-2 border-event bg-event-bg rounded-lg' : 'i360-inset'}`);
+      const row = e.isT ? el('div', 'flex justify-between items-center gap-md p-md transition-all border-2 border-event bg-event-bg rounded-lg')
+        : fromMarkup(componentBox('inset', { class: 'flex justify-between items-center gap-md p-md transition-all' }));
       const left = el('div', 'flex-1'), title = el('div', 'flex items-center gap-sm');
       title.append(el('span', 'text-base font-bold text-custom-secondary', L.events[e.id]));
       if (e.isT) title.append(el('span', 'bg-event text-page text-sm font-bold px-sm rounded-full', L.todayLabel));

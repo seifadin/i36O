@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-6JC6fC0SLRKL+mLK72UJ20xnjFRoqfUE1TtzYy4sTkg='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-jEomA7KnUbSI7LbE+5oKGTGPffdmADyLRK2va/cjStA='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -550,7 +550,7 @@ svg[data-lucide] {
 .i360-chip[aria-pressed="true"] .i360-chip-box::after { content: '✓'; }
 
 /* Buttons: pills, as on Android and iOS. Outlined by default; filled (.i360-btn-primary) for the main
-   action; .i360-btn-sm for small ones beside text (retry, more). */
+   action; .i360-btn-sm for small ones beside text (retry, more); .i360-btn-icon for an icon alone. */
 .i360-btn {
   display: inline-flex;
   align-items: center;
@@ -571,6 +571,10 @@ svg[data-lucide] {
 .i360-btn:hover:not(:disabled) { background: var(--i360-hover, #EEF2FF); }
 .i360-btn-primary, .i360-btn-primary[type], .i360-btn-primary:hover:not(:disabled) { background: var(--i360-accent, #0010CF); border-color: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
 .i360-btn-sm { padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem); font-size: var(--i360-text-size-sm, 0.875rem); }
+/* A button's icon, with or without words beside it: the toolbar icons' size. An icon-only button
+   (src/components.js button with an icon and no text) has just a little padding round it. */
+.i360-btn > svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+.i360-btn-icon { padding: var(--i360-space-xs, 0.25rem); }
 .i360-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
 
 /* A row in a list or menu. Hover (or the keyboard's current row, .active): the hover colour; the chosen
@@ -1124,8 +1128,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       <div class="tb-group" id="group-nav">
         <button class="toolbar-btn" type="button" id="btn-nav-left"><svg data-icon="pageLeft" data-lucide="arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button>
         <div class="page-counter">
-          <select id="vol-select" class="vol-select i360-field" hidden></select>
-          <input type="text" inputmode="numeric" autocomplete="off" id="page-num-input" class="page-input i360-field" value="">
+          <select class="i360-field vol-select" id="vol-select" hidden></select>
+          <input class="i360-field page-input" type="text" inputmode="numeric" autocomplete="off" id="page-num-input">
           <span id="lbl-of">of</span>
           <span id="total-pages">0</span>
           <span id="page-pos" class="page-pos"></span>
@@ -1172,9 +1176,9 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   </div>
 
   <!-- Search -->
-  <div class="search-popup i360-popup" id="search-popup" role="search">
+  <div class="i360-popup search-popup" id="search-popup" role="search">
     <div class="search-row">
-      <input type="search" id="search-input" class="search-input i360-field i360-field-search" autocomplete="off" enterkeyhint="search">
+      <input class="i360-field i360-field-search search-input" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" id="search-input">
       <span class="search-count" id="search-count" aria-live="polite">0 of 0</span>
       <button class="toolbar-btn" type="button" id="btn-search-prev"><svg data-icon="resultPrevious" data-lucide="arrow-up" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg></button>
       <button class="toolbar-btn" type="button" id="btn-search-next"><svg data-icon="resultNext" data-lucide="arrow-down" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg></button>
@@ -1182,8 +1186,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       <button class="toolbar-btn" type="button" id="btn-search-close"><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
     </div>
     <div class="search-row">
-      <button class="i360-chip" id="opt-diacritics" type="button" aria-pressed="false"><span class="i360-chip-box"></span><span class="chip-label"></span></button>
-      <button class="i360-chip" id="opt-word" type="button" aria-pressed="false"><span class="i360-chip-box"></span><span class="chip-label"></span></button>
+      <button class="i360-chip" type="button" id="opt-diacritics" aria-pressed="false"><span class="i360-chip-box"></span><span class="i360-chip-label"></span></button>
+      <button class="i360-chip" type="button" id="opt-word" aria-pressed="false"><span class="i360-chip-box"></span><span class="i360-chip-label"></span></button>
     </div>
     <ol class="search-results" id="search-results" hidden></ol>
   </div>
@@ -1202,13 +1206,13 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     <svg data-icon="exitReadingMode" data-lucide="minimize" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
   </button>
 
-  <div class="toast i360-toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="i360-toast toast" id="toast" role="status" aria-live="polite"></div>
 
   <input type="file" id="file-input" accept=".md,.markdown,.txt,text/markdown,text/plain">
 
   <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
-    <div class="missing-pages-banner i360-banner" id="missing-pages-banner" role="status">
-      <svg data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+    <div class="i360-banner missing-pages-banner" id="missing-pages-banner" role="status">
+      <svg data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>
     </div>
 
@@ -1674,6 +1678,67 @@ ${body}`;
     return { source, books: itemBooks(catalog, source), text: texts.filter(Boolean).join("\n\n") };
   }
 
+  // src/components.js
+  var escapeText = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  var escapeAttr = (s) => escapeText(s).replace(/"/g, "&quot;");
+  var ATTRIBUTE_ORDER = [
+    "id",
+    "name",
+    "href",
+    "target",
+    "rel",
+    "lang",
+    "dir",
+    "role",
+    "label",
+    "title",
+    "aria-label",
+    "placeholder",
+    "aria-controls",
+    "aria-labelledby",
+    "aria-haspopup",
+    "aria-expanded",
+    "aria-pressed",
+    "aria-selected",
+    "aria-live",
+    "data-i18n"
+  ];
+  function attributes(a) {
+    let out = "";
+    const write = (name, value) => {
+      if (value === void 0 || value === null || value === false) return;
+      if (name === "label") out += ` title="${escapeAttr(value)}" aria-label="${escapeAttr(value)}"`;
+      else out += value === true ? ` ${name}` : ` ${name}="${escapeAttr(value)}"`;
+    };
+    for (const name of ATTRIBUTE_ORDER) write(name, a[name]);
+    for (const name of Object.keys(a).filter((k2) => k2.startsWith("data-") && k2 !== "data-i18n").sort()) write(name, a[name]);
+    return out;
+  }
+  var TOOLBAR_BUTTON = "toolbar-btn";
+  var TITLE = "tb-title";
+  var flags = (a) => `${a.disabled ? " disabled" : ""}${a.hidden ? " hidden" : ""}`;
+  var classes = (own, extra) => extra ? `${own} ${extra}` : own;
+  function toolbarButton(a = {}) {
+    return `<button class="${classes(TOOLBAR_BUTTON, a.class)}" type="button"${attributes(a)}${flags(a)}>${a.icon || ""}</button>`;
+  }
+  var CLASS_CHIP_LABEL = "i360-chip-label";
+  var FIELD_KINDS = Object.freeze({
+    search: ' type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"',
+    number: ' type="text" inputmode="numeric" autocomplete="off"'
+  });
+  function listItem(a = {}) {
+    const inner = escapeText(a.text ?? "");
+    return a.href !== void 0 ? `<a class="${classes("i360-list-item", a.class)}"${attributes(a)}>${inner}</a>` : `<button class="${classes("i360-list-item", a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
+  }
+  var BOXES = Object.freeze({
+    card: { cls: "i360-card", tags: ["section", "details", "div"] },
+    inset: { cls: "i360-inset", tags: ["div", "details"] },
+    popup: { cls: "i360-popup", tags: ["div"] },
+    banner: { cls: "i360-banner", tags: ["div"], role: "status" },
+    toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" }
+  });
+  var CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
+
   // src/page-chrome.js
   var $ = (id) => document.getElementById(id);
   function el(tag, cls, text) {
@@ -1776,7 +1841,7 @@ ${body}`;
     };
     const setWidth = (value) => bar.style.setProperty("--toolbar-btn-w", value);
     const widen = (room) => {
-      const buttons = [...bar.querySelectorAll(".toolbar-btn")].filter((b) => b.offsetParent && !b.closest(".toolbar-menu"));
+      const buttons = [...bar.querySelectorAll(`.${CLASS.toolbarButton}`)].filter((b) => b.offsetParent && !b.closest(".toolbar-menu"));
       if (!buttons.length || room <= 0) return;
       const narrow = buttons.map((b) => b.getBoundingClientRect().width).sort((a, b) => a - b);
       setWidth("var(--toolbar-h)");
@@ -3635,26 +3700,6 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     };
   }
 
-  // src/components.js
-  var escapeText = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  var escapeAttr = (s) => escapeText(s).replace(/"/g, "&quot;");
-  var ATTRIBUTE_ORDER = ["id", "label", "dir", "aria-controls", "aria-haspopup", "aria-expanded", "aria-pressed", "data-i18n"];
-  function attributes(a) {
-    let out = "";
-    for (const name of ATTRIBUTE_ORDER) {
-      const value = a[name];
-      if (value === void 0 || value === null || value === false) continue;
-      if (name === "label") out += ` title="${escapeAttr(value)}" aria-label="${escapeAttr(value)}"`;
-      else out += ` ${name}="${escapeAttr(value)}"`;
-    }
-    return out;
-  }
-  var flags = (a) => `${a.disabled ? " disabled" : ""}${a.hidden ? " hidden" : ""}`;
-  var classes = (own, extra) => extra ? `${own} ${extra}` : own;
-  function toolbarButton(a = {}) {
-    return `<button class="${classes("toolbar-btn", a.class)}" type="button"${attributes(a)}${flags(a)}>${a.icon || ""}</button>`;
-  }
-
   // src/reader/fold.js
   var READER_FOLD = [
     { items: ["group-text"], to: "text" },
@@ -3938,9 +3983,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     for (let i = 0; i < shown; i++) {
       const m = search.matches[i];
       const li = el("li");
-      const btn = el("button");
-      btn.type = "button";
-      btn.className = "i360-list-item";
+      const btn = fromMarkup(listItem());
       const page = el("span", "res-page", state.format === "plain" ? "" : pageLabelText(state.pages[m.page.idx], tr));
       const text = el("span");
       text.dir = "auto";
@@ -4062,9 +4105,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     if (panelCoversPage()) closePanel();
   }
   function panelItem(text, pageText, onClick, extraClass) {
-    const btn = el("button");
-    btn.type = "button";
-    btn.className = "i360-list-item panel-item" + (extraClass ? " " + extraClass : "");
+    const btn = fromMarkup(listItem({ class: "panel-item" + (extraClass ? " " + extraClass : "") }));
     const s1 = el("span", "item-text", text);
     s1.dir = "auto";
     const s2 = el("span", "item-page", pageText);
@@ -4550,8 +4591,8 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     setLabel(btnSearchNext, tr.nextMatch);
     setLabel(btnSearchList, tr.showResults);
     setLabel(btnSearchClose, tr.closeSearch);
-    optDiacritics.querySelector(".chip-label").textContent = tr.matchDiacritics;
-    optWord.querySelector(".chip-label").textContent = tr.wholeWord;
+    optDiacritics.querySelector(`.${CLASS.chipLabel}`).textContent = tr.matchDiacritics;
+    optWord.querySelector(`.${CLASS.chipLabel}`).textContent = tr.wholeWord;
     tabContents.textContent = tr.contentsTab;
     tabBookmarks.textContent = tr.bookmarksTab;
     setLabel(btnCopyLink, tr.copyLink);

@@ -6,7 +6,8 @@ import * as CseIndex from '../cse-index.js';
 import * as CseView from '../cse-view.js';
 import { fetchWithTimeout } from '../net.js';
 import { LIB } from '../sites.js';
-import { $, IN_APP, drawSettingsButtons, el, setupClose, wireSettingsButtons } from '../page-chrome.js';
+import { $, IN_APP, drawSettingsButtons, el, fromMarkup, setupClose, wireSettingsButtons } from '../page-chrome.js';
+import { CLASS, box as componentBox, button, listItem } from '../components.js';
 import { CSE as LOCALES } from '../locales.js';
 import { numericDate } from '../dates.js';
 
@@ -43,7 +44,7 @@ const fmtNum = (n) => fmt(Number(n).toLocaleString('en-US'));
 function applyNumerals() {
   drawSettingsButtons(btnTheme, btnNumerals);
   // The page and the header's name; not what the visitor typed.
-  for (const root of [document.querySelector('.tb-title'), document.querySelector('main')]) {
+  for (const root of [document.querySelector(`.${CLASS.title}`), document.querySelector('main')]) {
     i360Theme.convertNumerals(root, { skip: 'form', numerals: state.numerals });
   }
 }
@@ -62,8 +63,7 @@ i360Theme.onChange(({ choice }) => {
 
 // A small outlined button (retry, more).
 function smallButton(cls, text, onClick) {
-  const b = el('button', `${cls} i360-btn i360-btn-sm`.trim(), text);
-  b.type = 'button';
+  const b = fromMarkup(button({ class: cls, text, small: true }));
   b.addEventListener('click', onClick);
   return b;
 }
@@ -72,7 +72,7 @@ function smallButton(cls, text, onClick) {
 function setStatus(text, { error = false, retry = null } = {}) {
   statusEl.textContent = '';
   statusEl.classList.toggle('error', error);
-  statusEl.classList.toggle('i360-banner', error);
+  statusEl.classList.toggle(CLASS.banner, error);
   if (text) statusEl.append(fmt(text));
   if (retry) {
     statusEl.append(smallButton('retry', T.retry, retry));
@@ -204,7 +204,7 @@ function summaryLine(name) {
 }
 
 function makeMajor(ctx, M) {
-  const box = el('details', 'major i360-card');
+  const box = fromMarkup(componentBox('card', { tag: 'details', class: 'major' }));
   const { summary, count } = summaryLine(M.major);
   const body = el('div', 'major-body');
   box.append(summary, body);
@@ -234,7 +234,7 @@ function makeGroup(ctx, U, m) {
   const details = U.name != null;
   let box, count = null;
   if (details) {
-    box = el('details', 'inter i360-inset');
+    box = fromMarkup(componentBox('inset', { tag: 'details', class: 'inter' }));
     const line = summaryLine(U.name);
     count = line.count;
     const body = el('div', 'inter-body');
@@ -373,10 +373,9 @@ function addHit(ctx, g, hit) {
   g.shown++;
   const block = sourceBlock(ctx, g, hit.source);
   const sn = hit.snippets[0];
-  const a = el('a', 'hit i360-list-item');
   const link = CseView.resultLink(hit, ctx.q, sn ? sn.hit : '');
   const toReader = link.startsWith(CseView.READER);
-  a.href = link;
+  const a = fromMarkup(listItem({ href: link, class: 'hit' }));
   if (IN_APP) {
     // Inside the app: the Reader in this same view (its ✕ and the back button return
     // here); anything else in the phone's browser overlay, like every resource in the app.

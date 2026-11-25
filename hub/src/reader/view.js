@@ -2,6 +2,7 @@
 // and zoom.
 import * as i360Theme from '../../theme/site/theme-loader.js';
 import { drawSettingsButtons, setLabel, wireSettingsButtons } from '../page-chrome.js';
+import { CLASS } from '../components.js';
 import { oncePerFrame } from '../frame.js';
 import { ICON, TEXT_SCALES, ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from './text.js';
 import { btnClose, btnCopyLink, btnDirToggle, btnExitReading, btnFitPage, btnFitWidth, btnMore, btnNavLeft, btnNavRight, btnNumerals, btnOpenFile, btnPanel, btnPanelClose, btnReading, btnScan, btnSearchClose, btnSearchList, btnSearchNext, btnSearchPrev, btnSearchToggle, btnTextLarger, btnTextSmaller, btnTheme, btnZoomIn, btnZoomOut, emptyState, fmtNum, lang, lblOf, missingPagesBanner, moreMenu, optDiacritics, optWord, pageNumInput, pagesWrapper, search, searchInput, searchPopup, sidePanel, state, storeSet, t, tabBookmarks, tabContents, tbTitle, updateConnection, viewerContainer, volSelect } from './state.js';
@@ -51,8 +52,8 @@ function applyLocalization() {
   setLabel(btnSearchNext, tr.nextMatch);
   setLabel(btnSearchList, tr.showResults);
   setLabel(btnSearchClose, tr.closeSearch);
-  optDiacritics.querySelector('.chip-label').textContent = tr.matchDiacritics;
-  optWord.querySelector('.chip-label').textContent = tr.wholeWord;
+  optDiacritics.querySelector(`.${CLASS.chipLabel}`).textContent = tr.matchDiacritics;
+  optWord.querySelector(`.${CLASS.chipLabel}`).textContent = tr.wholeWord;
   tabContents.textContent = tr.contentsTab;
   tabBookmarks.textContent = tr.bookmarksTab;
   setLabel(btnCopyLink, tr.copyLink);

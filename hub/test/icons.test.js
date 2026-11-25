@@ -45,6 +45,8 @@ test('icons: a missing or unknown meaning, a name other than its meaning\'s, an 
   ].join('\n');
   assert.deepEqual(icons.check(page, FAKE, MEANINGS).map(p => p.line), [3, 4, 5, 6, 7, 8, 9]);
   assert.equal(icons.check(page, FAKE, MEANINGS)[5].problem, '"close" is not hidden from screen readers (aria-hidden="true")');
+  assert.match(icons.check(`<svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true" stroke="red">${X}</svg>`, FAKE, MEANINGS)[0].problem, /carries attributes of its own/);
+  assert.deepEqual(icons.check(`<svg data-icon="close" data-lucide="x" class="icon-inline" viewBox="0 0 24 24" aria-hidden="true">${X}</svg>`, FAKE, MEANINGS), []);
   assert.equal(icons.check(`<svg data-icon="add" data-lucide="plus" aria-hidden="true">${PLUS}</svg>`, { x: FAKE.x }, MEANINGS)[0].problem, '"plus" is not a Lucide icon');
   assert.equal(icons.check('<link href="…/font-awesome/6.0.0/css/all.min.css">', FAKE, MEANINGS).length, 1);
 });

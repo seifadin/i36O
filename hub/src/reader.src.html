@@ -521,8 +521,8 @@
       <div class="tb-group" id="group-nav">
         <!--@@TOOLBAR_BUTTON id="btn-nav-left" icon="pageLeft"@@-->
         <div class="page-counter">
-          <select id="vol-select" class="vol-select i360-field" hidden></select>
-          <input type="text" inputmode="numeric" autocomplete="off" id="page-num-input" class="page-input i360-field" value="">
+          <!--@@FIELD kind="select" id="vol-select" class="vol-select" hidden@@-->
+          <!--@@FIELD kind="number" id="page-num-input" class="page-input"@@-->
           <span id="lbl-of">of</span>
           <span id="total-pages">0</span>
           <span id="page-pos" class="page-pos"></span>
@@ -569,9 +569,9 @@
   </div>
 
   <!-- Search -->
-  <div class="search-popup i360-popup" id="search-popup" role="search">
+  <!--@@POPUP id="search-popup" class="search-popup" role="search"@@-->
     <div class="search-row">
-      <input type="search" id="search-input" class="search-input i360-field i360-field-search" autocomplete="off" enterkeyhint="search">
+      <!--@@FIELD kind="search" id="search-input" class="search-input"@@-->
       <span class="search-count" id="search-count" aria-live="polite">0 of 0</span>
       <!--@@TOOLBAR_BUTTON id="btn-search-prev" icon="resultPrevious"@@-->
       <!--@@TOOLBAR_BUTTON id="btn-search-next" icon="resultNext"@@-->
@@ -579,11 +579,11 @@
       <!--@@TOOLBAR_BUTTON id="btn-search-close" icon="close"@@-->
     </div>
     <div class="search-row">
-      <button class="i360-chip" id="opt-diacritics" type="button" aria-pressed="false"><span class="i360-chip-box"></span><span class="chip-label"></span></button>
-      <button class="i360-chip" id="opt-word" type="button" aria-pressed="false"><span class="i360-chip-box"></span><span class="chip-label"></span></button>
+      <!--@@CHIP id="opt-diacritics"@@-->
+      <!--@@CHIP id="opt-word"@@-->
     </div>
     <ol class="search-results" id="search-results" hidden></ol>
-  </div>
+  <!--@@/POPUP@@-->
 
   <!-- Contents and bookmarks -->
   <aside class="side-panel" id="side-panel" aria-hidden="true">
@@ -599,15 +599,15 @@
     <svg data-icon="exitReadingMode" data-lucide="minimize" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
   </button>
 
-  <div class="toast i360-toast" id="toast" role="status" aria-live="polite"></div>
+  <!--@@TOAST id="toast" class="toast"@@--><!--@@/TOAST@@-->
 
   <input type="file" id="file-input" accept=".md,.markdown,.txt,text/markdown,text/plain">
 
   <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
-    <div class="missing-pages-banner i360-banner" id="missing-pages-banner" role="status">
-      <svg data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+    <!--@@BANNER id="missing-pages-banner" class="missing-pages-banner"@@-->
+      <svg data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>
-    </div>
+    <!--@@/BANNER@@-->
 
     <div class="empty-state" id="empty-state"></div>
 

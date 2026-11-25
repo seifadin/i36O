@@ -15,8 +15,9 @@
 //                                   Lucide's version)
 //
 // Wrong: an <svg> with no meaning, a meaning src/icons.js doesn't have, a Lucide name other than
-// its meaning's, a name Lucide doesn't have, no aria-hidden="true", a drawing that differs from
-// Lucide's, or anything left of Font Awesome. The tests run the check (test/icons.test.js).
+// its meaning's, a name Lucide doesn't have, no aria-hidden="true", an attribute of its own (its
+// stroke and fill are the shared style's), a drawing that differs from Lucide's, or anything left
+// of Font Awesome. The tests run the check (test/icons.test.js).
 
 import fs from 'fs';
 import path from 'path';
@@ -32,6 +33,9 @@ const SVG = /<svg\b([^>]*)>([\s\S]*?)<\/svg>/g;
 const NAME = /\sdata-lucide="([a-z0-9-]+)"/;
 const MEANING = /\sdata-icon="([A-Za-z0-9.]+)"/;
 const HIDDEN = /\saria-hidden="true"/;
+// What an icon's tag may carry: its meaning, name, drawing box, hiding, and a page's class (its
+// size or place). Its stroke and fill come from the shared style (src/page-chrome.css).
+const ALLOWED = new Set(['data-icon', 'data-lucide', 'viewBox', 'aria-hidden', 'class']);
 const FONT_AWESOME = /font-?awesome|\bfa-(solid|regular|brands|[a-z]+-[a-z])|\bfa[srb]? fa-/i;
 
 const LUCIDE = path.join(ROOT, 'node_modules/lucide-static');
@@ -63,6 +67,7 @@ function check(html, icons = lucide(), semantics = ICON_SEMANTICS) {
     else if (name !== wanted) problems.push({ line, problem: `"${meaning}" uses "${wanted}", not "${name || '(none)'}"` });
     else if (!icons[name]) problems.push({ line, problem: `"${name}" is not a Lucide icon` });
     else if (!HIDDEN.test(m[1])) problems.push({ line, problem: `"${meaning}" is not hidden from screen readers (aria-hidden="true")` });
+    else if ([...m[1].matchAll(/\s([a-zA-Z-]+)=/g)].some((a) => !ALLOWED.has(a[1]))) problems.push({ line, problem: `"${meaning}" carries attributes of its own (only ${[...ALLOWED].join(', ')}; its look is page-chrome.css's)` });
     else if (m[2] !== draw(icons[name])) problems.push({ line, problem: `"${name}" differs from Lucide ${version()}` });
   }
   const fa = html.match(FONT_AWESOME);

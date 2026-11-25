@@ -267,7 +267,7 @@ svg[data-lucide] {
 .i360-chip[aria-pressed="true"] .i360-chip-box::after { content: '✓'; }
 
 /* Buttons: pills, as on Android and iOS. Outlined by default; filled (.i360-btn-primary) for the main
-   action; .i360-btn-sm for small ones beside text (retry, more). */
+   action; .i360-btn-sm for small ones beside text (retry, more); .i360-btn-icon for an icon alone. */
 .i360-btn {
   display: inline-flex;
   align-items: center;
@@ -288,6 +288,10 @@ svg[data-lucide] {
 .i360-btn:hover:not(:disabled) { background: var(--i360-hover, #EEF2FF); }
 .i360-btn-primary, .i360-btn-primary[type], .i360-btn-primary:hover:not(:disabled) { background: var(--i360-accent, #0010CF); border-color: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
 .i360-btn-sm { padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem); font-size: var(--i360-text-size-sm, 0.875rem); }
+/* A button's icon, with or without words beside it: the toolbar icons' size. An icon-only button
+   (src/components.js button with an icon and no text) has just a little padding round it. */
+.i360-btn > svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+.i360-btn-icon { padding: var(--i360-space-xs, 0.25rem); }
 .i360-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
 
 /* A row in a list or menu. Hover (or the keyboard's current row, .active): the hover colour; the chosen

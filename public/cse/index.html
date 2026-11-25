@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-3ehIh2bnCoqVS9JCmEKbRYP8d64yZj+cEcurxy+hp38='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-D3wpcgEleBE6TTujPSMLUP+UMILYc31+incd9yxMHME='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -552,7 +552,7 @@ svg[data-lucide] {
 .i360-chip[aria-pressed="true"] .i360-chip-box::after { content: '✓'; }
 
 /* Buttons: pills, as on Android and iOS. Outlined by default; filled (.i360-btn-primary) for the main
-   action; .i360-btn-sm for small ones beside text (retry, more). */
+   action; .i360-btn-sm for small ones beside text (retry, more); .i360-btn-icon for an icon alone. */
 .i360-btn {
   display: inline-flex;
   align-items: center;
@@ -573,6 +573,10 @@ svg[data-lucide] {
 .i360-btn:hover:not(:disabled) { background: var(--i360-hover, #EEF2FF); }
 .i360-btn-primary, .i360-btn-primary[type], .i360-btn-primary:hover:not(:disabled) { background: var(--i360-accent, #0010CF); border-color: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
 .i360-btn-sm { padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem); font-size: var(--i360-text-size-sm, 0.875rem); }
+/* A button's icon, with or without words beside it: the toolbar icons' size. An icon-only button
+   (src/components.js button with an icon and no text) has just a little padding round it. */
+.i360-btn > svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+.i360-btn-icon { padding: var(--i360-space-xs, 0.25rem); }
 .i360-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
 
 /* A row in a list or menu. Hover (or the keyboard's current row, .active): the hover colour; the chosen
@@ -709,10 +713,6 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     .hit-text { font-family: var(--i360-font); font-size: var(--i360-text-size); line-height: var(--i360-line-height); }
 
     .group-foot { margin-top: var(--i360-space-sm); display: flex; align-items: center; gap: var(--i360-space-sm); color: var(--i360-muted); font-size: var(--i360-text-size-sm); }
-    .icon-btn { padding: var(--i360-space-xs); }
-    /* Icons: Lucide (lucide.dev, ISC licence), drawn inline; checked by scripts/icons.js. Their
-       sizes here; their drawing style for every page: src/page-chrome.css. */
-    .icon-btn svg { width: var(--i360-icon-size); height: var(--i360-icon-size); }
   </style>
 </head>
 <body class="i360-page">
@@ -731,19 +731,19 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   <div class="scroller safe-area safe-area-top-bar" id="scroller" tabindex="-1">
   <main>
     <form class="search-form" id="search-form" role="search" autocomplete="off">
-      <input class="search-input i360-field i360-field-search" id="q" type="search" name="q" enterkeyhint="search" spellcheck="false" aria-label="نص البحث" placeholder="ابحث في نصوص الكتب…">
-      <button class="search-btn i360-btn i360-btn-primary" type="submit">بحث</button>
+      <input class="i360-field i360-field-search search-input" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" id="q" name="q" aria-label="نص البحث" placeholder="ابحث في نصوص الكتب…">
+      <button class="i360-btn i360-btn-primary search-btn" type="submit">بحث</button>
     </form>
     <div class="options">
-      <button class="i360-chip" id="opt-exact" type="button" aria-pressed="false" title="بدون هذا الخيار يُتجاهل التشكيل وتُعامل أ/إ/آ كـ ا، وة كـ ه، وى كـ ي"><span class="i360-chip-box"></span>مطابقة التشكيل</button>
-      <button class="i360-chip" id="opt-word" type="button" aria-pressed="false" title="تجاهل النتائج التي تقع داخل كلمة أطول"><span class="i360-chip-box"></span>كلمة كاملة</button>
+      <button class="i360-chip" type="button" id="opt-exact" title="بدون هذا الخيار يُتجاهل التشكيل وتُعامل أ/إ/آ كـ ا، وة كـ ه، وى كـ ي" aria-pressed="false"><span class="i360-chip-box"></span><span class="i360-chip-label">مطابقة التشكيل</span></button>
+      <button class="i360-chip" type="button" id="opt-word" title="تجاهل النتائج التي تقع داخل كلمة أطول" aria-pressed="false"><span class="i360-chip-box"></span><span class="i360-chip-label">كلمة كاملة</span></button>
     </div>
 
     <div class="results-bar">
       <div class="status" id="status" role="status" aria-live="polite"></div>
       <div class="bar-btns" id="bar-btns" hidden>
-        <button class="i360-btn i360-btn-sm icon-btn" id="btn-expand" type="button" aria-label="توسيع الكل" title="توسيع الكل"><svg data-icon="expandAll" data-lucide="list-chevrons-up-down" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 8 3-3 3 3"></path><path d="m15 16 3 3 3-3"></path></svg></button>
-        <button class="i360-btn i360-btn-sm icon-btn" id="btn-collapse" type="button" aria-label="طي الكل" title="طي الكل"><svg data-icon="collapseAll" data-lucide="list-chevrons-down-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 5 3 3 3-3"></path><path d="m15 19 3-3 3 3"></path></svg></button>
+        <button class="i360-btn i360-btn-sm i360-btn-icon" type="button" id="btn-expand" title="توسيع الكل" aria-label="توسيع الكل"><svg data-icon="expandAll" data-lucide="list-chevrons-up-down" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 8 3-3 3 3"></path><path d="m15 16 3 3 3-3"></path></svg></button>
+        <button class="i360-btn i360-btn-sm i360-btn-icon" type="button" id="btn-collapse" title="طي الكل" aria-label="طي الكل"><svg data-icon="collapseAll" data-lucide="list-chevrons-down-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 5 3 3 3-3"></path><path d="m15 19 3-3 3 3"></path></svg></button>
       </div>
     </div>
     <div id="results"></div>
@@ -952,16 +952,16 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     const next = toNumerals(v, numerals);
     if (next !== v) node.nodeValue = next;
   }
-  function convertAttributes(el2, attributes, skip, numerals) {
-    if (!attributes.length || skip && el2.closest(skip)) return;
-    for (const name of attributes) {
+  function convertAttributes(el2, attributes2, skip, numerals) {
+    if (!attributes2.length || skip && el2.closest(skip)) return;
+    for (const name of attributes2) {
       const v = el2.getAttribute(name);
       if (v === null || !ANY_DIGIT.test(v)) continue;
       const next = toNumerals(v, numerals);
       if (next !== v) el2.setAttribute(name, next);
     }
   }
-  function convertNumerals(root2, { skip = "", attributes = [], attributeSkip = skip, numerals = getNumerals() } = {}) {
+  function convertNumerals(root2, { skip = "", attributes: attributes2 = [], attributeSkip = skip, numerals = getNumerals() } = {}) {
     if (!root2) return;
     if (root2.nodeType === Node.TEXT_NODE) {
       convertText(
@@ -976,11 +976,11 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     convertAttributes(
       /** @type {Element} */
       root2,
-      attributes,
+      attributes2,
       attributeSkip,
       numerals
     );
-    const walker = document.createTreeWalker(root2, attributes.length ? NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT : NodeFilter.SHOW_TEXT);
+    const walker = document.createTreeWalker(root2, attributes2.length ? NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT : NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       if (n.nodeType === Node.TEXT_NODE) convertText(
         /** @type {Text} */
@@ -991,7 +991,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       else convertAttributes(
         /** @type {Element} */
         n,
-        attributes,
+        attributes2,
         attributeSkip,
         numerals
       );
@@ -1468,6 +1468,78 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     return s ? `?${s}` : "";
   }
 
+  // src/components.js
+  var escapeText = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  var escapeAttr = (s) => escapeText(s).replace(/"/g, "&quot;");
+  var ATTRIBUTE_ORDER = [
+    "id",
+    "name",
+    "href",
+    "target",
+    "rel",
+    "lang",
+    "dir",
+    "role",
+    "label",
+    "title",
+    "aria-label",
+    "placeholder",
+    "aria-controls",
+    "aria-labelledby",
+    "aria-haspopup",
+    "aria-expanded",
+    "aria-pressed",
+    "aria-selected",
+    "aria-live",
+    "data-i18n"
+  ];
+  function attributes(a) {
+    let out = "";
+    const write = (name, value) => {
+      if (value === void 0 || value === null || value === false) return;
+      if (name === "label") out += ` title="${escapeAttr(value)}" aria-label="${escapeAttr(value)}"`;
+      else out += value === true ? ` ${name}` : ` ${name}="${escapeAttr(value)}"`;
+    };
+    for (const name of ATTRIBUTE_ORDER) write(name, a[name]);
+    for (const name of Object.keys(a).filter((k) => k.startsWith("data-") && k !== "data-i18n").sort()) write(name, a[name]);
+    return out;
+  }
+  var TOOLBAR_BUTTON = "toolbar-btn";
+  var TITLE = "tb-title";
+  var flags = (a) => `${a.disabled ? " disabled" : ""}${a.hidden ? " hidden" : ""}`;
+  var classes = (own, extra) => extra ? `${own} ${extra}` : own;
+  var CLASS_CHIP_LABEL = "i360-chip-label";
+  var FIELD_KINDS = Object.freeze({
+    search: ' type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"',
+    number: ' type="text" inputmode="numeric" autocomplete="off"'
+  });
+  function button(a = {}) {
+    const iconOnly = a.icon && !a["text-target"];
+    const own = ["i360-btn", a.primary && "i360-btn-primary", a.small && "i360-btn-sm", iconOnly && "i360-btn-icon"].filter(Boolean).join(" ");
+    const inner = a.icon ? a.icon + (a["text-target"] ? `<span data-target="${escapeAttr(a["text-target"])}"></span>` : "") : escapeText(a.text ?? "");
+    return `<button class="${classes(own, a.class)}" type="${a.type === "submit" ? "submit" : "button"}"${attributes(a)}${flags(a)}>${inner}</button>`;
+  }
+  function listItem(a = {}) {
+    const inner = escapeText(a.text ?? "");
+    return a.href !== void 0 ? `<a class="${classes("i360-list-item", a.class)}"${attributes(a)}>${inner}</a>` : `<button class="${classes("i360-list-item", a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
+  }
+  var BOXES = Object.freeze({
+    card: { cls: "i360-card", tags: ["section", "details", "div"] },
+    inset: { cls: "i360-inset", tags: ["div", "details"] },
+    popup: { cls: "i360-popup", tags: ["div"] },
+    banner: { cls: "i360-banner", tags: ["div"], role: "status" },
+    toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" }
+  });
+  function box(kind, a = {}) {
+    const k = BOXES[kind];
+    if (!k) throw new Error(`no container "${kind}"`);
+    const tag = a.tag || k.tags[0];
+    if (!k.tags.includes(tag)) throw new Error(`a ${kind} is a ${k.tags.join(" or ")}, not a ${tag}`);
+    const all = { ...a, role: a.role ?? k.role, "aria-live": a["aria-live"] ?? k.live };
+    return `<${tag} class="${classes(k.cls, a.class)}"${attributes(all)}${flags(a)}>${a.html ?? ""}</${tag}>`;
+  }
+  var CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
+
   // src/page-chrome.js
   var $ = (id) => document.getElementById(id);
   function el(tag, cls, text) {
@@ -1476,11 +1548,16 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     if (text !== void 0) e.textContent = text;
     return e;
   }
+  function fromMarkup(markup) {
+    const t = document.createElement("template");
+    t.innerHTML = markup;
+    return t.content.firstElementChild;
+  }
   var IN_APP = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
-  function setupClose(button, stepsBack = () => 1) {
+  function setupClose(button2, stepsBack = () => 1) {
     if (!IN_APP) return;
-    button.hidden = false;
-    button.addEventListener("click", () => {
+    button2.hidden = false;
+    button2.addEventListener("click", () => {
       let fromApp = false;
       try {
         fromApp = window.history.length > 1 && !!document.referrer && new URL(document.referrer).origin === window.location.origin;
@@ -1579,7 +1656,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   var fmtNum = (n) => fmt(Number(n).toLocaleString("en-US"));
   function applyNumerals2() {
     drawSettingsButtons(btnTheme, btnNumerals);
-    for (const root2 of [document.querySelector(".tb-title"), document.querySelector("main")]) {
+    for (const root2 of [document.querySelector(`.${CLASS.title}`), document.querySelector("main")]) {
       convertNumerals(root2, { skip: "form", numerals: state.numerals });
     }
   }
@@ -1592,15 +1669,14 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     applyTheme();
   });
   function smallButton(cls, text, onClick) {
-    const b = el("button", `${cls} i360-btn i360-btn-sm`.trim(), text);
-    b.type = "button";
+    const b = fromMarkup(button({ class: cls, text, small: true }));
     b.addEventListener("click", onClick);
     return b;
   }
   function setStatus(text, { error = false, retry = null } = {}) {
     statusEl.textContent = "";
     statusEl.classList.toggle("error", error);
-    statusEl.classList.toggle("i360-banner", error);
+    statusEl.classList.toggle(CLASS.banner, error);
     if (text) statusEl.append(fmt(text));
     if (retry) {
       statusEl.append(smallButton("retry", T.retry, retry));
@@ -1726,11 +1802,11 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     return { summary, count };
   }
   function makeMajor(ctx, M) {
-    const box = el("details", "major i360-card");
+    const box2 = fromMarkup(box("card", { tag: "details", class: "major" }));
     const { summary, count } = summaryLine(M.major);
     const body = el("div", "major-body");
-    box.append(summary, body);
-    const m = { el: box, count, groups: [] };
+    box2.append(summary, body);
+    const m = { el: box2, count, groups: [] };
     for (const U of M.units) {
       const g = makeGroup(ctx, U, m);
       m.groups.push(g);
@@ -1738,8 +1814,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       body.append(g.el);
     }
     updateMajor(m);
-    box.addEventListener("toggle", () => {
-      if (!box.open) return;
+    box2.addEventListener("toggle", () => {
+      if (!box2.open) return;
       if (m.groups.length === 1 && m.groups[0].details) m.groups[0].el.open = true;
       for (const g of m.groups) if (!g.details && g.next === 0 && !g.loading) loadMore(ctx, g);
     });
@@ -1749,22 +1825,22 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     const list = el("div");
     const foot = el("div", "group-foot");
     const details = U.name != null;
-    let box, count = null;
+    let box2, count = null;
     if (details) {
-      box = el("details", "inter i360-inset");
+      box2 = fromMarkup(box("inset", { tag: "details", class: "inter" }));
       const line = summaryLine(U.name);
       count = line.count;
       const body = el("div", "inter-body");
       body.append(list, foot);
-      box.append(line.summary, body);
+      box2.append(line.summary, body);
     } else {
-      box = el("div", "direct");
-      box.append(list, foot);
+      box2 = el("div", "direct");
+      box2.append(list, foot);
     }
-    const g = { el: box, details, count, list, foot, gps: U.gps, next: 0, shown: 0, done: false, loading: null, sources: /* @__PURE__ */ new Map(), major: m };
+    const g = { el: box2, details, count, list, foot, gps: U.gps, next: 0, shown: 0, done: false, loading: null, sources: /* @__PURE__ */ new Map(), major: m };
     setCount(g);
-    if (details) box.addEventListener("toggle", () => {
-      if (box.open && g.next === 0 && !g.loading) loadMore(ctx, g);
+    if (details) box2.addEventListener("toggle", () => {
+      if (box2.open && g.next === 0 && !g.loading) loadMore(ctx, g);
     });
     return g;
   }
@@ -1883,10 +1959,9 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     g.shown++;
     const block = sourceBlock(ctx, g, hit.source);
     const sn = hit.snippets[0];
-    const a = el("a", "hit i360-list-item");
     const link = resultLink(hit, ctx.q, sn ? sn.hit : "");
     const toReader = link.startsWith(READER);
-    a.href = link;
+    const a = fromMarkup(listItem({ href: link, class: "hit" }));
     if (IN_APP) {
       if (!toReader) a.addEventListener("click", openOutside);
     } else {

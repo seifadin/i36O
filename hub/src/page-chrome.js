@@ -4,6 +4,7 @@
 // that fits by measurement (fittingToolbar, below; its style: src/page-chrome.css). Bundled into
 // each page by scripts/build.js.
 import * as i360Theme from '../theme/site/theme-loader.js';
+import { CLASS } from './components.js';
 
 // A page element by its id.
 export const $ = (id) => document.getElementById(id);
@@ -144,7 +145,7 @@ export function fittingToolbar({ bar, fold = [] }) {
   // Every button narrower than the bar is high widens to one width, as far as the room allows:
   // the buttons' widths at their narrowest, filled up evenly from the narrowest one.
   const widen = (room) => {
-    const buttons = [...bar.querySelectorAll('.toolbar-btn')].filter((b) => b.offsetParent && !b.closest('.toolbar-menu'));
+    const buttons = [...bar.querySelectorAll(`.${CLASS.toolbarButton}`)].filter((b) => b.offsetParent && !b.closest('.toolbar-menu'));
     if (!buttons.length || room <= 0) return;
     const narrow = buttons.map((b) => b.getBoundingClientRect().width).sort((a, b) => a - b);
     setWidth('var(--toolbar-h)');

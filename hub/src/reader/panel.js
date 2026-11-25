@@ -2,7 +2,7 @@
 // measurement, and keyboard shortcuts.
 import { oncePerFrame } from '../frame.js';
 import { el, fittingToolbar, fromMarkup, setLabel } from '../page-chrome.js';
-import { toolbarButton } from '../components.js';
+import { listItem, toolbarButton } from '../components.js';
 import { READER_FOLD } from './fold.js';
 import { ICON, PANEL_COVERS, ZOOM_STEP } from './text.js';
 import { btnCopyLink, btnExitReading, btnMore, btnPanel, btnPanelClose, btnReading, fmtNum, moreMenu, nextFrame, panelBody, searchPopup, sidePanel, state, t, tabBookmarks, tabContents, tbEnd, toolbar, viewerContainer } from './state.js';
@@ -49,9 +49,7 @@ async function jumpToElement(idx, target) {
 }
 
 function panelItem(text, pageText, onClick, extraClass) {
-  const btn = el('button');
-  btn.type = 'button';
-  btn.className = 'i360-list-item panel-item' + (extraClass ? ' ' + extraClass : '');
+  const btn = fromMarkup(listItem({ class: 'panel-item' + (extraClass ? ' ' + extraClass : '') }));
   const s1 = el('span', 'item-text', text);
   s1.dir = 'auto';
   const s2 = el('span', 'item-page', pageText);

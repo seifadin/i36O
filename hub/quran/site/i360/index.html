@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-r/8Yh261pnucuCGaRF3BHDa9Xa6qwmO78GeiJ+5rMqw='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-YIBu+FfdFQoFhrQOUccrWLJVCVT+cwPFDrg7/AMy8zA='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>القرآن الكريم — مشروع تنزيل</title>
   <meta name="description" content="القرآن الكريم من مشروع تنزيل (tanzil.net)، مع زر لتفسير الآية الظاهرة من فهرس الموسوعة الإسلامية i360إ.">
@@ -544,7 +544,7 @@ svg[data-lucide] {
 .i360-chip[aria-pressed="true"] .i360-chip-box::after { content: '✓'; }
 
 /* Buttons: pills, as on Android and iOS. Outlined by default; filled (.i360-btn-primary) for the main
-   action; .i360-btn-sm for small ones beside text (retry, more). */
+   action; .i360-btn-sm for small ones beside text (retry, more); .i360-btn-icon for an icon alone. */
 .i360-btn {
   display: inline-flex;
   align-items: center;
@@ -565,6 +565,10 @@ svg[data-lucide] {
 .i360-btn:hover:not(:disabled) { background: var(--i360-hover, #EEF2FF); }
 .i360-btn-primary, .i360-btn-primary[type], .i360-btn-primary:hover:not(:disabled) { background: var(--i360-accent, #0010CF); border-color: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
 .i360-btn-sm { padding: var(--i360-space-xs, 0.25rem) var(--i360-space-sm, 0.5rem); font-size: var(--i360-text-size-sm, 0.875rem); }
+/* A button's icon, with or without words beside it: the toolbar icons' size. An icon-only button
+   (src/components.js button with an icon and no text) has just a little padding round it. */
+.i360-btn > svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+.i360-btn-icon { padding: var(--i360-space-xs, 0.25rem); }
 .i360-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
 
 /* A row in a list or menu. Hover (or the keyboard's current row, .active): the hover colour; the chosen
@@ -916,6 +920,23 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     }
     return { ...state, source };
   }
+
+  // src/components.js
+  var TOOLBAR_BUTTON = "toolbar-btn";
+  var TITLE = "tb-title";
+  var CLASS_CHIP_LABEL = "i360-chip-label";
+  var FIELD_KINDS = Object.freeze({
+    search: ' type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"',
+    number: ' type="text" inputmode="numeric" autocomplete="off"'
+  });
+  var BOXES = Object.freeze({
+    card: { cls: "i360-card", tags: ["section", "details", "div"] },
+    inset: { cls: "i360-inset", tags: ["div", "details"] },
+    popup: { cls: "i360-popup", tags: ["div"] },
+    banner: { cls: "i360-banner", tags: ["div"], role: "status" },
+    toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" }
+  });
+  var CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
 
   // src/page-chrome.js
   var $ = (id) => document.getElementById(id);
