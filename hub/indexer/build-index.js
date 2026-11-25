@@ -25,6 +25,8 @@
 //    site's _headers and robots.txt, ready for `wrangler deploy`.
 // 5. Every build also carries quran/ — tanzil's Quran texts and translations and the exegesis
 //    index, for the quran Worker (quran-data.js); a change there alone is also a reason to publish.
+// 6. Once a quarter, the science icons named in the same rows are checked against the pinned
+//    Lucide (science-icons.js): old or unknown names are reported, never a reason to stop.
 //
 // Text is gathered in indexer/work/ during a run and removed afterwards;
 // indexer/dist/ and indexer/work/ are git-ignored.
@@ -35,6 +37,7 @@ import * as inventory from './inventory.js';
 import * as extract from './extract.js';
 import { writeBuild } from './index-writer.js';
 import * as QuranData from './quran-data.js';
+import * as ScienceIcons from './science-icons.js';
 import * as BookFormat from '../src/book-format.js';
 import * as SearchCore from '../src/search-core.js';
 import * as CseIndex from '../src/cse-index.js';
@@ -229,6 +232,15 @@ async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, 
   const wantRefresh = (s) => refreshAll || refresh.some((r) => s.links.includes(r) || s.id === r || s.fetchUrl === r);
   log(`${sources.length} sources (${all.length - sources.length} website links skipped).`);
 
+  // Once a quarter (the full check in a quarter's first week, as tanzil's re-check): the science
+  // icons in those same rows against the pinned Lucide (science-icons.js). Report only.
+  const scienceIcons = QuranData.quarterlyCheck(check, now) ? ScienceIcons.checkIcons(rows) : null;
+  if (scienceIcons) {
+    const lines = ScienceIcons.describe(scienceIcons);
+    for (const line of lines) log(line);
+    if (scienceIcons.length && process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+  }
+
   const status = { reused: [], fresh: [], stale: [], failed: [] };
   const entries = [];   // for the writer
   const started = Date.now();
@@ -305,7 +317,7 @@ async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, 
   if (prev && prev.usable && !quran.changed && catalogSignature(prev.catalog) === plannedSignature(entries, ownBooks)) {
     log(`Nothing changed since build ${prev.catalog.buildId}: no build written, nothing to publish.`);
     output(false);
-    return { catalog: prev.catalog, report: { buildId: prev.catalog.buildId, status, quran: quran.report, changed: false }, changed: false };
+    return { catalog: prev.catalog, report: { buildId: prev.catalog.buildId, status, quran: quran.report, scienceIcons, changed: false }, changed: false };
   }
 
   // The Quran files are gathered in the work folder first: with --previous dist, the ones taken
@@ -329,7 +341,7 @@ async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, 
     for (const b of ownBooks) copyFileSync(join(libraryDir, b.name), join(distDir, 'books', b.name));
   }
 
-  const report = { buildId: id, stats, status, quran: quran.report };
+  const report = { buildId: id, stats, status, quran: quran.report, scienceIcons };
   const books = [...status.fresh, ...status.reused, ...status.stale].filter((s) => s.how);
   const methods = {};
   for (const b of books) { const k = `${b.how.method}${b.how.labels ? ', printed page numbers' : ', no page numbers'}`; methods[k] = (methods[k] || 0) + 1; }

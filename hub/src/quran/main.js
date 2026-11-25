@@ -22,19 +22,19 @@ const EMBED = '/?embed=true&defTrans=ar.jalalayn';
 const FLASH_MS = 1500;
 
 const btnTheme = $('btn-theme'), btnNumerals = $('btn-numerals');
-const btnTafsir = $('btn-tafsir'), tafsirIcon = $('tafsir-icon');
+const btnExegesis = $('btn-exegesis'), exegesisIcon = $('exegesis-icon');
 const frame = $('tanzil'), announce = $('announce');
 
 let rows = null;          // the exegesis index, once loaded
 let flashTimer = 0;
 
-function showIcon(name) { tafsirIcon.innerHTML = ICONS[name]; }
+function showIcon(name) { exegesisIcon.innerHTML = ICONS[name]; }
 
 // «تفسير» at rest: its usual icon, on when the index is loaded.
 function rest() {
-  showIcon('languages');
-  setLabel(btnTafsir, T.tafsirTitle);
-  btnTafsir.disabled = !rows;
+  showIcon('exegesis');
+  setLabel(btnExegesis, T.exegesisTitle);
+  btnExegesis.disabled = !rows;
 }
 
 // A short sign on the button (the app's search bar does the same): which icon, and words for the
@@ -42,7 +42,7 @@ function rest() {
 function flash(name, words) {
   clearTimeout(flashTimer);
   showIcon(name);
-  setLabel(btnTafsir, words);
+  setLabel(btnExegesis, words);
   announce.textContent = words;
   flashTimer = setTimeout(rest, FLASH_MS);
 }
@@ -51,9 +51,9 @@ function flash(name, words) {
 function unavailable() {
   rows = null;
   clearTimeout(flashTimer);
-  showIcon('database-x');
-  setLabel(btnTafsir, T.unavailable);
-  btnTafsir.disabled = true;
+  showIcon('unavailable');
+  setLabel(btnExegesis, T.unavailable);
+  btnExegesis.disabled = true;
 }
 
 function openExegesis(url) {
@@ -61,21 +61,36 @@ function openExegesis(url) {
   // page in the browser overlay, which has no tabs: the exegesis opens in its place (back returns).
   if (isDesktop()) {
     const w = window.open(url, '_blank');
-    if (!w) { flash('circle-x', T.openFailed); return; }
+    if (!w) { flash('openFailed', T.openFailed); return; }
     w.opener = null;
   } else {
     window.location.assign(url);
   }
 }
 
-btnTafsir.addEventListener('click', () => {
+btnExegesis.addEventListener('click', () => {
   if (!rows) return;
   const verse = readVerse(frame);
-  if (!verse) { flash('circle-alert', T.noVerse); return; }
+  if (!verse) { flash('invalid', T.noVerse); return; }
   const url = findExegesisUrl(rows, verse.sura, verse.aya);
-  if (!url) { flash('circle-question-mark', T.notFound); return; }
+  if (!url) { flash('notFound', T.notFound); return; }
   openExegesis(url);
 });
+
+/* ---------------- Tanzil centred under its banner ---------------- */
+// Tanzil's page scrolls inside the frame, and its scrollbar takes room on one side, so tanzil
+// centres itself a little off the banner above. An equal gap on both sides centres it on the
+// frame's full width, like the banner. Set on every load (tanzil may navigate inside the frame),
+// on whichever of html and body scrolls (a gutter only acts on a scroller), as properties rather
+// than a <style> element, which a policy on tanzil's page could refuse. Tanzil.net's embed (when
+// the Worker can't serve tanzil) is another site: it can't be reached, and stays as it is.
+function centreTanzil() {
+  try {
+    const doc = frame.contentDocument;
+    for (const el of [doc?.documentElement, doc?.body]) el?.style.setProperty('scrollbar-gutter', 'stable both-edges');
+  } catch { /* another site's page */ }
+}
+frame.addEventListener('load', centreTanzil);
 
 /* ---------------- Theme and numerals ---------------- */
 const redraw = () => drawSettingsButtons(btnTheme, btnNumerals);
@@ -87,8 +102,8 @@ i360Theme.onNumeralsChange(redraw);
 async function start() {
   redraw();
   i360Theme.init();   // fresh theme.css in the background; the saved copy is already shown
-  showIcon('languages');
-  setLabel(btnTafsir, T.tafsirTitle);
+  showIcon('exegesis');
+  setLabel(btnExegesis, T.exegesisTitle);
   try {
     const health = await fetchJson('/i360/health', { retries: 1 });
     if (!health || !health.ok) throw new Error('not ok');

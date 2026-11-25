@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lucide": "node scripts/lucide.js"
   },
   "dependencies": {
     "@capacitor/android": "8.5.3",
@@ -18,7 +19,7 @@
     "@capacitor/ios": "8.5.3",
     "@capacitor/splash-screen": "8.0.2",
     "@otakit/capacitor-updater": "2.3.3",
-    "lucide-react": "^1.21.0",
+    "lucide-react": "1.79.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

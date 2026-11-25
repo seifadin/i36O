@@ -14,6 +14,8 @@ i360إ is an Arabic-only Islamic knowledge discovery app that organizes Islamic 
 - On phones, the "last update was rolled back" notice no longer reappears at every start (it shows once per failure), and a slow connection no longer makes the app undo an update that works (2026-11-16)
 
 ### Changed
+- One set of icons everywhere, each with one meaning: the «تفسير» button and a typed verse number show a scroll, loading shows a turning circle, the Markdown Reader's page arrows and search-result arrows are arrows, its contents button has its own icon and deleting a bookmark shows a bin, the Daily Reflection's language button shows a list icon and a Hijri date awaiting Dar al-Ifta's announcement a fading clock (2026-11-25)
+- The Quran page's tanzil.net banner lines up with the Navigator below it (2026-11-25)
 - The "checking the page" message and the Markdown Reader's short messages now use the encyclopedia's own colour in each theme (blue in light), and code boxes in books and in the assistant follow the theme instead of always being dark (2026-11-16)
 - Your theme and numerals choices are now saved in a new way across the encyclopedia, the Markdown Reader, the book search and the Daily Reflection: they start from the device's own theme and 0123 once, so choose them again if you had changed them (2026-11-16)
 - A Markdown Reader link naming a page the book doesn't have now opens where you are and shows that page's number in the address, instead of keeping the wrong one (2026-11-16)

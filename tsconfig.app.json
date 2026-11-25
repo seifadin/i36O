@@ -44,6 +44,9 @@
       ],
       "@i360/platform": [
         "./hub/src/platform.js"
+      ],
+      "@i360/icons": [
+        "./hub/src/icons.js"
       ]
     },
     "noImplicitReturns": true,

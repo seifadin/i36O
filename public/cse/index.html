@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-UsHswNXiEMGOJXEMxjIyulkE6shaCuhL9WSDqvO7CYA='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-3ehIh2bnCoqVS9JCmEKbRYP8d64yZj+cEcurxy+hp38='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -719,7 +719,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       <button class="toolbar-btn numerals-btn" id="btn-numerals" type="button"></button>
     </div>
     <div class="tb-title">البحث في <bdi dir="ltr">i360&lrm;إ</bdi></div>
-    <button class="toolbar-btn" id="btn-close" type="button" aria-label="إغلاق" title="إغلاق" hidden><svg data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+    <button class="toolbar-btn" id="btn-close" type="button" aria-label="إغلاق" title="إغلاق" hidden><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
   </header>
 
   <div class="scroller safe-area safe-area-top-bar" id="scroller" tabindex="-1">
@@ -736,8 +736,8 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     <div class="results-bar">
       <div class="status" id="status" role="status" aria-live="polite"></div>
       <div class="bar-btns" id="bar-btns" hidden>
-        <button class="i360-btn i360-btn-sm icon-btn" id="btn-expand" type="button" aria-label="توسيع الكل" title="توسيع الكل"><svg data-lucide="list-chevrons-up-down" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 8 3-3 3 3"></path><path d="m15 16 3 3 3-3"></path></svg></button>
-        <button class="i360-btn i360-btn-sm icon-btn" id="btn-collapse" type="button" aria-label="طي الكل" title="طي الكل"><svg data-lucide="list-chevrons-down-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 5 3 3 3-3"></path><path d="m15 19 3-3 3 3"></path></svg></button>
+        <button class="i360-btn i360-btn-sm icon-btn" id="btn-expand" type="button" aria-label="توسيع الكل" title="توسيع الكل"><svg data-icon="expandAll" data-lucide="list-chevrons-up-down" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 8 3-3 3 3"></path><path d="m15 16 3 3 3-3"></path></svg></button>
+        <button class="i360-btn i360-btn-sm icon-btn" id="btn-collapse" type="button" aria-label="طي الكل" title="طي الكل"><svg data-icon="collapseAll" data-lucide="list-chevrons-down-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 5 3 3 3-3"></path><path d="m15 19 3-3 3 3"></path></svg></button>
       </div>
     </div>
     <div id="results"></div>
@@ -1485,10 +1485,10 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     });
   }
   var THEME_ICONS = Object.freeze({
-    system: '<svg data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>',
-    light: '<svg data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>',
-    sepia: '<svg data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>',
-    dark: '<svg data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>'
+    system: '<svg data-icon="theme.system" data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>',
+    light: '<svg data-icon="theme.light" data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>',
+    sepia: '<svg data-icon="theme.sepia" data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>',
+    dark: '<svg data-icon="theme.dark" data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>'
   });
   function drawSettingsButtons(themeBtn, numeralsBtn, lang) {
     const theme = getChoice(), numerals = getNumerals();

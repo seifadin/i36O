@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, Fragment, ReactNode } from 'react'
-import { LoaderCircle, Paperclip, CircleCheck, CircleSlash, ChevronDown, ChevronLeft } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { useAppState } from '@/store/appState'
 import { useDataCache, LOAD_ERROR } from '@/store/dataCache'
@@ -9,7 +8,7 @@ import { groupSciences } from '@/lib/groupSciences'
 import { checkPageReachable } from '@/lib/reachability'
 import { wait } from '@i360/net'
 import { openResource, ownPagePath } from '@/lib/openResource'
-import { fetchIcon, iconLoaded, loadedIcon } from '@/lib/iconLoader'
+import { ICON, fetchIcon, iconLoaded, loadedIcon } from '@/lib/icons'
 import { REPORT_SUBJECTS } from '@/lib/feedbackReport'
 import Dialog from '@/components/Dialog'
 import ReportNotice from '@/components/ReportNotice'
@@ -17,7 +16,7 @@ import ReportNotice from '@/components/ReportNotice'
 // Visible fallback for a missing/misnamed icon — silently rendering nothing
 // would make a bad icon name indistinguishable from "no icon set" (a failure
 // nobody sees is hard to diagnose). CircleSlash makes a bad name noticeable.
-const FALLBACK_ICON = <CircleSlash />
+const FALLBACK_ICON = <ICON.badIcon />
 
 // A science's icon, by its Lucide name from Baserow: drawn at once when already loaded (the
 // preload, dataCache.tsx), else as soon as it arrives; nothing until then.
@@ -66,7 +65,7 @@ function DisclosureRow({ level, label, icon, expanded, panelId, onToggle, childr
     <div>
       <button onClick={onToggle} aria-expanded={expanded} aria-controls={panelId} className={BUTTON[level]}>
         <div className="flex items-center gap-sm">
-          {expanded ? <ChevronDown /> : <ChevronLeft />}
+          {expanded ? <ICON.expanded /> : <ICON.collapsed />}
           {icon && (
             <span className="text-brand-green">
               <DynamicIcon name={icon} />
@@ -118,7 +117,7 @@ function MinorButton({
           className="px-sm py-xs text-brand-blue"
           aria-label="فتح الملحق"
         >
-          <Paperclip />
+          <ICON.attachment />
         </button>
       )}
     </div>
@@ -137,7 +136,7 @@ function StatusPill({ busy, text }: { busy?: boolean; text: string }) {
       role="status"
       className="i360-toast fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+7rem)] mx-auto w-fit"
     >
-      {busy ? <LoaderCircle className="animate-spin" /> : <CircleCheck />}
+      {busy ? <ICON.loading className="animate-spin" /> : <ICON.checked />}
       <span>{text}</span>
     </div>
   )
@@ -221,7 +220,7 @@ export default function ScienceGrid() {
     // this deliberately isn't a button at all.
     return (
       <div className="flex items-center justify-center gap-sm p-md text-base text-brand-muted">
-        <LoaderCircle className="animate-spin" />
+        <ICON.loading className="animate-spin" />
         <span>جارٍ التحميل...</span>
       </div>
     )
@@ -245,7 +244,7 @@ export default function ScienceGrid() {
             ? 'flex w-full items-center justify-center gap-sm p-md text-center text-base'
             : 'i360-banner m-md flex w-[calc(100%-2*var(--i360-space-md,1rem))] items-center justify-center gap-sm text-center'}
         >
-          {loading && <LoaderCircle className="animate-spin text-brand-muted" />}
+          {loading && <ICON.loading className="animate-spin text-brand-muted" />}
           <span className={loading ? 'text-brand-muted' : undefined}>
             {loading ? (isRetrying ? 'يُعاد المحاولة...' : 'جارٍ التحميل...') : lastFailure.message}
           </span>

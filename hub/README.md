@@ -49,9 +49,13 @@ src/sites.js          every i360 address (app site, forwarders, old book paths, 
 src/exegesis.js       the exegesis lookup: exegesisRows(), findExegesisUrl() — the app (@i360/exegesis), the
                       quran page and the indexer
 src/platform.js       detectOS(), isDesktop() — the app (@i360/platform) and the quran page
+src/icons.js          ICON_SEMANTICS: each meaning's Lucide icon, decided once — the pages draw them inline
+                      (data-icon + data-lucide, checked and redrawn by scripts/icons.js), the app maps them in
+                      src/lib/icons.ts (@i360/icons). Lucide's version: `npm run lucide -- <version>` at the root
 library/books/        our own books     → lib.i36o.workers.dev/books/ (published by the CSE index workflow)
 indexer/wrangler.jsonc  the lib Worker (lib.i36o.workers.dev: the CSE build, our books and quran/, files only)
 indexer/quran-data.js tanzil's Quran texts and translations and the exegesis index → lib's quran/ (every CSE build)
+indexer/science-icons.js  once a quarter, the science icons in Baserow checked against the pinned Lucide (report only)
 quran/                the quran Worker (quran.i36o.workers.dev): tanzil's Navigator from our address, its two
                       data scripts answered from lib (worker/data.js), the page (site/i360/) — i360-quran.md
 forward/404.html      fallback for the forwarding sites

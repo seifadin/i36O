@@ -32,8 +32,8 @@ export const CSE = {
 // The quran page (quran.i36o.workers.dev/i360/): Arabic only, like the app.
 export const QURAN = {
   ar: {
-    tafsir: 'تفسير',
-    tafsirTitle: 'تفسير الآية الظاهرة',
+    exegesis: 'تفسير',
+    exegesisTitle: 'تفسير الآية الظاهرة',
     noVerse: 'تعذّرت قراءة الآية الظاهرة',
     notFound: 'لا يوجد تفسير لهذه الآية',
     openFailed: 'تعذّر فتح التفسير',

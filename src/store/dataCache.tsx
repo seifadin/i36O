@@ -189,7 +189,7 @@ export function DataCacheProvider({ children }: { children: ReactNode }): JSX.El
         // Major icons are visible before a tap. Major loads now; Intermediate, then
         // Minor, at idle time — not lazily per tap, which would bring back the burst
         // of requests on a category's first tap.
-        import('@/lib/iconLoader').then(({ preloadIcons, scheduleIdle }) => {
+        import('@/lib/icons').then(({ preloadIcons, scheduleIdle }) => {
           const tiers = collectIconNamesByTier(freshSciences)
 
           preloadIcons(tiers.major)

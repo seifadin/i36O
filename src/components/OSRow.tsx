@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, CSSProperties } from 'react'
-import { Coffee, EllipsisVertical, Globe, Monitor, Moon, Sun } from 'lucide-react'
+import { ICON, THEME_ICON } from '@/lib/icons'
 import type { Numerals, ThemeChoice } from '@i360/theme-loader'
 import { dayFirstToNumeric } from '@i360/dates'
 import { getOtaBuild } from '@/lib/feedbackReport'
@@ -30,8 +30,6 @@ const AppDeveloper = '© 2013 سيف الدين س. إبراهيم'
 // and icons as the hub pages (claude/i360-hub.md §3), stored per site, so the
 // app and its merged pages share them. Their text (the numerals sample and both
 // tooltips) comes from the shared theme loader, like the hub pages'.
-
-const THEME_ICON: Record<ThemeChoice, typeof Monitor> = { system: Monitor, light: Sun, sepia: Coffee, dark: Moon }
 
 // The current choices, kept in step with changes made here, in another tab, or by the device.
 function useSharedChoices() {
@@ -187,7 +185,7 @@ export default function OSRow() {
   // cycle below ('android' or 'ios' via simIOS).
   const effectiveOS = resolveEffectiveOS(state.useWeb, state.simIOS)
   const osIcon = state.useWeb
-    ? <Globe />
+    ? <ICON.web />
     : effectiveOS === 'ios' ? <AppleIcon /> : <AndroidIcon />
   const osAriaLabel = state.useWeb ? 'ويب' : effectiveOS === 'ios' ? 'آبل' : 'أندرويد'
 
@@ -238,7 +236,7 @@ export default function OSRow() {
           className="toolbar-btn"
           aria-label="معلومات الإصدار"
         >
-          <EllipsisVertical />
+          <ICON.menu />
         </button>
         <button
           onClick={() => { i360Theme.cycle() }}

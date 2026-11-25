@@ -102,7 +102,7 @@ function renderPanel() {
       const del = el('button');
       del.type = 'button';
       del.className = 'toolbar-btn';
-      del.innerHTML = ICON.trash;
+      del.innerHTML = ICON.delete;
       setLabel(del, tr.removeBookmark);
       del.addEventListener('click', () => removeBookmarkAt(idx));
       li.appendChild(del);

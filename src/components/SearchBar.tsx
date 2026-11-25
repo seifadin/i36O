@@ -1,9 +1,5 @@
 import { useRef, useState } from 'react'
-import {
-  Search, Bot, Keyboard,
-  PencilSparkles, Minimize2, Languages, BookSearch,
-  CircleAlert, CircleQuestionMark, CircleX,
-} from 'lucide-react'
+import { ICON } from '@/lib/icons'
 import { useAppState } from '@/store/appState'
 import { useDataCache } from '@/store/dataCache'
 import { isArabic, translateToArabic } from '@/api/translator'
@@ -62,8 +58,8 @@ export default function SearchBar() {
   const [flash, setFlash] = useState<FlashIcon>(null)
 
   // Two distinct in-flight phases for the custom-search path:
-  // 'translating' (Languages) — only for non-Arabic text, during the MS
-  // Translator call. 'opening' (BookSearch) — always, while resolving/opening
+  // 'translating' (ICON.translating) — only for non-Arabic text, during the MS
+  // Translator call. 'opening' (ICON.loading) — always, while resolving/opening
   // the URL. Arabic text skips straight to 'opening'. Never used for the
   // exegesis path, which is a synchronous local lookup with no "in flight" state.
   const [searchPhase, setSearchPhase] = useState<SearchPhase>(null)
@@ -146,9 +142,9 @@ export default function SearchBar() {
     if (!opened) flashIconFor('openfailed')
   }
 
-  // fSearchCustom-equivalent. Choreography: Arabic text → BookSearch while
-  // opening, then reverts. Non-Arabic text → Languages while translating,
-  // then BookSearch while opening, then reverts. CircleX flash only on a
+  // fSearchCustom-equivalent. Choreography: Arabic text → loading while
+  // opening, then reverts. Non-Arabic text → translating while translating,
+  // then loading while opening, then reverts. openFailed flash only on a
   // genuine open failure. CustomSearch/Huawei_CustomSearch (search engine cx)
   // and Translator (translator endpoint URL) are read from cached i360dbc —
   // wired up this session; both fall back to their VITE_* env var if the
@@ -238,27 +234,27 @@ export default function SearchBar() {
       {/* Search input with SearchIcon (right) + Search-execute icon (left) */}
       <div className="i360-field i360-field-search flex flex-1 min-w-0 items-center px-sm py-xs gap-sm">
         {/* SearchIcon — live 3-state indicator + one-shot override control.
-            PencilSparkles: auto-detect, input doesn't match (resting/default,
-            including empty input). Tapping while empty flashes CircleAlert.
-            Languages: auto-detect, input matches chapter.verse live — OR
-            custom-search translating a non-Arabic term (in flight).
-            Minimize2: forced search-only override armed (tap to arm/disarm).
-            BookSearch: custom search opening the resolved URL (in flight). */}
+            searchAuto: auto-detect, input doesn't match (resting/default,
+            including empty input). Tapping while empty flashes invalid.
+            exegesis: auto-detect, input matches chapter.verse live.
+            translating: custom search translating a non-Arabic term (in flight).
+            searchOnly: forced search-only override armed (tap to arm/disarm).
+            loading: custom search opening the resolved URL (in flight). */}
         <button
           onClick={handleSearchIconTap}
           className="shrink-0 text-brand-blue"
           aria-label={searchIconLabel}
         >
-          {flash === 'invalid' && <CircleAlert />}
+          {flash === 'invalid' && <ICON.invalid />}
           {flash === 'notfound' && (
-            <CircleQuestionMark className="-scale-x-100" />
+            <ICON.notFound className="-scale-x-100" />
           )}
-          {flash === 'openfailed' && <CircleX />}
-          {!flash && searchPhase === 'translating' && <Languages />}
-          {!flash && searchPhase === 'opening' && <BookSearch />}
-          {!flash && !searchPhase && overrideArmed && <Minimize2 />}
-          {!flash && !searchPhase && !overrideArmed && isExegesisMatch && <Languages />}
-          {!flash && !searchPhase && !overrideArmed && !isExegesisMatch && <PencilSparkles />}
+          {flash === 'openfailed' && <ICON.openFailed />}
+          {!flash && searchPhase === 'translating' && <ICON.translating />}
+          {!flash && searchPhase === 'opening' && <ICON.loading className="animate-spin" />}
+          {!flash && !searchPhase && overrideArmed && <ICON.searchOnly />}
+          {!flash && !searchPhase && !overrideArmed && isExegesisMatch && <ICON.exegesis />}
+          {!flash && !searchPhase && !overrideArmed && !isExegesisMatch && <ICON.searchAuto />}
         </button>
 
         <input
@@ -280,7 +276,7 @@ export default function SearchBar() {
         />
         {/* Search icon inside input on LEFT (last in RTL flex = leftmost) */}
         <button onClick={handleSubmit} className="shrink-0 text-brand-blue" aria-label="بحث">
-          <Search />
+          <ICON.search />
         </button>
       </div>
 
@@ -291,7 +287,7 @@ export default function SearchBar() {
         disabled={!botUrl}
         aria-label="المساعد الذكي"
       >
-        {botFailed ? <CircleX /> : <Bot />}
+        {botFailed ? <ICON.openFailed /> : <ICON.assistant />}
       </button>
 
       {/* Keyboard — leftmost */}
@@ -301,7 +297,7 @@ export default function SearchBar() {
         disabled={!keyboardUrl}
         aria-label="لوحة المفاتيح"
       >
-        {keyboardFailed ? <CircleX /> : <Keyboard />}
+        {keyboardFailed ? <ICON.openFailed /> : <ICON.keyboard />}
       </button>
     </div>
   )

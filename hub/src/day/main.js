@@ -81,8 +81,8 @@ function minutesNowIn(tz) {
     return parseInt(p.find(x => x.type === 'hour').value, 10) * 60 + parseInt(p.find(x => x.type === 'minute').value, 10);
   } catch (e) { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); }
 }
-// Lucide icons shown from script (the hourglass beside a provisional Hijri date).
-const HOURGLASS = '<svg data-lucide="hourglass" class="icon-inline me-xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>';
+// Lucide icons shown from script (beside a provisional Hijri date).
+const PROVISIONAL_ICON = '<svg data-icon="provisional" data-lucide="clock-fading" class="icon-inline me-xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 1 7.38 16.75"></path><path d="M12 6v6l4 2"></path><path d="M2.5 8.875a10 10 0 0 0-.5 3"></path><path d="M2.83 16a10 10 0 0 0 2.43 3.4"></path><path d="M4.636 5.235a10 10 0 0 1 .891-.857"></path><path d="M8.644 21.42a10 10 0 0 0 7.631-.38"></path></svg>';
 function svgIcon(markup) {
   const t = document.createElement('template');
   t.innerHTML = markup;
@@ -601,7 +601,7 @@ const UI = {
     this.set('hijri-date', hijriLong(h.today, L.months));
     const src = this.targets['hijri-source'];
     if (src) {
-      const icon = h.provisional ? [svgIcon(HOURGLASS)] : [];
+      const icon = h.provisional ? [svgIcon(PROVISIONAL_ICON)] : [];
       src.replaceChildren(...icon, document.createTextNode(Hijri.label(h, App.lang)));
     }
   },

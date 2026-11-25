@@ -38,7 +38,7 @@ function applyLocalization() {
   setLabel(btnNavLeft, isRtl ? tr.nextPage('←') : tr.prevPage('←'));
   setLabel(btnNavRight, isRtl ? tr.prevPage('→') : tr.nextPage('→'));
   setLabel(btnDirToggle, isRtl ? tr.dirRTL : tr.dirLTR);
-  btnDirToggle.innerHTML = isRtl ? ICON.stepForward : ICON.stepBack;
+  btnDirToggle.innerHTML = isRtl ? ICON.bookRtl : ICON.bookLtr;
   drawSettingsButtons(btnTheme, btnNumerals, lang());
   setLabel(btnScan, tr.scan);
   setLabel(btnReading, tr.reading);

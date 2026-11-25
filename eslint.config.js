@@ -32,8 +32,12 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true, allowExportNames: ['useAppState', 'useDataCache'] }],
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: { attributes: false } }],
+      // One icon file: components take icons from src/lib/icons.ts, which maps the meanings
+      // decided in hub/src/icons.js.
+      'no-restricted-imports': ['error', { paths: [{ name: 'lucide-react', message: 'Take icons from @/lib/icons (meanings: hub/src/icons.js).' }] }],
     },
   },
+  { files: ['src/lib/icons.ts'], rules: { 'no-restricted-imports': 'off' } },
   // The configs read by Vite and Capacitor, type-checked by tsconfig.node.json: the same promise rules.
   {
     files: ['vite.config.ts', 'capacitor.config.ts'],

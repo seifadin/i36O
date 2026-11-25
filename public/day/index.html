@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-fYJc3jAm9pOF4Qql0BxhMxxR0Ug59SK+jjAq9T86CqE='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-vTeAxcRjTjmDHAR1gosbLCVYsJv71LrV/XH498IdVXg='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -690,7 +690,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       <button id="btn-theme" type="button" class="toolbar-btn"></button>
       <button id="btn-numerals" type="button" class="toolbar-btn numerals-btn"></button>
       <div class="lang-wrap">
-        <button id="btn-lang" type="button" class="toolbar-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-list"><span id="lang-short"></span><svg data-lucide="chevron-down" class="tb-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+        <button id="btn-lang" type="button" class="toolbar-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-list"><span id="lang-short"></span><svg data-icon="dropdown" data-lucide="chevrons-up-down" class="tb-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path></svg></button>
         <!-- dir="rtl" keeps the list in a fixed order; each language is written in its own language. -->
         <div id="lang-list" class="lang-list i360-popup" dir="rtl" role="group" aria-labelledby="btn-lang" hidden>
           <button type="button" data-lang="ar" id="lang-ar" lang="ar" class="i360-list-item">العربية</button>
@@ -703,7 +703,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     </div>
     <h1 data-i18n="title" class="tb-title">Daily Reflection</h1>
     <!-- Inside the installed i360إ app only: back to its home; last, so at the far end in either direction. -->
-    <button id="btn-close" type="button" class="toolbar-btn" hidden><svg data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+    <button id="btn-close" type="button" class="toolbar-btn" hidden><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
   </header>
 
   <div class="page safe-area safe-area-top-bar">
@@ -717,7 +717,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     <div class="cards-col" id="col-a">
     <section id="quran-card" class="glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
       <div class="flex items-center gap-sm mb-md">
-        <span class="bg-quran-soft text-quran p-sm rounded-lg"><svg data-lucide="moon-star" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5h4"></path><path d="M20 3v4"></path><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></span>
+        <span class="bg-quran-soft text-quran p-sm rounded-lg"><svg data-icon="verse" data-lucide="moon-star" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5h4"></path><path d="M20 3v4"></path><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></span>
         <h2 data-i18n="quranLabel" class="text-sm font-bold uppercase tracking-widest text-quran">Quranic Verse</h2>
       </div>
       <div class="space-y-md">
@@ -730,7 +730,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
 
     <section id="hadith-card" class="glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
       <div class="flex items-center gap-sm mb-md">
-        <span class="bg-hadith-bg text-hadith p-sm rounded-lg"><svg data-lucide="book-open" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v16"></path><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"></path></svg></span>
+        <span class="bg-hadith-bg text-hadith p-sm rounded-lg"><svg data-icon="hadith" data-lucide="book-open" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v16"></path><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"></path></svg></span>
         <h2 data-i18n="hadithLabel" class="text-base font-bold uppercase tracking-widest text-hadith">Hadith</h2>
       </div>
       <div class="space-y-md">
@@ -755,7 +755,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     <div class="cards-col" id="col-b">
     <section id="prayer-card" class="glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
       <div class="flex items-center gap-sm mb-md">
-        <span class="bg-prayer-bg text-prayer p-sm rounded-lg"><svg data-lucide="clock" class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></span>
+        <span class="bg-prayer-bg text-prayer p-sm rounded-lg"><svg data-icon="prayerTimes" data-lucide="clock" class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></span>
         <h2 data-i18n="prayerLabel" class="text-base font-bold uppercase tracking-widest text-prayer">Prayer Times</h2>
       </div>
       <div data-target="prayer-grid" class="grid grid-cols-3 gap-sm mb-md"></div>
@@ -786,10 +786,10 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       <!-- The card's name, and the direction switch at the other end of the same row (wraps under it if the row is too narrow). -->
       <div class="flex flex-wrap items-center justify-between gap-sm mb-md">
         <div class="flex items-center gap-sm">
-          <span class="bg-converter-bg text-converter p-sm rounded-lg"><svg data-lucide="calendar-sync" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 10v4h4"></path><path d="m11 14 1.535-1.605a5 5 0 018 1.5"></path><path d="M16 2v3"></path><path d="m21 18-1.535 1.605a5 5 0 01-8-1.5"></path><path d="M21 22v-4h-4"></path><path d="M21 8.517V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h3.517"></path><path d="M3 9h4"></path><path d="M8 2v3"></path></svg></span>
+          <span class="bg-converter-bg text-converter p-sm rounded-lg"><svg data-icon="converter" data-lucide="calendar-sync" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 10v4h4"></path><path d="m11 14 1.535-1.605a5 5 0 018 1.5"></path><path d="M16 2v3"></path><path d="m21 18-1.535 1.605a5 5 0 01-8-1.5"></path><path d="M21 22v-4h-4"></path><path d="M21 8.517V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h3.517"></path><path d="M3 9h4"></path><path d="M8 2v3"></path></svg></span>
           <h2 data-i18n="convLabel" class="text-base font-bold uppercase tracking-widest text-converter">Date Converter</h2>
         </div>
-        <button type="button" id="conv-swap" class="i360-btn"><svg data-lucide="arrow-left-right" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg><span data-target="conv-dir"></span></button>
+        <button type="button" id="conv-swap" class="i360-btn"><svg data-icon="swap" data-lucide="arrow-left-right" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg><span data-target="conv-dir"></span></button>
       </div>
       <div class="i360-inset p-md flex flex-col gap-md">
         <div class="conv-fields" role="group" id="conv-fields">
@@ -806,7 +806,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
             <input id="conv-y" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" class="i360-field">
           </div>
           <span class="conv-pick" id="conv-pick" hidden>
-            <button type="button" id="conv-pick-btn" class="i360-btn"><svg data-lucide="calendar" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg></button>
+            <button type="button" id="conv-pick-btn" class="i360-btn"><svg data-icon="pickDate" data-lucide="calendar" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg></button>
             <input type="date" id="conv-native" class="conv-native" tabindex="-1" aria-hidden="true">
           </span>
         </div>
@@ -821,7 +821,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     </div>
     <section id="events-card" class="cards-wide glass-card i360-card opacity-0 translate-y-4 transition-all duration-500">
       <div class="flex items-center gap-sm mb-md">
-        <span class="bg-event-bg text-event p-sm rounded-lg"><svg data-lucide="calendar-check" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="m9 15 2 2 4-4"></path></svg></span>
+        <span class="bg-event-bg text-event p-sm rounded-lg"><svg data-icon="events" data-lucide="calendar-check" class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="m9 15 2 2 4-4"></path></svg></span>
         <h2 data-i18n="eventsLabel" class="text-base font-bold uppercase tracking-widest text-event">Upcoming Events</h2>
       </div>
       <p data-target="events-note" class="text-sm text-custom-secondary mb-md"></p>
@@ -2293,10 +2293,10 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     });
   }
   var THEME_ICONS = Object.freeze({
-    system: '<svg data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>',
-    light: '<svg data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>',
-    sepia: '<svg data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>',
-    dark: '<svg data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>'
+    system: '<svg data-icon="theme.system" data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>',
+    light: '<svg data-icon="theme.light" data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>',
+    sepia: '<svg data-icon="theme.sepia" data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>',
+    dark: '<svg data-icon="theme.dark" data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>'
   });
   function drawSettingsButtons(themeBtn, numeralsBtn, lang) {
     const theme = getChoice(), numerals = getNumerals();
@@ -2849,7 +2849,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       return n.getHours() * 60 + n.getMinutes();
     }
   }
-  var HOURGLASS = '<svg data-lucide="hourglass" class="icon-inline me-xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>';
+  var PROVISIONAL_ICON = '<svg data-icon="provisional" data-lucide="clock-fading" class="icon-inline me-xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 1 7.38 16.75"></path><path d="M12 6v6l4 2"></path><path d="M2.5 8.875a10 10 0 0 0-.5 3"></path><path d="M2.83 16a10 10 0 0 0 2.43 3.4"></path><path d="M4.636 5.235a10 10 0 0 1 .891-.857"></path><path d="M8.644 21.42a10 10 0 0 0 7.631-.38"></path></svg>';
   function svgIcon(markup) {
     const t = document.createElement("template");
     t.innerHTML = markup;
@@ -3543,7 +3543,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       this.set("hijri-date", hijriLong(h.today, L.months));
       const src = this.targets["hijri-source"];
       if (src) {
-        const icon = h.provisional ? [svgIcon(HOURGLASS)] : [];
+        const icon = h.provisional ? [svgIcon(PROVISIONAL_ICON)] : [];
         src.replaceChildren(...icon, document.createTextNode(Hijri.label(h, App.lang)));
       }
     },

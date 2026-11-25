@@ -124,7 +124,7 @@ function checkConnection() {
 
 function updateConnection() {
   const label = online ? t().online : t().offline;
-  statusIcon.innerHTML = `${online ? ICON.globeCheck : ICON.globeX}<span class="status-text"></span>`;
+  statusIcon.innerHTML = `${online ? ICON.online : ICON.offline}<span class="status-text"></span>`;
   statusIcon.lastChild.textContent = label;
   statusIcon.classList.toggle('offline', !online);
   setLabel(statusIcon, label);

@@ -501,13 +501,13 @@
   <header class="toolbar" id="toolbar">
     <div class="tb-start">
       <button class="toolbar-btn" id="btn-more" type="button" aria-controls="more-menu" aria-expanded="false">
-        <svg data-lucide="ellipsis-vertical" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+        <svg data-icon="menu" data-lucide="ellipsis-vertical" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
       </button>
       <button class="toolbar-btn" id="btn-theme" type="button"></button>
       <button class="toolbar-btn numerals-btn" id="btn-numerals" type="button"></button>
       <div class="divider"></div>
       <span class="status-icon" id="status-icon" role="img"></span>
-      <button class="toolbar-btn toolbar-btn-label" id="btn-open-file" type="button"><svg data-lucide="folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg><span id="open-file-label">Open file</span></button>
+      <button class="toolbar-btn toolbar-btn-label" id="btn-open-file" type="button"><svg data-icon="openFile" data-lucide="folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg><span id="open-file-label">Open file</span></button>
     </div>
 
     <div class="tb-main">
@@ -517,21 +517,21 @@
       </div>
       <div class="tb-group" id="group-zoom">
         <button class="toolbar-btn" id="btn-zoom-out" type="button">
-          <svg data-lucide="minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></svg>
+          <svg data-icon="zoomOut" data-lucide="minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></svg>
         </button>
         <button class="toolbar-btn" id="btn-zoom-in" type="button">
-          <svg data-lucide="plus" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+          <svg data-icon="zoomIn" data-lucide="plus" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
         </button>
         <button class="toolbar-btn" id="btn-fit-width" type="button">
-          <svg data-lucide="move-horizontal" viewBox="0 0 24 24"><path d="m18 8 4 4-4 4"></path><path d="M2 12h20"></path><path d="m6 8-4 4 4 4"></path></svg>
+          <svg data-icon="fitWidth" data-lucide="move-horizontal" viewBox="0 0 24 24"><path d="m18 8 4 4-4 4"></path><path d="M2 12h20"></path><path d="m6 8-4 4 4 4"></path></svg>
         </button>
         <button class="toolbar-btn" id="btn-fit-page" type="button">
-          <svg data-lucide="move-vertical" viewBox="0 0 24 24"><path d="M12 2v20"></path><path d="m8 18 4 4 4-4"></path><path d="m8 6 4-4 4 4"></path></svg>
+          <svg data-icon="fitPage" data-lucide="move-vertical" viewBox="0 0 24 24"><path d="M12 2v20"></path><path d="m8 18 4 4 4-4"></path><path d="m8 6 4-4 4 4"></path></svg>
         </button>
       </div>
       <div class="tb-group" id="group-nav">
         <button class="toolbar-btn" id="btn-nav-left" type="button">
-          <svg data-lucide="chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>
+          <svg data-icon="pageLeft" data-lucide="arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>
         </button>
         <div class="page-counter">
           <select id="vol-select" class="vol-select i360-field" hidden></select>
@@ -541,39 +541,39 @@
           <span id="page-pos" class="page-pos"></span>
         </div>
         <button class="toolbar-btn" id="btn-nav-right" type="button">
-          <svg data-lucide="chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></svg>
+          <svg data-icon="pageRight" data-lucide="arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
         </button>
       </div>
       <div class="divider" aria-hidden="true"></div>
       <button class="toolbar-btn" id="btn-copy-link" type="button" hidden>
-        <svg data-lucide="link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        <svg data-icon="copyLink" data-lucide="link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
       </button>
       <div class="tb-group" id="group-mark">
         <template data-slot="copy-link"></template>
         <button class="toolbar-btn" id="btn-bookmark" type="button" aria-pressed="false">
-          <svg data-lucide="bookmark" viewBox="0 0 24 24"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"></path></svg>
+          <svg data-icon="bookmark" data-lucide="bookmark" viewBox="0 0 24 24"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"></path></svg>
         </button>
       </div>
       <div class="tb-group" id="group-acts">
         <button class="toolbar-btn" id="btn-scan" type="button" hidden>
-          <svg data-lucide="scan-text" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 8h8"></path><path d="M7 12h10"></path><path d="M7 16h6"></path></svg>
+          <svg data-icon="originalPage" data-lucide="scan-text" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 8h8"></path><path d="M7 12h10"></path><path d="M7 16h6"></path></svg>
         </button>
         <button class="toolbar-btn" id="btn-reading" type="button">
-          <svg data-lucide="maximize" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"></path><path d="M21 8V5a2 2 0 0 0-2-2h-3"></path><path d="M3 16v3a2 2 0 0 0 2 2h3"></path><path d="M16 21h3a2 2 0 0 0 2-2v-3"></path></svg>
+          <svg data-icon="readingMode" data-lucide="maximize" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"></path><path d="M21 8V5a2 2 0 0 0-2-2h-3"></path><path d="M3 16v3a2 2 0 0 0 2 2h3"></path><path d="M16 21h3a2 2 0 0 0 2-2v-3"></path></svg>
         </button>
       </div>
     </div>
 
     <div class="tb-end">
       <button class="toolbar-btn" id="btn-search-toggle" type="button" aria-controls="search-popup" aria-expanded="false">
-        <svg data-lucide="search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+        <svg data-icon="search" data-lucide="search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
       </button>
       <button class="toolbar-btn" id="btn-panel" type="button" aria-controls="side-panel" aria-expanded="false">
-        <svg data-lucide="list" viewBox="0 0 24 24"><path d="M3 5h.01"></path><path d="M3 12h.01"></path><path d="M3 19h.01"></path><path d="M8 5h13"></path><path d="M8 12h13"></path><path d="M8 19h13"></path></svg>
+        <svg data-icon="contents" data-lucide="table-of-contents" viewBox="0 0 24 24"><path d="M16 5H3"></path><path d="M16 12H3"></path><path d="M16 19H3"></path><path d="M21 5h.01"></path><path d="M21 12h.01"></path><path d="M21 19h.01"></path></svg>
       </button>
       <span class="tb-title" id="tb-title"></span>
       <button class="toolbar-btn" id="btn-close" type="button" hidden>
-        <svg data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        <svg data-icon="close" data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
       </button>
     </div>
 
@@ -603,16 +603,16 @@
       <input type="search" id="search-input" class="search-input i360-field i360-field-search" autocomplete="off" enterkeyhint="search">
       <span class="search-count" id="search-count" aria-live="polite">0 of 0</span>
       <button class="toolbar-btn" id="btn-search-prev" type="button">
-        <svg data-lucide="chevron-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"></path></svg>
+        <svg data-icon="resultPrevious" data-lucide="arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg>
       </button>
       <button class="toolbar-btn" id="btn-search-next" type="button">
-        <svg data-lucide="chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></svg>
+        <svg data-icon="resultNext" data-lucide="arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>
       </button>
       <button class="toolbar-btn" id="btn-search-list" type="button" aria-pressed="false" aria-controls="search-results">
-        <svg data-lucide="list" viewBox="0 0 24 24"><path d="M3 5h.01"></path><path d="M3 12h.01"></path><path d="M3 19h.01"></path><path d="M8 5h13"></path><path d="M8 12h13"></path><path d="M8 19h13"></path></svg>
+        <svg data-icon="searchResults" data-lucide="list" viewBox="0 0 24 24"><path d="M3 5h.01"></path><path d="M3 12h.01"></path><path d="M3 19h.01"></path><path d="M8 5h13"></path><path d="M8 12h13"></path><path d="M8 19h13"></path></svg>
       </button>
       <button class="toolbar-btn" id="btn-search-close" type="button">
-        <svg data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        <svg data-icon="close" data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
       </button>
     </div>
     <div class="search-row">
@@ -628,14 +628,14 @@
       <button class="panel-tab" id="tab-contents" type="button" role="tab" aria-selected="true"></button>
       <button class="panel-tab" id="tab-bookmarks" type="button" role="tab" aria-selected="false"></button>
       <button class="toolbar-btn" id="btn-panel-close" type="button">
-        <svg data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        <svg data-icon="close" data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
       </button>
     </div>
     <div class="panel-body" id="panel-body"></div>
   </aside>
 
   <button class="floating-btn" id="btn-exit-reading" type="button">
-    <svg data-lucide="minimize" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
+    <svg data-icon="exitReadingMode" data-lucide="minimize" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
   </button>
 
   <div class="toast i360-toast" id="toast" role="status" aria-live="polite"></div>
@@ -644,7 +644,7 @@
 
   <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
     <div class="missing-pages-banner i360-banner" id="missing-pages-banner" role="status">
-      <svg data-lucide="triangle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+      <svg data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>
     </div>
 

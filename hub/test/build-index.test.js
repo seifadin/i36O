@@ -172,3 +172,22 @@ test('a translated Wikipedia link with no Arabic article is listed as not indexe
   await assert.rejects(ex2.translatedWikiPages(services(state), { fetchUrl: 'https://en-wikipedia-org.translate.goog/wiki/NoArabic?_x_tr_tl=ar' }),
     /«NoArabic» has no ar version on wikipedia; not indexed/);
 });
+
+test('once a quarter, the science icons in the same rows are reported (old and unknown names), without stopping the build', async () => {
+  const dir = setup();
+  const state = { calls: [], md5: 'a1', archiveDownloads: 0 };
+  ROWS[0].ScienceMinorIcon = 'BookMarked';
+  ROWS[1].ScienceMinorIcon = 'NoSuchIcon';
+  ROWS[2].ScienceMinorIcon = 'ScrollText';
+  try {
+    const logs = [];
+    const quarter = await idx.run({ fetchFn: services(state), key: 'K', rootDir: dir, archivePages: fakeArchive(state), passes: 1, buildId: 'q', log: (s) => logs.push(s), now: new Date('2027-01-05T01:00:00Z') });
+    assert.deepEqual(quarter.report.scienceIcons.map((f) => [f.name, f.current]), [['BookMarked', 'BookBookmark'], ['NoSuchIcon', null]]);
+    assert.ok(logs.some((l) => /BookMarked → BookBookmark — صحيح البخاري/.test(l)));
+    assert.ok(quarter.catalog.sources.length > 0, 'the build still ran');
+    const other = await idx.run({ fetchFn: services(state), key: 'K', rootDir: dir, archivePages: fakeArchive(state), passes: 1, buildId: 'r', log: () => {}, now: new Date('2027-02-05T01:00:00Z') });
+    assert.equal(other.report.scienceIcons, null, 'not checked outside a quarter\'s first week');
+  } finally {
+    for (const r of ROWS) delete r.ScienceMinorIcon;
+  }
+});
