@@ -37,7 +37,7 @@ export default tseslint.config(
       'no-restricted-imports': ['error', { paths: [{ name: 'lucide-react', message: 'Take icons from @/lib/icons (meanings: hub/src/icons.js).' }] }],
     },
   },
-  { files: ['src/lib/icons.ts'], rules: { 'no-restricted-imports': 'off' } },
+  { files: ['src/lib/icons.ts', 'src/lib/iconsLoader.ts'], rules: { 'no-restricted-imports': 'off' } },
   // The configs read by Vite and Capacitor, type-checked by tsconfig.node.json: the same promise rules.
   {
     files: ['vite.config.ts', 'capacitor.config.ts'],

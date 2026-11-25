@@ -2,7 +2,7 @@
 // name. The one place to decide an icon: the hub pages draw these names inline (scripts/icons.js
 // checks every drawing is keyed by its meaning here), the app maps each meaning to its lucide-react
 // component in src/lib/icons.ts (a test checks they match). One meaning, one icon; one icon, one
-// meaning. Science icons are not here: they come from Baserow (src/lib/icons.ts loads them by name,
+// meaning. Science icons are not here: they come from Baserow (src/lib/iconsLoader.ts loads them by name,
 // and the indexer's quarterly check reports old or unknown names).
 
 export const ICON_SEMANTICS = Object.freeze({
