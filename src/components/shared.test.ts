@@ -1,0 +1,60 @@
+import { describe, expect, it } from 'vitest'
+import { createElement as h, type ReactElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import * as Hub from '@i360/components'
+import { Banner, Button, FieldBox, Popup, Toast, ToolbarButton } from './shared'
+
+// The app's shared components (shared.tsx) against the hub builders (hub/src/components.js): the
+// same element, classes and attributes for the same inputs. An icon's drawing is left out (each
+// side draws its own Lucide icon; which icon is checked by src/lib/icons.test.ts), and attributes
+// are compared as a set (their order means nothing to a browser).
+
+const ICON = '<svg data-icon="x"></svg>'
+const icon = h('svg', { 'data-icon': 'x' })
+
+function normal(html: string): string {
+  return html
+    .replace(/<svg\b[\s\S]*?<\/svg>/g, '<svg/>')
+    .replace(/<([a-z0-9]+)((?:\s+[a-zA-Z-]+(?:="[^"]*")?)*)\s*>/g, (_, tag: string, attrs: string) => {
+      const list = [...attrs.matchAll(/([a-zA-Z-]+)(?:="([^"]*)")?/g)].map((m) => (m[2] === undefined || m[2] === '' ? m[1] : `${m[1]}="${m[2]}"`))
+      return `<${tag}${list.sort().map((a) => ` ${a}`).join('')}>`
+    })
+}
+const app = (el: ReactElement) => normal(renderToStaticMarkup(el))
+
+describe('the app\'s shared components write the hub builders\' structure', () => {
+  const cases: [string, ReactElement, string][] = [
+    ['toolbar button with icon', h(ToolbarButton, { icon, label: 'معلومات الإصدار' }), Hub.toolbarButton({ icon: ICON, label: 'معلومات الإصدار' })],
+    ['toolbar button, own class, no icon', h(ToolbarButton, { className: 'numerals-btn', label: 'الأرقام' }), Hub.toolbarButton({ class: 'numerals-btn', label: 'الأرقام' })],
+    ['button, primary, words', h(Button, { primary: true }, 'موافق'), Hub.button({ primary: true, text: 'موافق' })],
+    ['button, words, placement', h(Button, { className: 'w-full' }, 'إعادة'), Hub.button({ class: 'w-full', text: 'إعادة' })],
+    ['button, small, icon only', h(Button, { small: true, icon, label: 'توسيع' }), Hub.button({ small: true, icon: ICON, label: 'توسيع' })],
+    ['pop-up', h(Popup, { className: 'w-full', role: 'dialog' }), Hub.box('popup', { class: 'w-full', role: 'dialog' })],
+    ['pop-up as a tooltip', h(Popup, { as: 'span', 'aria-hidden': 'true' }), Hub.box('popup', { tag: 'span' }).replace('<span ', '<span aria-hidden="true" ')],
+    ['notice', h(Banner, { className: 'm-md' }), Hub.box('banner', { class: 'm-md' })],
+    ['notice as a button', h(Banner, { onClick: () => {} }), Hub.box('banner', { tag: 'button' })],
+    ['toast', h(Toast, { className: 'fixed' }), Hub.box('toast', { class: 'fixed' })],
+    ['field box', h(FieldBox, { className: 'flex' }), Hub.box('fieldBox', { class: 'flex' })],
+  ]
+  it.each(cases)('%s', (_, el, hub) => {
+    expect(app(el)).toBe(normal(hub))
+  })
+
+  it('fails when the two differ (the comparison can see a difference)', () => {
+    expect(app(h(Button, { small: true }, 'x'))).not.toBe(normal(Hub.button({ text: 'x' })))
+  })
+})
+
+describe('no app component writes a shared component\'s class itself', () => {
+  const COMPONENT_CLASS = /(?<![\w-])(toolbar-btn|tb-title|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast))(?![\w-])/
+  const dir = join(process.cwd(), 'src')
+  const files = (readdirSync(dir, { recursive: true }) as string[])
+    .filter((f) => f.endsWith('.tsx') && !f.endsWith('shared.tsx'))
+  it.each(files)('src/%s', (f) => {
+    const code = readFileSync(join(dir, f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+    const found = [...code.matchAll(/(['"`])((?:\\.|(?!\1)[^\\])*)\1/g)].map((m) => m[2] ?? "").filter((s) => COMPONENT_CLASS.test(s))
+    expect(found).toEqual([])
+  })
+})

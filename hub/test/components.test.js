@@ -28,6 +28,15 @@ test('components: no page writes a shared component itself — in its HTML each 
   }
 });
 
+test('components: Daily Reflection writes no card header or status line itself — each names its placeholder', () => {
+  const html = markup(fs.readFileSync(path.join(SRC, 'day.src.html'), 'utf8'));
+  assert.doesNotMatch(html, /<h2\b/, 'a hand-written card header (<!--@@CARD_HEADER …@@-->)');
+  assert.doesNotMatch(html, /data-status="/, 'a hand-written status line (<!--@@STATUS_LINE …@@-->)');
+  const built = markup(read('../public/day/index.html'));
+  assert.equal((built.match(/<h2 data-i18n="[a-zA-Z]+" class="text-base font-bold uppercase tracking-widest text-[a-z]+">/g) || []).length, 5, 'five card headers, all one size');
+  assert.equal((built.match(/<div data-status="[a-z]+" class="hidden items-center gap-sm text-sm text-custom-secondary m[tb]-md"><span data-status-text><\/span><button class="i360-btn i360-btn-sm" type="button" data-retry><\/button><\/div>/g) || []).length, 3, 'three status lines');
+});
+
 test('components: no page script writes a shared component\'s class itself — it calls the builder (src/components.js)', () => {
   const scripts = fs.readdirSync(SRC, { recursive: true }).filter((f) => f.endsWith('.js') && f !== 'components.js');
   for (const rel of scripts) {
@@ -91,6 +100,11 @@ test('components: each builder writes one fixed structure, attributes in one ord
   assert.equal(C.box('card', { tag: 'details', class: 'major' }), '<details class="i360-card major"></details>');
   assert.equal(C.box('toast', { id: 't' }), '<div class="i360-toast" id="t" role="status" aria-live="polite"></div>');
   assert.equal(C.box('banner', { html: '<p>x</p>' }), '<div class="i360-banner" role="status"><p>x</p></div>');
+  assert.equal(C.cardHeader({ tone: 'quran', icon: SVG('verse'), 'data-i18n': 'quranLabel', text: 'Quranic Verse', class: 'mb-md' }),
+    '<div class="flex items-center gap-sm mb-md"><span class="bg-quran-soft text-quran p-sm rounded-lg"><svg class="icon" data-icon="verse" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path></path></svg></span><h2 data-i18n="quranLabel" class="text-base font-bold uppercase tracking-widest text-quran">Quranic Verse</h2></div>');
+  assert.equal(C.statusLine({ part: 'prayer', class: 'mb-md' }), '<div data-status="prayer" class="hidden items-center gap-sm text-sm text-custom-secondary mb-md"><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry></button></div>');
+  assert.throws(() => C.cardHeader({ tone: 'pink', icon: SVG('x'), text: 't' }), /needs a tone/);
+  assert.throws(() => C.statusLine({}), /needs its part/);
   assert.throws(() => C.field({ kind: 'date' }), /search, number or select/);
   assert.throws(() => C.box('popup', { tag: 'section' }), /a popup is a div/);
   assert.throws(() => C.box('sidebar'), /no container/);

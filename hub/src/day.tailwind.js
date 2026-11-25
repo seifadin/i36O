@@ -5,7 +5,7 @@
 // theme's, which follow the chosen theme by themselves (no dark: classes).
 const v = (name) => `var(--i360-${name})`;
 export default {
-  content: ['./src/day.src.html', './src/day/**/*.js'],
+  content: ['./src/day.src.html', './src/day/**/*.js', './src/components.js'],
   theme: {
     // Three sizes: the fourth (xl) is the app title's alone.
     fontSize: {

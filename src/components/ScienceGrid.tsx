@@ -13,6 +13,7 @@ import { fetchIcon, iconLoaded, loadedIcon } from '@/lib/iconsLoader'
 import { REPORT_SUBJECTS } from '@/lib/feedbackReport'
 import Dialog from '@/components/Dialog'
 import ReportNotice from '@/components/ReportNotice'
+import { Banner, Toast } from '@/components/shared'
 
 // Visible fallback for a missing/misnamed icon — silently rendering nothing
 // would make a bad icon name indistinguishable from "no icon set" (a failure
@@ -133,13 +134,10 @@ const CHECK_FLASH_MS = 450 // "site available" shows this long before the open
 
 function StatusPill({ busy, text }: { busy?: boolean; text: string }) {
   return (
-    <div
-      role="status"
-      className="i360-toast fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+7rem)] mx-auto w-fit"
-    >
+    <Toast className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+7rem)] mx-auto w-fit">
       {busy ? <ICON.loading className="animate-spin" /> : <ICON.checked />}
       <span>{text}</span>
-    </div>
+    </Toast>
   )
 }
 
@@ -237,19 +235,18 @@ export default function ScienceGrid() {
     // behind it worth returning to mid-failure either way.
     return (
       <>
-        <button
-          type="button"
-          onClick={() => setErrorDialogOpen(true)}
-          // Failed: the shared notice (.i360-banner), as the hub pages' errors; retrying: plain status text.
-          className={loading
-            ? 'flex w-full items-center justify-center gap-sm p-md text-center text-base'
-            : 'i360-banner m-md flex w-[calc(100%-2*var(--i360-space-md,1rem))] items-center justify-center gap-sm text-center'}
-        >
-          {loading && <ICON.loading className="animate-spin text-brand-muted" />}
-          <span className={loading ? 'text-brand-muted' : undefined}>
-            {loading ? (isRetrying ? 'يُعاد المحاولة...' : 'جارٍ التحميل...') : lastFailure.message}
-          </span>
-        </button>
+        {/* Retrying: plain status text; failed: the shared notice, as the hub pages' errors — here a
+            button, as tapping it opens the details. */}
+        {loading ? (
+          <button type="button" onClick={() => setErrorDialogOpen(true)} className="flex w-full items-center justify-center gap-sm p-md text-center text-base">
+            <ICON.loading className="animate-spin text-brand-muted" />
+            <span className="text-brand-muted">{isRetrying ? 'يُعاد المحاولة...' : 'جارٍ التحميل...'}</span>
+          </button>
+        ) : (
+          <Banner onClick={() => setErrorDialogOpen(true)} className="m-md flex w-[calc(100%-2*var(--i360-space-md,1rem))] items-center justify-center gap-sm text-center">
+            <span>{lastFailure.message}</span>
+          </Banner>
+        )}
         <ReportNotice
           open={errorDialogOpen}
           title={LOAD_ERROR}

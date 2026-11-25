@@ -122,13 +122,18 @@ function listItem(a = {}) {
 }
 
 // The containers: their element and class; what is inside is the page's own (`html`, or what its
-// script adds). A card or inset may be a <details> (the CSE's groups), a card a <section>.
+// script adds). A card or inset may be a <details> (the CSE's groups), a card a <section>; a popup
+// a <span> when it is a tooltip; a banner a <button> when tapping it opens its details (the app's
+// load error) — then a button, not a status. fieldBox: a field's look round a field and its
+// buttons (the app's search bar). The app's React versions: src/components/shared.tsx, checked
+// against these by src/components/shared.test.ts.
 const BOXES = Object.freeze({
   card: { cls: 'i360-card', tags: ['section', 'details', 'div'] },
   inset: { cls: 'i360-inset', tags: ['div', 'details'] },
-  popup: { cls: 'i360-popup', tags: ['div'] },
-  banner: { cls: 'i360-banner', tags: ['div'], role: 'status' },
+  popup: { cls: 'i360-popup', tags: ['div', 'span'] },
+  banner: { cls: 'i360-banner', tags: ['div', 'button'], role: 'status' },
   toast: { cls: 'i360-toast', tags: ['div'], role: 'status', live: 'polite' },
+  fieldBox: { cls: 'i360-field i360-field-search', tags: ['div'] },
 });
 
 function box(kind, a = {}) {
@@ -136,8 +141,36 @@ function box(kind, a = {}) {
   if (!k) throw new Error(`no container "${kind}"`);
   const tag = a.tag || k.tags[0];
   if (!k.tags.includes(tag)) throw new Error(`a ${kind} is a ${k.tags.join(' or ')}, not a ${tag}`);
-  const all = { ...a, role: a.role ?? k.role, 'aria-live': a['aria-live'] ?? k.live };
-  return `<${tag} class="${classes(k.cls, a.class)}"${attributes(all)}${flags(a)}>${a.html ?? ''}</${tag}>`;
+  const isButton = tag === 'button';
+  const all = { ...a, role: a.role ?? (isButton ? undefined : k.role), 'aria-live': a['aria-live'] ?? k.live };
+  return `<${tag} class="${classes(k.cls, a.class)}"${isButton ? ' type="button"' : ''}${attributes(all)}${flags(a)}>${a.html ?? ''}</${tag}>`;
+}
+
+// A card's header (Daily Reflection): its icon on a tile in the card's colour, then its name.
+// Each colour's classes are written out whole, so Tailwind (src/day.tailwind.js, which reads this
+// file) builds them. `class` places it (a margin).
+const CARD_TONES = Object.freeze({
+  quran: { tile: 'bg-quran-soft text-quran', text: 'text-quran' },
+  hadith: { tile: 'bg-hadith-bg text-hadith', text: 'text-hadith' },
+  prayer: { tile: 'bg-prayer-bg text-prayer', text: 'text-prayer' },
+  converter: { tile: 'bg-converter-bg text-converter', text: 'text-converter' },
+  event: { tile: 'bg-event-bg text-event', text: 'text-event' },
+});
+
+function cardHeader(a = {}) {
+  const tone = CARD_TONES[a.tone];
+  if (!tone || !a.icon || a.text === undefined) throw new Error(`a card header needs a tone (${Object.keys(CARD_TONES).join(', ')}), icon and text`);
+  const icon = a.icon.replace(/^<svg /, '<svg class="icon" ');
+  const name = `<h2${a['data-i18n'] ? ` data-i18n="${escapeAttr(a['data-i18n'])}"` : ''} class="text-base font-bold uppercase tracking-widest ${tone.text}">${escapeText(a.text)}</h2>`;
+  return `<div class="${classes('flex items-center gap-sm', a.class)}"><span class="${tone.tile} p-sm rounded-lg">${icon}</span>${name}</div>`;
+}
+
+// A part's status (Daily Reflection): its words while loading or after a failure, and a retry
+// button; hidden until its script shows it. `part` names it; `class` places it.
+function statusLine(a = {}) {
+  if (!a.part) throw new Error('a status line needs its part');
+  return `<div data-status="${escapeAttr(a.part)}" class="${classes('hidden items-center gap-sm text-sm text-custom-secondary', a.class)}">`
+    + `<span data-status-text></span>${button({ small: true, 'data-retry': true })}</div>`;
 }
 
 // The component classes a script needs — to turn a component's look on and off (the CSE's status
@@ -146,4 +179,4 @@ function box(kind, a = {}) {
 const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
 
 export { toolbarButton, labelButton, menuButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box,
-  BOXES, FIELD_KINDS, CLASS, ATTRIBUTE_ORDER };
+  cardHeader, statusLine, BOXES, FIELD_KINDS, CARD_TONES, CLASS, ATTRIBUTE_ORDER };

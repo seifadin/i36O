@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-D3wpcgEleBE6TTujPSMLUP+UMILYc31+incd9yxMHME='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-zdiUFRhpxl3wwORjdwwW1idY3Xx507KUZecT0n23GtA='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -1538,6 +1538,13 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     const all = { ...a, role: a.role ?? k.role, "aria-live": a["aria-live"] ?? k.live };
     return `<${tag} class="${classes(k.cls, a.class)}"${attributes(all)}${flags(a)}>${a.html ?? ""}</${tag}>`;
   }
+  var CARD_TONES = Object.freeze({
+    quran: { tile: "bg-quran-soft text-quran", text: "text-quran" },
+    hadith: { tile: "bg-hadith-bg text-hadith", text: "text-hadith" },
+    prayer: { tile: "bg-prayer-bg text-prayer", text: "text-prayer" },
+    converter: { tile: "bg-converter-bg text-converter", text: "text-converter" },
+    event: { tile: "bg-event-bg text-event", text: "text-event" }
+  });
   var CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
 
   // src/page-chrome.js

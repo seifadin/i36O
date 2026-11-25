@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react'
 import { resolveFeedbackMailto, copyAndEmailReport, REPORT_LABEL, REPORT_SUBJECTS } from '@/lib/feedbackReport'
+import { Button } from '@/components/shared'
 
 interface Props {
   children: ReactNode
@@ -79,21 +80,15 @@ export default class ErrorBoundary extends Component<Props, State> {
           <p className="text-base text-brand-blue">
             يرجى إعادة تحميل الصفحة
           </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="i360-btn i360-btn-primary"
-          >
+          <Button primary onClick={() => window.location.reload()}>
             إعادة التحميل
-          </button>
-          <button
-            onClick={this.handleReport}
-            className={`i360-btn transition-colors${reported ? ' border-brand-green text-brand-green' : ''}`}
-          >
+          </Button>
+          <Button className={`transition-colors${reported ? ' border-brand-green text-brand-green' : ''}`} onClick={this.handleReport}>
             {/* aria-live on this inner span, not the button itself —
                 screen readers handle a live region more reliably when
                 it's not also the interactive element receiving focus. */}
             <span aria-live="polite">{reportLabel}</span>
-          </button>
+          </Button>
         </div>
       )
     }

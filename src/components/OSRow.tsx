@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, CSSProperties } from 'react'
 import { ICON, THEME_ICON } from '@/lib/icons'
+import { Popup, ToolbarButton } from '@/components/shared'
 import type { Numerals, ThemeChoice } from '@i360/theme-loader'
 import { dayFirstToNumeric } from '@i360/dates'
 import { getOtaBuild } from '@/lib/feedbackReport'
@@ -135,13 +136,13 @@ function ToggleItem({
         <span className="text-brand-blue" aria-hidden="true">
           {icon}
         </span>
-        <span aria-hidden="true" className={`pointer-events-none absolute -top-7 whitespace-nowrap i360-popup px-sm py-xs text-base text-brand-blue transition-opacity group-hover:opacity-100 ${
+        <Popup as="span" aria-hidden="true" className={`pointer-events-none absolute -top-7 whitespace-nowrap px-sm py-xs text-base text-brand-blue transition-opacity group-hover:opacity-100 ${
           tooltipAlign === 'left' ? 'left-0' : 'left-1/2 -translate-x-1/2'
         } ${
           showTooltip ? 'opacity-100' : 'opacity-0'
         }`}>
           {ariaLabel}
-        </span>
+        </Popup>
       </span>
     </div>
   )
@@ -231,30 +232,11 @@ export default function OSRow() {
           height, widths, tap areas, colours, focus ring; the simulator keeps
           its own highlight. */}
       <div className="tb-start">
-        <button
-          onClick={() => setVersionOpen(true)}
-          className="toolbar-btn"
-          aria-label="معلومات الإصدار"
-        >
-          <ICON.menu />
-        </button>
-        <button
-          onClick={() => { i360Theme.cycle() }}
-          className="toolbar-btn"
-          aria-label={i360Theme.themeLabel(choice)}
-          title={i360Theme.themeLabel(choice)}
-        >
-          <ThemeIcon />
-        </button>
-        <button
-          onClick={() => { i360Theme.cycleNumerals() }}
-          className="toolbar-btn numerals-btn"
-          aria-label={i360Theme.numeralsLabel(numerals)}
-          title={i360Theme.numeralsLabel(numerals)}
-          data-i360-digits="keep"
-        >
+        <ToolbarButton icon={<ICON.menu />} label="معلومات الإصدار" onClick={() => setVersionOpen(true)} />
+        <ToolbarButton icon={<ThemeIcon />} label={i360Theme.themeLabel(choice)} onClick={() => { i360Theme.cycle() }} />
+        <ToolbarButton className="numerals-btn" label={i360Theme.numeralsLabel(numerals)} data-i360-digits="keep" onClick={() => { i360Theme.cycleNumerals() }}>
           {i360Theme.NUMERALS_SAMPLE[numerals]}
-        </button>
+        </ToolbarButton>
       </div>
 
       {/* Middle — real Android: the original binary Google/Huawei switch */}

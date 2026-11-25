@@ -47,6 +47,9 @@
       ],
       "@i360/icons": [
         "./hub/src/icons.js"
+      ],
+      "@i360/components": [
+        "./hub/src/components.js"
       ]
     },
     "noImplicitReturns": true,

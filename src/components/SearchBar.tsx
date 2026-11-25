@@ -7,6 +7,7 @@ import { computeUseHuawei } from '@/hooks/usePlatform'
 import { tryOpenNewTab } from '@/lib/openTab'
 import { openResource } from '@/lib/openResource'
 import { i360Theme } from '@/lib/theme'
+import { FieldBox } from '@/components/shared'
 
 // Icon mapping confirmation:
 // Search   → search icon inside input LEFT side
@@ -232,7 +233,7 @@ export default function SearchBar() {
       <span className="sr-only" role="status" aria-live="polite">{liveMessage}</span>
 
       {/* Search input with SearchIcon (right) + Search-execute icon (left) */}
-      <div className="i360-field i360-field-search flex flex-1 min-w-0 items-center px-sm py-xs gap-sm">
+      <FieldBox className="flex flex-1 min-w-0 items-center px-sm py-xs gap-sm">
         {/* SearchIcon — live 3-state indicator + one-shot override control.
             searchAuto: auto-detect, input doesn't match (resting/default,
             including empty input). Tapping while empty flashes invalid.
@@ -278,7 +279,7 @@ export default function SearchBar() {
         <button onClick={handleSubmit} className="shrink-0 text-brand-blue" aria-label="بحث">
           <ICON.search />
         </button>
-      </div>
+      </FieldBox>
 
       {/* Bot — outside input LEFT */}
       <button

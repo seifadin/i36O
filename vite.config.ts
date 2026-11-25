@@ -161,6 +161,7 @@ export default defineConfig(({ command }) => ({
       '@i360/exegesis': fileURLToPath(new URL('./hub/src/exegesis.js', import.meta.url)),
       '@i360/platform': fileURLToPath(new URL('./hub/src/platform.js', import.meta.url)),
       '@i360/icons': fileURLToPath(new URL('./hub/src/icons.js', import.meta.url)),
+      '@i360/components': fileURLToPath(new URL('./hub/src/components.js', import.meta.url)),
     },
   },
   build: { target: BUILD_TARGETS },

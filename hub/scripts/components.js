@@ -16,6 +16,8 @@
 //   <!--@@LIST_ITEM id="lang-ar" lang="ar" data-lang="ar" text="العربية"@@-->
 //   <!--@@CARD id="quran-card" class="…"@@--> …the page's own contents… <!--@@/CARD@@-->
 //   (likewise INSET, POPUP, BANNER and TOAST; tag="…" where the container allows another element)
+//   <!--@@CARD_HEADER tone="quran" icon="verse" data-i18n="quranLabel" text="Quranic Verse" class="mb-md"@@-->
+//   <!--@@STATUS_LINE part="quran" class="mt-md"@@-->
 //
 // A misspelled component, a missing field or an unknown meaning stops the build. A placeholder
 // with no attributes that isn't a component (<!--@@CSP@@-->) is build.js's own and is left for it;
@@ -56,6 +58,8 @@ const COMPONENTS = Object.freeze({
   FIELD: (a) => C.field(a),
   BUTTON: (a, draw) => C.button({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
   LIST_ITEM: (a) => C.listItem(a),
+  CARD_HEADER: (a, draw) => C.cardHeader({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
+  STATUS_LINE: (a) => C.statusLine(a),
 });
 
 // The page's HTML with every component written out.

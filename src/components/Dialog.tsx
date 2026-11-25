@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useId, useRef } from 'react'
 import { closeOnBack } from '@/lib/backButton'
+import { Button, Popup } from '@/components/shared'
 
 interface DialogProps {
   open: boolean
@@ -78,12 +79,12 @@ export default function Dialog({ open, title, message, onClose, secondaryAction,
 
   return (
     <div className="fixed inset-0 z-dialog flex items-center justify-center bg-brand-overlay px-md">
-      <div
+      <Popup
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${id}-title`}
         aria-describedby={`${id}-message`}
-        className="i360-popup w-full max-w-sm p-md text-right"
+        className="w-full max-w-sm p-md text-right"
       >
         <h2 id={`${id}-title`} className="mb-sm text-lg font-bold text-brand-blue">
           {title}
@@ -96,22 +97,14 @@ export default function Dialog({ open, title, message, onClose, secondaryAction,
             action, which shouldn't compete with the safer, recommended dismiss; emphasizeSecondary
             swaps the two when proceeding is the recommended choice (see the prop's comment above). */}
         {secondaryAction && (
-          <button
-            ref={secondaryButtonRef}
-            onClick={secondaryAction.onClick}
-            className={`i360-btn mb-sm w-full${emphasizeSecondary ? ' i360-btn-primary' : ''}`}
-          >
+          <Button ref={secondaryButtonRef} primary={emphasizeSecondary} className="mb-sm w-full" onClick={secondaryAction.onClick}>
             {secondaryAction.label}
-          </button>
+          </Button>
         )}
-        <button
-          ref={okButtonRef}
-          onClick={onClose}
-          className={`i360-btn w-full${emphasizeSecondary ? '' : ' i360-btn-primary'}`}
-        >
+        <Button ref={okButtonRef} primary={!emphasizeSecondary} className="w-full" onClick={onClose}>
           موافق
-        </button>
-      </div>
+        </Button>
+      </Popup>
     </div>
   )
 }
