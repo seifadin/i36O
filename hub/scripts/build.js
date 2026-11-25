@@ -12,7 +12,8 @@
 // bundles it with everything it imports — the shared files (book format, search, CSE index,
 // Hijri date, the theme loader…) and the pinned libraries (marked, adhan) — into one plain
 // script, inlined into the page so it works offline and can't change under us. Not minified;
-// comments are left out (they stay in src/).
+// comments are left out (they stay in src/). Its icons come from 'i360:icons', drawn here by meaning
+// (scripts/icons.js iconModule).
 //
 // Placeholders, each filled once:
 //   /*@@MAIN@@*/         the page's bundled script
@@ -23,13 +24,15 @@
 //   /*@@THEME_ORIGIN@@*/ the theme site's address (I360_THEME_ORIGIN to test
 //                        against another one)
 //   /*@@TAILWIND@@*/     Daily Reflection's Tailwind CSS (src/day.tailwind.js)
-//   <!--@@LABEL_BUTTON …@@-->  a shared component, written by scripts/components.js (any number)
+//   /*@@EXEGESIS@@*/, /*@@TANZIL@@*/  the quran page's words (src/locales.js QURAN)
+//   <!--@@LABEL_BUTTON …@@-->  a shared component, written by scripts/placeholders.js (any number)
 //   <!--@@CSP@@-->       a Content-Security-Policy allowing only the page's
 //                        own inline scripts (by hash), so it must be made
 //                        after everything else is in place
 // Editing the built pages by hand breaks those hashes: edit src/ and rebuild.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { writeComponents } from './components.js';
+import { writeComponents } from './placeholders.js';
+import { iconModule } from './icons.js';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
@@ -37,7 +40,8 @@ import * as esbuild from 'esbuild';
 import { fallbackCss } from '../theme/fallbacks.js';
 import { LIB_HOST, TANZIL_ORIGIN, THEME_ORIGIN as THEME_SITE } from '../src/sites.js';
 import { WORKER as HIJRI_WORKER } from '../hijri/client.js';
-import { checkInlineScripts } from './check-scripts.js';
+import { checkInlineScripts } from './check-inline-scripts.js';
+import { QURAN } from '../src/locales.js';
 
 const root = join(import.meta.dirname, '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');
@@ -63,6 +67,15 @@ if (/<\/style/i.test(pageChrome)) throw new Error('src/page-chrome.css contains 
 // beside itself (import.meta.url): built in, its address is the theme site's.
 // banner: the licence notices of the libraries bundled in (esbuild leaves comments out).
 // The script runs in strict mode, as ES modules do (and as every page script did before).
+// Every page script may import its icons by meaning from 'i360:icons' (scripts/icons.js).
+const ICONS_MODULE = iconModule();
+const pageIcons = {
+  name: 'i360-icons',
+  setup(b) {
+    b.onResolve({ filter: /^i360:icons$/ }, () => ({ path: 'icons', namespace: 'i360' }));
+    b.onLoad({ filter: /.*/, namespace: 'i360' }, () => ({ contents: ICONS_MODULE, loader: 'js' }));
+  }
+};
 async function bundle(entry, { banner = '', plugins = [] } = {}) {
   const result = await esbuild.build({
     entryPoints: [join(root, entry)],
@@ -75,7 +88,7 @@ async function bundle(entry, { banner = '', plugins = [] } = {}) {
     define: { 'import.meta.url': JSON.stringify(`${THEME_ORIGIN}/theme-loader.js`) },
     banner: { js: `${banner ? `${banner}\n` : ''}"use strict";` },
     logLevel: 'silent',
-    plugins
+    plugins: [pageIcons, ...plugins]
   });
   const code = result.outputFiles[0].text;
   if (/<\/script/i.test(code)) throw new Error(`${entry} contains "</script": it can't be inlined`);
@@ -104,7 +117,7 @@ function buildPage({ src, out, main, connectSrc, fills = [], imgSrc = "'none'", 
   html = fill(html, '/*@@MAIN@@*/', main);
   if (/fonts\.googleapis|fonts\.gstatic/.test(html)) throw new Error(`${src}: Google Fonts left in the page: fonts come from the theme site`);
   if (connectSrc !== '*') connectSrc = connectSrc === "'none'" ? THEME_ORIGIN : `${THEME_ORIGIN} ${connectSrc}`;
-  checkInlineScripts(html, src);   // a script that doesn't parse stops the build (scripts/check-scripts.js)
+  checkInlineScripts(html, src);   // a script that doesn't parse stops the build (scripts/check-inline-scripts.js)
   const hashes = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)]
     .map((m) => `'sha256-${createHash('sha256').update(m[1], 'utf8').digest('base64')}'`);
   if (/<script\b[^>]*\bsrc=/i.test(html.replace(/<script>[\s\S]*?<\/script>/g, ''))) {
@@ -156,6 +169,8 @@ buildPage({
 buildPage({
   src: 'src/quran.src.html',
   out: 'quran/site/i360/index.html',
+  // Its text in the HTML from src/locales.js, the one place the page's words are written.
+  fills: [['/*@@EXEGESIS@@*/', QURAN.ar.exegesis], ['/*@@TANZIL@@*/', QURAN.ar.tanzil]],
   main: await bundle('src/quran/main.js'),
   connectSrc: "'self'",
   imgSrc: "'self'",

@@ -7,7 +7,7 @@ import * as i360Theme from '../../theme/site/theme-loader.js';
 import { $, setLabel } from '../page-chrome.js';
 import { createStore } from '../storage.js';
 import { fetchWithTimeout } from '../net.js';
-import { ICON } from './text.js';
+import * as ICON from 'i360:icons';
 
 /* ================================================================
    State and elements

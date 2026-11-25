@@ -37,6 +37,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonBase & {
   )
 })
 
+// A bare icon button beside a field or inside one (the search bar's mode, search, assistant and
+// keyboard buttons): app-only, no hub twin. `label` names it (tooltip and screen readers); disabled
+// shows the disabled colour.
+export function IconButton({ icon, label, disabled, className, ...rest }: ButtonBase & {
+  icon: ReactNode; label: string; className?: string
+}) {
+  return (
+    <button className={cx(`shrink-0 ${disabled ? 'text-brand-disabled' : 'text-brand-blue'}`, className)} type="button" title={label} aria-label={label} disabled={disabled} {...rest}>
+      {icon}
+    </button>
+  )
+}
+
 type BoxProps = Omit<HTMLAttributes<HTMLElement>, 'className'> & { className?: string; children?: ReactNode }
 
 // A pop-up (hub: box('popup')): a <div>, or a <span> when it is a tooltip.

@@ -1,9 +1,9 @@
 # i360 theme: monthly reminder for newer Amiri / Amiri Quran fonts.
 #
 # The run fails on purpose when a newer version exists (or the check itself
-# fails), so GitHub emails you; then run `npm run fonts-update` in hub/ and push.
+# fails), so GitHub emails you; then run `npm run update-fonts` in hub/ and push.
 # It never changes the repo.
-name: Fonts check
+name: Check fonts
 
 on:
   schedule:

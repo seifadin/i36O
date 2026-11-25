@@ -7,7 +7,7 @@ import { computeUseHuawei } from '@/hooks/usePlatform'
 import { tryOpenNewTab } from '@/lib/openTab'
 import { openResource } from '@/lib/openResource'
 import { i360Theme } from '@/lib/theme'
-import { FieldBox } from '@/components/shared'
+import { FieldBox, IconButton } from '@/components/shared'
 
 // Icon mapping confirmation:
 // Search   → search icon inside input LEFT side
@@ -241,22 +241,22 @@ export default function SearchBar() {
             translating: custom search translating a non-Arabic term (in flight).
             searchOnly: forced search-only override armed (tap to arm/disarm).
             loading: custom search opening the resolved URL (in flight). */}
-        <button
+        <IconButton
           onClick={handleSearchIconTap}
-          className="shrink-0 text-brand-blue"
-          aria-label={searchIconLabel}
-        >
-          {flash === 'invalid' && <ICON.invalid />}
-          {flash === 'notfound' && (
-            <ICON.notFound className="-scale-x-100" />
-          )}
-          {flash === 'openfailed' && <ICON.openFailed />}
-          {!flash && searchPhase === 'translating' && <ICON.translating />}
-          {!flash && searchPhase === 'opening' && <ICON.loading className="animate-spin" />}
-          {!flash && !searchPhase && overrideArmed && <ICON.searchOnly />}
-          {!flash && !searchPhase && !overrideArmed && isExegesisMatch && <ICON.exegesis />}
-          {!flash && !searchPhase && !overrideArmed && !isExegesisMatch && <ICON.searchAuto />}
-        </button>
+          label={searchIconLabel}
+          icon={<>
+            {flash === 'invalid' && <ICON.invalid />}
+            {flash === 'notfound' && (
+              <ICON.notFound className="-scale-x-100" />
+            )}
+            {flash === 'openfailed' && <ICON.openFailed />}
+            {!flash && searchPhase === 'translating' && <ICON.translating />}
+            {!flash && searchPhase === 'opening' && <ICON.loading className="animate-spin" />}
+            {!flash && !searchPhase && overrideArmed && <ICON.searchOnly />}
+            {!flash && !searchPhase && !overrideArmed && isExegesisMatch && <ICON.exegesis />}
+            {!flash && !searchPhase && !overrideArmed && !isExegesisMatch && <ICON.searchAuto />}
+          </>}
+        />
 
         <input
           type="text"
@@ -276,30 +276,14 @@ export default function SearchBar() {
           dir="rtl"
         />
         {/* Search icon inside input on LEFT (last in RTL flex = leftmost) */}
-        <button onClick={handleSubmit} className="shrink-0 text-brand-blue" aria-label="بحث">
-          <ICON.search />
-        </button>
+        <IconButton onClick={handleSubmit} label="بحث" icon={<ICON.search />} />
       </FieldBox>
 
       {/* Bot — outside input LEFT */}
-      <button
-        onClick={handleBot}
-        className={`shrink-0 p-xs ${botUrl ? 'text-brand-blue' : 'text-brand-disabled'}`}
-        disabled={!botUrl}
-        aria-label="المساعد الذكي"
-      >
-        {botFailed ? <ICON.openFailed /> : <ICON.assistant />}
-      </button>
+      <IconButton onClick={handleBot} className="p-xs" disabled={!botUrl} label="المساعد الذكي" icon={botFailed ? <ICON.openFailed /> : <ICON.assistant />} />
 
       {/* Keyboard — leftmost */}
-      <button
-        onClick={handleKeyboard}
-        className={`shrink-0 p-xs ${keyboardUrl ? 'text-brand-blue' : 'text-brand-disabled'}`}
-        disabled={!keyboardUrl}
-        aria-label="لوحة المفاتيح"
-      >
-        {keyboardFailed ? <ICON.openFailed /> : <ICON.keyboard />}
-      </button>
+      <IconButton onClick={handleKeyboard} className="p-xs" disabled={!keyboardUrl} label="لوحة المفاتيح" icon={keyboardFailed ? <ICON.openFailed /> : <ICON.keyboard />} />
     </div>
   )
 }

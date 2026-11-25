@@ -2,7 +2,7 @@
 // page bookmarks.
 import { IN_APP } from '../page-chrome.js';
 import { MD_READER_KEY, createStore } from '../storage.js';
-import { POSITIONS_MAX, SAVE_DEBOUNCE_MS, TOAST_MS } from './text.js';
+import { POSITIONS_MAX, SAVE_DEBOUNCE_MS, TOAST_MS } from './constants.js';
 import { btnBookmark, sidePanel, state, storeGet, storeSet, t, toWestern, toastEl } from './state.js';
 import { captureAnchor, restoreAnchor } from './view.js';
 import { findCurrentIdx, findPage, scrollToSheet, updateCounter } from './nav.js';

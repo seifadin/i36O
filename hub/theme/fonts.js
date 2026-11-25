@@ -8,8 +8,8 @@
 //                                  the Fonts section of theme.css rewritten,
 //                                  the folder before the current one removed
 //
-// npm run fonts-update runs the check and, when there's a newer version, the update,
-// the tests and a separate commit (scripts/fonts-update.js).
+// npm run update-fonts runs the check and, when there's a newer version, the update,
+// the tests and a separate commit (scripts/update-fonts.js).
 //
 // Safety check: a new file must have every character its current one has
 // (for Amiri Quran: every Quranic mark), or the update stops.
@@ -232,7 +232,7 @@ if (process.argv[1] === import.meta.filename) {
     }
     for (const i of infos) console.log(`Fonts: ${describe(i)}`);
     if (arg === '--strict' && infos.some((i) => i.newer)) {
-      console.log('A newer font is available: run npm run fonts-update (or node theme/fonts.js --apply).');
+      console.log('A newer font is available: run npm run update-fonts (or node theme/fonts.js --apply).');
       process.exitCode = 1;
     }
   })().catch((e) => { console.error(`Fonts: update failed — ${e.message}`); process.exitCode = 1; });

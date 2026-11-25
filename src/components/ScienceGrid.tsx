@@ -13,7 +13,7 @@ import { fetchIcon, iconLoaded, loadedIcon } from '@/lib/iconsLoader'
 import { REPORT_SUBJECTS } from '@/lib/feedbackReport'
 import Dialog from '@/components/Dialog'
 import ReportNotice from '@/components/ReportNotice'
-import { Banner, Toast } from '@/components/shared'
+import { Banner, IconButton, Toast } from '@/components/shared'
 
 // Visible fallback for a missing/misnamed icon — silently rendering nothing
 // would make a bad icon name indistinguishable from "no icon set" (a failure
@@ -65,7 +65,7 @@ function DisclosureRow({ level, label, icon, expanded, panelId, onToggle, childr
 }) {
   return (
     <div>
-      <button onClick={onToggle} aria-expanded={expanded} aria-controls={panelId} className={BUTTON[level]}>
+      <button type="button" onClick={onToggle} aria-expanded={expanded} aria-controls={panelId} className={BUTTON[level]}>
         <div className="flex items-center gap-sm">
           {expanded ? <ICON.expanded /> : <ICON.collapsed />}
           {icon && (
@@ -99,6 +99,7 @@ function MinorButton({
     // keeps the levels' gaps, so the whole indent stays tappable and the paperclip clears the edge too.
     <div className="flex w-full items-center hover:bg-brand-highlight safe-sides [--safe-level:0]">
       <button
+        type="button"
         onClick={() => onTap(science)}
         className={`flex flex-1 items-center gap-sm ${indent === 'nested' ? 'px-[calc(var(--safe-gap)*3)]' : 'px-[calc(var(--safe-gap)*2)]'} py-xs text-right text-list focus:outline-none text-brand-blue`}
       >
@@ -110,17 +111,16 @@ function MinorButton({
         <span className="flex-1">{science.ScienceMinor_Ar}</span>
       </button>
       {science.WebAppendix && (
-        <button
+        <IconButton
           // stopPropagation isn't actually needed here — this is a sibling
           // of the row button, not nested inside it, so there's no bubbling
           // "row tap" to prevent — but kept explicit anyway since it costs
           // nothing and removes any doubt for a future reader.
           onClick={e => { e.stopPropagation(); onAppendixTap(science) }}
-          className="px-sm py-xs text-brand-blue"
-          aria-label="فتح الملحق"
-        >
-          <ICON.attachment />
-        </button>
+          className="px-sm py-xs"
+          label="فتح الملحق"
+          icon={<ICON.attachment />}
+        />
       )}
     </div>
   )

@@ -1,9 +1,9 @@
-// The built pages' inline scripts all parse (scripts/check-scripts.js, the same check the build runs).
+// The built pages' inline scripts all parse (scripts/check-inline-scripts.js, the same check the build runs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { checkInlineScripts } from '../scripts/check-scripts.js';
+import { checkInlineScripts } from '../scripts/check-inline-scripts.js';
 
 for (const page of ['md', 'cse', 'day']) {
   test(`the built ${page} page's inline scripts all parse`, () => {

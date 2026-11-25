@@ -363,4 +363,4 @@ svg[data-lucide] {
 }
 
 /* Search matches. */
-mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); color: inherit; border-radius: var(--i360-radius-sm, 0.25rem); }
+.i360-page mark { background: var(--i360-highlight, #fef08a); color: inherit; border-radius: var(--i360-radius-sm, 0.25rem); }

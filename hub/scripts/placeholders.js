@@ -80,4 +80,4 @@ function writeComponents(html, draw = svgFor) {
   });
 }
 
-export { writeComponents, COMPONENTS, PAIRED };
+export { writeComponents };

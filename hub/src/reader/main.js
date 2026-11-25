@@ -6,7 +6,7 @@ import * as i360Theme from '../../theme/site/theme-loader.js';
 import * as LibCopy from '../lib-copy.js';
 import { fetchWithTimeout } from '../net.js';
 import { setupClose } from '../page-chrome.js';
-import { TEXT_SCALES } from './text.js';
+import { TEXT_SCALES } from './constants.js';
 import { btnClose, btnOpenFile, btnSearchList, checkConnection, fileInput, hashText, optDiacritics, optWord, parseBook, search, state, storeGet, wireState } from './state.js';
 import { renderDocument, setProgress, wirePages } from './pages.js';
 import { wirePosition } from './position.js';

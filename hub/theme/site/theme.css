@@ -105,6 +105,7 @@
   --i360-disabled-opacity: 0.4;
   --i360-speed-quick: 0.15s;
   --i360-speed: 0.2s;
+  --i360-speed-slow: 0.5s;
   --i360-layer-bar: 10;
   --i360-layer-menu: 20;
   --i360-layer-panel: 30;

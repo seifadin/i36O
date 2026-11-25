@@ -16,11 +16,12 @@ export default {
     borderRadius: { none: '0', sm: v('radius-sm'), lg: v('radius-lg'), full: v('radius-full') },
     borderWidth: { 0: '0', DEFAULT: v('line-width'), 2: v('line-width-strong') },
     boxShadow: { none: 'none', page: v('page-shadow'), popup: v('popup-shadow') },
+    // Speeds: the theme's (duration-quick, -normal, -slow; plain `transition` is quick).
+    transitionDuration: { DEFAULT: v('speed-quick'), quick: v('speed-quick'), normal: v('speed'), slow: v('speed-slow') },
     extend: {
       // Spacing: the theme's four steps (p-sm, gap-xs, …); Tailwind's numbers stay for sizes.
       spacing: { xs: v('space-xs'), sm: v('space-sm'), md: v('space-md'), lg: v('space-lg') },
       lineHeight: { reading: v('line-height') },
-      transitionDuration: { DEFAULT: v('speed-quick') },
       colors: {
         hadith: { DEFAULT: v('hadith'), bg: v('hadith-bg') },
         prayer: { DEFAULT: v('prayer'), bg: v('prayer-bg') },

@@ -1,12 +1,12 @@
 // Shared components are written once (src/components.js): no page writes their markup itself, the
-// build writes each placeholder with the builder (scripts/components.js), and every built page
+// build writes each placeholder with the builder (scripts/placeholders.js), and every built page
 // carries exactly the builder's structure.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'fs';
 import path from 'path';
 import * as C from '../src/components.js';
-import { writeComponents } from '../scripts/components.js';
+import { writeComponents } from '../scripts/placeholders.js';
 
 const ROOT = path.join(import.meta.dirname, '..');
 const SRC = path.join(ROOT, 'src');

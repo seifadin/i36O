@@ -62,3 +62,18 @@ test('icons: svgFor draws an icon whole from its meaning; an unknown meaning or 
   assert.throws(() => icons.svgFor('nope', FAKE, MEANINGS), /not a meaning/);
   assert.throws(() => icons.svgFor('add', { x: FAKE.x }, MEANINGS), /is not a Lucide/);
 });
+
+test('icons: i360:icons exports every meaning drawn by svgFor (a group as an object), under its own name', async () => {
+  const code = icons.iconModule(FAKE, MEANINGS);
+  const mod = await import(`data:text/javascript,${encodeURIComponent(code)}`);
+  assert.deepEqual(Object.keys(mod).sort(), ['add', 'close', 'theme']);
+  assert.equal(mod.close, icons.svgFor('close', FAKE, MEANINGS));
+  assert.deepEqual(mod.theme, { dark: icons.svgFor('theme.dark', FAKE, MEANINGS) });
+  const real = await import(`data:text/javascript,${encodeURIComponent(icons.iconModule())}`);
+  assert.ok(real.delete.startsWith('<svg data-icon="delete"'), 'a meaning that is a reserved word is still exported');
+});
+
+test('icons: no page script keeps a drawing of its own (they import them from i360:icons)', () => {
+  const scripts = icons.PAGES.filter((rel) => rel.endsWith('.js') && rel !== 'src/components.js');
+  for (const rel of scripts) assert.doesNotMatch(fs.readFileSync(path.join(ROOT, rel), 'utf8'), /<svg\b/, `${rel}: import the icon by meaning from 'i360:icons'`);
+});

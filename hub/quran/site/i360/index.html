@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-H9TVXy8KW6hAJoYBkOuptvkCUHqSEn93aDNHxXEU34M='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-v5bil0tLTSzNMb98dWCbZ9bFZXEGha+xjb/lYOqa5+g='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>القرآن الكريم — مشروع تنزيل</title>
   <meta name="description" content="القرآن الكريم من مشروع تنزيل (tanzil.net)، مع زر لتفسير الآية الظاهرة من فهرس الموسوعة الإسلامية i360إ.">
@@ -84,6 +84,7 @@
   --i360-disabled-opacity: 0.4;
   --i360-speed-quick: 0.15s;
   --i360-speed: 0.2s;
+  --i360-speed-slow: 0.5s;
   --i360-layer-bar: 10;
   --i360-layer-menu: 20;
   --i360-layer-panel: 30;
@@ -640,7 +641,7 @@ svg[data-lucide] {
 }
 
 /* Search matches. */
-mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); color: inherit; border-radius: var(--i360-radius-sm, 0.25rem); }
+.i360-page mark { background: var(--i360-highlight, #fef08a); color: inherit; border-radius: var(--i360-radius-sm, 0.25rem); }
     /* The bar and everything in it: src/page-chrome.css. Here: its place in the page. */
     .toolbar { flex-shrink: 0; z-index: var(--i360-layer-bar); }
 
@@ -932,9 +933,10 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   var BOXES = Object.freeze({
     card: { cls: "i360-card", tags: ["section", "details", "div"] },
     inset: { cls: "i360-inset", tags: ["div", "details"] },
-    popup: { cls: "i360-popup", tags: ["div"] },
-    banner: { cls: "i360-banner", tags: ["div"], role: "status" },
-    toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" }
+    popup: { cls: "i360-popup", tags: ["div", "span"] },
+    banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
+    toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" },
+    fieldBox: { cls: "i360-field i360-field-search", tags: ["div"] }
   });
   var CARD_TONES = Object.freeze({
     quran: { tile: "bg-quran-soft text-quran", text: "text-quran" },
@@ -945,18 +947,20 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   });
   var CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
 
+  // i360:icons
+  var icon_theme = { "system": '<svg data-icon="theme.system" data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>', "light": '<svg data-icon="theme.light" data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>', "sepia": '<svg data-icon="theme.sepia" data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>', "dark": '<svg data-icon="theme.dark" data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>' };
+  var icon_exegesis = '<svg data-icon="exegesis" data-lucide="scroll-text" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12h-5"></path><path d="M15 8h-5"></path><path d="M19 17V5a2 2 0 0 0-2-2H4"></path><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"></path></svg>';
+  var icon_invalid = '<svg data-icon="invalid" data-lucide="circle-exclamation-point" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>';
+  var icon_notFound = '<svg data-icon="notFound" data-lucide="circle-question-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9 9.5a3 2.5 0 016 0c0 2-2 2-3 3.5"></path><path d="M12 17h.01"></path></svg>';
+  var icon_openFailed = '<svg data-icon="openFailed" data-lucide="circle-x" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>';
+  var icon_unavailable = '<svg data-icon="unavailable" data-lucide="database-x" viewBox="0 0 24 24" aria-hidden="true"><path d="m17 17 5 5"></path><path d="M19.323 13.744A9 3 0 0 0 21 12"></path><path d="M21 13.127V5"></path><path d="m22 17-5 5"></path><path d="M3 12A9 3 0 0 0 13.563 14.954"></path><path d="M3 5V19A9 3 0 0 0 13 21.981"></path><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse></svg>';
+
   // src/page-chrome.js
   var $ = (id) => document.getElementById(id);
   var IN_APP = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
-  var THEME_ICONS = Object.freeze({
-    system: '<svg data-icon="theme.system" data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>',
-    light: '<svg data-icon="theme.light" data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>',
-    sepia: '<svg data-icon="theme.sepia" data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>',
-    dark: '<svg data-icon="theme.dark" data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>'
-  });
   function drawSettingsButtons(themeBtn, numeralsBtn, lang) {
     const theme = getChoice(), numerals = getNumerals();
-    themeBtn.innerHTML = THEME_ICONS[theme];
+    themeBtn.innerHTML = icon_theme[theme];
     setLabel(themeBtn, themeLabel(theme, lang));
     numeralsBtn.textContent = NUMERALS_SAMPLE[numerals];
     setLabel(numeralsBtn, numeralsLabel(numerals, lang));
@@ -1040,13 +1044,6 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     return null;
   }
   var valid = (sura, aya) => Number.isInteger(sura) && Number.isInteger(aya) && sura >= 1 && sura <= 114 && aya >= 1 && aya <= 286;
-  var ICONS = {
-    exegesis: '<svg data-icon="exegesis" data-lucide="scroll-text" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12h-5"></path><path d="M15 8h-5"></path><path d="M19 17V5a2 2 0 0 0-2-2H4"></path><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"></path></svg>',
-    invalid: '<svg data-icon="invalid" data-lucide="circle-exclamation-point" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>',
-    notFound: '<svg data-icon="notFound" data-lucide="circle-question-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9 9.5a3 2.5 0 016 0c0 2-2 2-3 3.5"></path><path d="M12 17h.01"></path></svg>',
-    openFailed: '<svg data-icon="openFailed" data-lucide="circle-x" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>',
-    unavailable: '<svg data-icon="unavailable" data-lucide="database-x" viewBox="0 0 24 24" aria-hidden="true"><path d="m17 17 5 5"></path><path d="M19.323 13.744A9 3 0 0 0 21 12"></path><path d="M21 13.127V5"></path><path d="m22 17-5 5"></path><path d="M3 12A9 3 0 0 0 13.563 14.954"></path><path d="M3 5V19A9 3 0 0 0 13 21.981"></path><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse></svg>'
-  };
 
   // src/quran/main.js
   var T = QURAN.ar;
@@ -1059,8 +1056,9 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   var announce = $("announce");
   var rows = null;
   var flashTimer = 0;
+  var BUTTON_ICONS = { exegesis: icon_exegesis, invalid: icon_invalid, notFound: icon_notFound, openFailed: icon_openFailed, unavailable: icon_unavailable };
   function showIcon(name) {
-    btnExegesis.querySelector("svg").outerHTML = ICONS[name];
+    btnExegesis.querySelector("svg").outerHTML = BUTTON_ICONS[name];
   }
   function rest() {
     showIcon("exegesis");

@@ -1,6 +1,6 @@
 // i360 icons: Lucide (lucide.dev, ISC licence), from the lucide-static npm package (version set
 // with the app's lucide-react by `npm run lucide -- <version>` at the repo root). The pages carry
-// each icon as inline SVG (in their HTML, or as text in their scripts), tagged with its meaning
+// each icon as inline SVG (in their HTML; their scripts import it from 'i360:icons', below), tagged with its meaning
 // (src/icons.js) and the Lucide icon that meaning uses:
 //
 //   <svg data-icon="search" data-lucide="search" viewBox="0 0 24 24" aria-hidden="true">…drawing…</svg>
@@ -88,7 +88,7 @@ function write(html, icons = lucide(), semantics = ICON_SEMANTICS) {
   });
 }
 
-// A page icon drawn whole from its meaning, for markup the build writes (scripts/components.js):
+// A page icon drawn whole from its meaning, for markup the build writes (scripts/placeholders.js):
 // the same tags, name and drawing the check above expects. An unknown meaning, or a name Lucide
 // doesn't have, throws (the build stops).
 function svgFor(meaning, icons = lucide(), semantics = ICON_SEMANTICS) {
@@ -96,6 +96,22 @@ function svgFor(meaning, icons = lucide(), semantics = ICON_SEMANTICS) {
   if (typeof name !== 'string') throw new Error(`"${meaning}" is not a meaning in src/icons.js`);
   if (!icons[name]) throw new Error(`"${name}" (for "${meaning}") is not a Lucide ${version()} icon`);
   return `<svg data-icon="${meaning}" data-lucide="${name}" viewBox="0 0 24 24" aria-hidden="true">${draw(icons[name])}</svg>`;
+}
+
+// The page scripts' icons: one build-time module, `i360:icons` (served by scripts/build.js to every
+// bundle), drawing every meaning with svgFor — so no page keeps a copy of a drawing. A meaning is
+// an export of the same name (a group, like theme, an object of its choices); a page imports only
+// what it shows (esbuild keeps only those):
+//   import * as ICON from 'i360:icons';   …   button.innerHTML = ICON.delete;
+// Node can't load it (the tests import no page script that uses it).
+function iconModule(icons = lucide(), semantics = ICON_SEMANTICS) {
+  const lines = [];
+  for (const [meaning, value] of Object.entries(semantics)) {
+    const drawn = typeof value === 'string' ? svgFor(meaning, icons, semantics)
+      : Object.fromEntries(Object.keys(value).map((k) => [k, svgFor(`${meaning}.${k}`, icons, semantics)]));
+    lines.push(`const icon_${meaning} = ${JSON.stringify(drawn)};`, `export { icon_${meaning} as ${meaning} };`);
+  }
+  return lines.join('\n');
 }
 
 function main() {
@@ -115,4 +131,4 @@ function main() {
 }
 
 if (process.argv[1] === import.meta.filename) main();
-export { PAGES, draw, check, write, version, svgFor };
+export { PAGES, draw, check, write, version, svgFor, iconModule };

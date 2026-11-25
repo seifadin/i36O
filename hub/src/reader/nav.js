@@ -2,7 +2,7 @@
 // footnote links.
 import { el, setLabel } from '../page-chrome.js';
 import { oncePerFrame } from '../frame.js';
-import { CURRENT_PAGE_LINE, PIN_MAX_MS, PIN_MS, PIN_SETTLE_MS } from './text.js';
+import { CURRENT_PAGE_LINE, PIN_MAX_MS, PIN_MS, PIN_SETTLE_MS } from './constants.js';
 import { btnNavLeft, btnNavRight, fmtNum, pageNumInput, pagePos, pagesWrapper, state, t, toWestern, totalPagesLabel, viewerContainer, volSelect } from './state.js';
 import { updateNear } from './pages.js';
 import { queueSave, updateBookmarkButton } from './position.js';

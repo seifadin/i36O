@@ -14,7 +14,8 @@ import { findExegesisUrl } from '../exegesis.js';
 import { isDesktop } from '../platform.js';
 import { TANZIL_ORIGIN } from '../sites.js';
 import { QURAN } from '../locales.js';
-import { ICONS, readVerse } from './verse.js';
+import { readVerse } from './verse.js';
+import * as ICON from 'i360:icons';
 
 const T = QURAN.ar;
 // Tanzil's embed, Jalalayn as its translation (its one documented option).
@@ -29,7 +30,9 @@ let rows = null;          // the exegesis index, once loaded
 let flashTimer = 0;
 
 // The icon is the button's first child (every label button's shape, page-chrome.css): swapped whole.
-function showIcon(name) { btnExegesis.querySelector('svg').outerHTML = ICONS[name]; }
+// The exegesis button's states, named (a lookup by name would bring in every icon).
+const BUTTON_ICONS = { exegesis: ICON.exegesis, invalid: ICON.invalid, notFound: ICON.notFound, openFailed: ICON.openFailed, unavailable: ICON.unavailable };
+function showIcon(name) { btnExegesis.querySelector('svg').outerHTML = BUTTON_ICONS[name]; }
 
 // «تفسير» at rest: its usual icon, on when the index is loaded.
 function rest() {

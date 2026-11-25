@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
-    "lucide": "node scripts/lucide.js"
+    "lucide": "node scripts/set-lucide-version.js"
   },
   "dependencies": {
     "@capacitor/android": "8.5.3",

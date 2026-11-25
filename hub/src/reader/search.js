@@ -2,7 +2,7 @@
 import * as SearchCore from '../search-core.js';
 import { el, fromMarkup } from '../page-chrome.js';
 import { listItem } from '../components.js';
-import { BLOCK_SEL, SEARCH_DEBOUNCE_MS, SEARCH_LIST_MAX, SEARCH_MAX_MATCHES, SEARCH_MIN_CHARS, SNIPPET_CHARS } from './text.js';
+import { BLOCK_SEL, SEARCH_DEBOUNCE_MS, SEARCH_LIST_MAX, SEARCH_MAX_MATCHES, SEARCH_MIN_CHARS, SNIPPET_CHARS } from './constants.js';
 import { btnSearchClose, btnSearchList, btnSearchNext, btnSearchPrev, btnSearchToggle, fmtNum, nextFrame, optDiacritics, optWord, search, searchCount, searchInput, searchPopup, searchResults, state, storeSet, t, viewerContainer } from './state.js';
 import { isBuilding, pageLabelText } from './pages.js';
 import { findCurrentIdx, pinElement, scrollToSheet } from './nav.js';

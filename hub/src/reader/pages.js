@@ -6,7 +6,7 @@ import * as BookFormat from '../book-format.js';
 import * as marked from 'marked';
 import * as i360Theme from '../../theme/site/theme-loader.js';
 import { oncePerFrame } from '../frame.js';
-import { BLOCK_SEL, QURAN_CLOSE, QURAN_OPEN } from './text.js';
+import { BLOCK_SEL, QURAN_CLOSE, QURAN_OPEN } from './constants.js';
 import { btnSearchToggle, detectDirection, emptyState, fmtNum, hasVisibleContent, missingPagesBanner, missingPagesText, nextFrame, pagesWrapper, parseBook, progressEl, progressFill, progressText, search, searchInput, searchPopup, sidePanel, splitFootnotes, state, storeGet, stripComments, t, viewerContainer } from './state.js';
 import { applyBookmarkRibbons, hashNamesPage, hashTargetIdx, isLinkable, queueSave, restorePosition, saveNow } from './position.js';
 import { updateScanButton } from './library.js';

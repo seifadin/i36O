@@ -15,6 +15,7 @@ import { createStore } from '../storage.js';
 import { fetchJson } from '../net.js';
 import { gregorianLong, gregorianMonthNames, hijriLong, listSep, numericDate } from '../dates.js';
 import { DAY as LOCALES } from '../locales.js';
+import * as ICON from 'i360:icons';
 
 
 /* ---------- Config ---------- */
@@ -28,6 +29,7 @@ const CONFIG = {
   // HadeethEnc root categories left out of the daily pick (2 = "The Hadith and Hadith Sciences", technical, 10 items).
   HADEETH_EXCLUDE_ROOTS: ['2'],
   EDITIONS: { quran: { ar: 'ar.jalalayn', en: 'en.sahih', tr: 'tr.ates', id: 'id.indonesian', ur: 'ur.ahmedali' } },
+  REVEAL_STAGGER_MS: 120,   // the cards enter one after another, this far apart
   P_KEYS: ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'],
   P_NEXT_KEYS: ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'],   // Sunrise is shown but is not a prayer
   // Arabic Gregorian months also by their Levantine names (كانون الثاني …), from the browser's own
@@ -82,12 +84,11 @@ function minutesNowIn(tz) {
     return parseInt(p.find(x => x.type === 'hour').value, 10) * 60 + parseInt(p.find(x => x.type === 'minute').value, 10);
   } catch (e) { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); }
 }
-// Lucide icons shown from script (beside a provisional Hijri date).
-const PROVISIONAL_ICON = '<svg data-icon="provisional" data-lucide="clock-fading" class="icon-inline me-xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 1 7.38 16.75"></path><path d="M12 6v6l4 2"></path><path d="M2.5 8.875a10 10 0 0 0-.5 3"></path><path d="M2.83 16a10 10 0 0 0 2.43 3.4"></path><path d="M4.636 5.235a10 10 0 0 1 .891-.857"></path><path d="M8.644 21.42a10 10 0 0 0 7.631-.38"></path></svg>';
-function svgIcon(markup) {
-  const t = document.createElement('template');
-  t.innerHTML = markup;
-  return t.content.firstChild;
+// An icon from 'i360:icons' as an element, with the page's size or place classes.
+function svgIcon(markup, classes) {
+  const icon = fromMarkup(markup);
+  icon.setAttribute('class', classes);
+  return icon;
 }
 
 const DataStore = createStore();   // src/storage.js — keys as they are (CONFIG.S)
@@ -559,9 +560,7 @@ const UI = {
   },
   reveal() {
     if (this.shown) return; this.shown = true;
-    ['quran-card', 'hadith-card', 'prayer-card', 'converter-card', 'events-card'].forEach((id, i) => setTimeout(() => {
-      const e = $(id); if (e) { e.style.opacity = 1; e.style.transform = 'translateY(0)'; }
-    }, i * 120));
+    document.querySelectorAll('.day-card').forEach((card, i) => setTimeout(() => card.classList.add('is-shown'), i * CONFIG.REVEAL_STAGGER_MS));
   },
   render() {
     const L = this.L, lang = App.lang;
@@ -601,7 +600,7 @@ const UI = {
     this.set('hijri-date', hijriLong(h.today, L.months));
     const src = this.targets['hijri-source'];
     if (src) {
-      const icon = h.provisional ? [svgIcon(PROVISIONAL_ICON)] : [];
+      const icon = h.provisional ? [svgIcon(ICON.provisional, 'icon-inline me-xs')] : [];
       src.replaceChildren(...icon, document.createTextNode(Hijri.label(h, App.lang)));
     }
   },

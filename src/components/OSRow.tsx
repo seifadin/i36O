@@ -98,6 +98,7 @@ function ToggleItem({
   return (
     <div className="flex items-center gap-xs">
       <button
+        type="button"
         onClick={handleToggle}
         className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
           triPosition !== undefined || active ? 'bg-brand-green' : 'bg-brand-disabled'

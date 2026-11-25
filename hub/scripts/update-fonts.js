@@ -1,4 +1,4 @@
-// npm run fonts-update — when the monthly fonts check (or npm run fonts-check) reports a
+// npm run update-fonts — when the monthly fonts check (or npm run check-fonts) reports a
 // newer Amiri or Amiri Quran:
 //   1. ask npm whether either has a newer version;
 //   2. if so: download it, safety check, rewrite theme.css (theme/fonts.js), npm test, and
@@ -41,7 +41,7 @@ async function updateFonts() {
   console.log(`Fonts: newer version available — ${newer.map((i) => `${i.family} ${i.current} → ${i.latest}`).join(', ')}. Updating…`);
 
   if (git('status', '--porcelain', '--', SITE_REL).trim()) {
-    fail(`Font update not done: ${SITE_REL} has uncommitted changes. Commit or undo them, then run npm run fonts-update again.`);
+    fail(`Font update not done: ${SITE_REL} has uncommitted changes. Commit or undo them, then run npm run update-fonts again.`);
     return;
   }
 

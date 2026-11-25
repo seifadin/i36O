@@ -50,8 +50,12 @@ src/exegesis.js       the exegesis lookup: exegesisRows(), findExegesisUrl() —
                       quran page and the indexer
 src/platform.js       detectOS(), isDesktop() — the app (@i360/platform) and the quran page
 src/icons.js          ICON_SEMANTICS: each meaning's Lucide icon, decided once — the pages draw them inline
-                      (data-icon + data-lucide, checked and redrawn by scripts/icons.js), the app maps them in
-                      src/lib/icons.ts (@i360/icons). Lucide's version: `npm run lucide -- <version>` at the root
+                      (data-icon + data-lucide, checked and redrawn by scripts/icons.js; page scripts import them
+                      by meaning from 'i360:icons', drawn by the build), the app maps them in src/lib/icons.ts
+                      (@i360/icons). Lucide's version: `npm run lucide -- <version>` at the root
+src/components.js     the shared components (toolbar and label buttons, fields, chips, boxes, card headers…), each
+                      written once: page HTML placeholders (scripts/placeholders.js) and page scripts call the same
+                      builders; the app's twins in src/components/shared.tsx are parity-tested against them
 library/books/        our own books     → lib.i36o.workers.dev/books/ (published by the CSE index workflow)
 indexer/wrangler.jsonc  the lib Worker (lib.i36o.workers.dev: the CSE build, our books and quran/, files only)
 indexer/quran-data.js tanzil's Quran texts and translations and the exegesis index → lib's quran/ (every CSE build)
@@ -103,8 +107,8 @@ theme/wrangler.jsonc         the theme Worker (files only)
 - **Colours:** after changing a colour that a `color-mix` is made from,
   `node theme/fallbacks.js --write` (`npm test` and the hook's colour check stop while one is stale).
 
-## Font updates: `npm run fonts-update`
-When the monthly fonts check reports a newer font (or `npm run fonts-check` does), run it here:
+## Font updates: `npm run update-fonts`
+When the monthly fonts check reports a newer font (or `npm run check-fonts` does), run it here:
 1. asks npm whether Amiri or Amiri Quran has a newer version;
 2. if so: downloads it into a new version folder, checks that every character of the
    current font is still there (every Quranic mark), rewrites the Fonts section of
@@ -114,7 +118,7 @@ When the monthly fonts check reports a newer font (or `npm run fonts-check` does
 Then push as usual (`git push` from the repo root): the pre-push hook publishes the theme
 Worker with the new fonts.
 
-`npm run fonts-check` only reports. `.github/workflows/fonts-check.yml` runs the check on
+`npm run check-fonts` only reports. `.github/workflows/check-fonts.yml` runs the check on
 the 1st of each month and fails on purpose when a newer font exists (GitHub emails you).
 
 ## Book file names

@@ -1,12 +1,12 @@
 // The shared components' markup, written once (their style: src/page-chrome.css). Every page gets
 // exactly this structure and differs only in its own id, words and icon:
-// - in a page's HTML, a placeholder the build writes out (scripts/components.js):
+// - in a page's HTML, a placeholder the build writes out (scripts/placeholders.js):
 //     <!--@@TOOLBAR_BUTTON id="btn-zoom-in" icon="zoomIn"@@-->
 // - in a page's script, the same function, its markup made an element (fromMarkup in page-chrome.js):
 //     fromMarkup(toolbarButton({ icon: ICON.delete }))
 // Pure functions of their inputs (no browser needed), so the build and the pages share them. An icon
-// is passed drawn (an <svg> string: the build draws it from its meaning, a page takes it from its
-// icon set, both checked by scripts/icons.js); every icon is hidden from screen readers, as each
+// is passed drawn (an <svg> string: the build draws it from its meaning, a page script imports it
+// from 'i360:icons', drawn the same way by scripts/icons.js); every icon is hidden from screen readers, as each
 // control names itself (its label, or title and aria-label).
 
 const escapeText = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -179,4 +179,4 @@ function statusLine(a = {}) {
 const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
 
 export { toolbarButton, labelButton, menuButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box,
-  cardHeader, statusLine, BOXES, FIELD_KINDS, CARD_TONES, CLASS, ATTRIBUTE_ORDER };
+  cardHeader, statusLine, CLASS };

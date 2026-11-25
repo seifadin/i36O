@@ -31,10 +31,11 @@ npm run dev            # the app, locally
 npm test               # the app's tests (Vitest)
 npm run lint           # ESLint
 npm run build          # type check + production build into dist/
+npm run lucide -- <v>  # Lucide's version, for the app and the hub together
 
 cd hub && npm ci       # the hub's packages
 npm test               # ESLint, then the hub's tests
-npm run build          # writes public/md, public/cse, public/day
+npm run build          # writes public/md, public/cse, public/day and the quran page (hub/quran/site/i360/)
 ```
 
 Pushes to `vite` (the one permanent branch) go through `scripts/pre-push-hook.sh`, which runs the tests, publishes the hub's Workers when they change, deploys a preview and asks before releasing to the web and, over the air, to phones. Install the hooks once per clone:
