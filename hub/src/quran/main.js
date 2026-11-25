@@ -22,13 +22,14 @@ const EMBED = '/?embed=true&defTrans=ar.jalalayn';
 const FLASH_MS = 1500;
 
 const btnTheme = $('btn-theme'), btnNumerals = $('btn-numerals');
-const btnExegesis = $('btn-exegesis'), exegesisIcon = $('exegesis-icon');
+const btnExegesis = $('btn-exegesis');
 const frame = $('tanzil'), announce = $('announce');
 
 let rows = null;          // the exegesis index, once loaded
 let flashTimer = 0;
 
-function showIcon(name) { exegesisIcon.innerHTML = ICONS[name]; }
+// The icon is the button's first child (every label button's shape, page-chrome.css): swapped whole.
+function showIcon(name) { btnExegesis.querySelector('svg').outerHTML = ICONS[name]; }
 
 // «تفسير» at rest: its usual icon, on when the index is loaded.
 function rest() {

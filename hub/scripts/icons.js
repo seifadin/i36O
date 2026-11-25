@@ -79,6 +79,16 @@ function write(html, icons = lucide(), semantics = ICON_SEMANTICS) {
   });
 }
 
+// A page icon drawn whole from its meaning, for markup the build writes (scripts/components.js):
+// the same tags, name and drawing the check above expects. An unknown meaning, or a name Lucide
+// doesn't have, throws (the build stops).
+function svgFor(meaning, icons = lucide(), semantics = ICON_SEMANTICS) {
+  const name = nameFor(meaning, semantics);
+  if (typeof name !== 'string') throw new Error(`"${meaning}" is not a meaning in src/icons.js`);
+  if (!icons[name]) throw new Error(`"${name}" (for "${meaning}") is not a Lucide ${version()} icon`);
+  return `<svg data-icon="${meaning}" data-lucide="${name}" viewBox="0 0 24 24" aria-hidden="true">${draw(icons[name])}</svg>`;
+}
+
 function main() {
   const fix = process.argv.includes('--write');
   let bad = 0;
@@ -96,4 +106,4 @@ function main() {
 }
 
 if (process.argv[1] === import.meta.filename) main();
-export { PAGES, draw, check, write, version };
+export { PAGES, draw, check, write, version, svgFor };

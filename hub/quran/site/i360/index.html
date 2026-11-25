@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-pTDDwAmuh7Twv9Xzg+IyLF/gnA7wZkr2r6EU2eXsVyU='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-r/8Yh261pnucuCGaRF3BHDa9Xa6qwmO78GeiJ+5rMqw='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>القرآن الكريم — مشروع تنزيل</title>
   <meta name="description" content="القرآن الكريم من مشروع تنزيل (tanzil.net)، مع زر لتفسير الآية الظاهرة من فهرس الموسوعة الإسلامية i360إ.">
@@ -443,7 +443,9 @@ svg[data-lucide] {
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* A button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»): set off
-   from the icon-only buttons by a box and bold text. */
+   from the icon-only buttons by a box and bold text. Its markup is written once, by the build
+   (scripts/components.js, <!--@@LABEL_BUTTON …@@-->): the icon's <svg> then the label, both direct
+   children, centred on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
 .toolbar-btn-label {
   background-color: var(--i360-input, #FAF7F2);
   border: var(--i360-line-width, 1px) solid var(--toolbar-line);
@@ -651,7 +653,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       <button class="toolbar-btn" id="btn-theme" type="button"></button>
       <button class="toolbar-btn numerals-btn" id="btn-numerals" type="button"></button>
       <span class="divider" aria-hidden="true"></span>
-      <button class="toolbar-btn toolbar-btn-label" id="btn-exegesis" type="button" disabled><span id="exegesis-icon"></span><span id="exegesis-label">تفسير</span></button>
+      <button class="toolbar-btn toolbar-btn-label" id="btn-exegesis" type="button" disabled><svg data-icon="exegesis" data-lucide="scroll-text" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12h-5"></path><path d="M15 8h-5"></path><path d="M19 17V5a2 2 0 0 0-2-2H4"></path><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"></path></svg><span id="exegesis-label">تفسير</span></button>
     </div>
     <div class="tb-title">القرآن الكريم</div>
   </header>
@@ -1021,13 +1023,12 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   var btnTheme = $("btn-theme");
   var btnNumerals = $("btn-numerals");
   var btnExegesis = $("btn-exegesis");
-  var exegesisIcon = $("exegesis-icon");
   var frame = $("tanzil");
   var announce = $("announce");
   var rows = null;
   var flashTimer = 0;
   function showIcon(name) {
-    exegesisIcon.innerHTML = ICONS[name];
+    btnExegesis.querySelector("svg").outerHTML = ICONS[name];
   }
   function rest() {
     showIcon("exegesis");

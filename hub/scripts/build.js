@@ -23,11 +23,13 @@
 //   /*@@THEME_ORIGIN@@*/ the theme site's address (I360_THEME_ORIGIN to test
 //                        against another one)
 //   /*@@TAILWIND@@*/     Daily Reflection's Tailwind CSS (src/day.tailwind.js)
+//   <!--@@LABEL_BUTTON …@@-->  a shared component, written by scripts/components.js (any number)
 //   <!--@@CSP@@-->       a Content-Security-Policy allowing only the page's
 //                        own inline scripts (by hash), so it must be made
 //                        after everything else is in place
 // Editing the built pages by hand breaks those hashes: edit src/ and rebuild.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { writeComponents } from './components.js';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
@@ -93,7 +95,7 @@ function fill(html, placeholder, value) {
 // (plus theme.css from the theme site). imgSrc / frameSrc: what a page may show
 // in <img> / <iframe> (none, unless it says).
 function buildPage({ src, out, main, connectSrc, fills = [], imgSrc = "'none'", frameSrc = "'none'" }) {
-  let html = read(src);
+  let html = writeComponents(read(src));
   for (const [placeholder, value] of fills) html = fill(html, placeholder, value);
   html = fill(html, '/*@@PAGE_CHROME@@*/', pageChrome);
   html = fill(html, '/*@@THEME_FALLBACK@@*/', theme.fallback);
