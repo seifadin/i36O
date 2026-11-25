@@ -43,8 +43,6 @@
        at the top while the page scrolls; its row lines up with the page column, --toolbar-row-w). */
     /*@@PAGE_CHROME@@*/
     .toolbar { --toolbar-row-w: var(--col); z-index: var(--i360-layer-bar); }
-    #btn-lang { gap: var(--i360-space-xs); font-weight: 700; line-height: 1; }
-    .toolbar-btn .tb-caret { width: 0.875rem; height: 0.875rem; }
     .tb-title { margin: 0; }
     .lang-wrap { position: relative; flex-shrink: 0; }
     /* The language list (its look: .i360-popup; each language: .i360-list-item). */
@@ -91,10 +89,9 @@
   <header class="toolbar toolbar-sticky">
     <!-- The shared theme and numerals (the same order on every i360 page), then the language. -->
     <div class="tb-start">
-      <button id="btn-theme" type="button" class="toolbar-btn"></button>
-      <button id="btn-numerals" type="button" class="toolbar-btn numerals-btn"></button>
+      <!--@@SETTINGS_BUTTONS@@-->
       <div class="lang-wrap">
-        <button id="btn-lang" type="button" class="toolbar-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-list"><span id="lang-short"></span><svg data-icon="dropdown" data-lucide="chevrons-up-down" class="tb-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path></svg></button>
+        <!--@@MENU_BUTTON id="btn-lang" icon="dropdown" text-id="lang-short" aria-controls="lang-list"@@-->
         <!-- dir="rtl" keeps the list in a fixed order; each language is written in its own language. -->
         <div id="lang-list" class="lang-list i360-popup" dir="rtl" role="group" aria-labelledby="btn-lang" hidden>
           <button type="button" data-lang="ar" id="lang-ar" lang="ar" class="i360-list-item">العربية</button>
@@ -105,9 +102,9 @@
         </div>
       </div>
     </div>
-    <h1 data-i18n="title" class="tb-title">Daily Reflection</h1>
+    <!--@@TOOLBAR_TITLE data-i18n="title"@@-->Daily Reflection<!--@@/TOOLBAR_TITLE@@-->
     <!-- Inside the installed i360إ app only: back to its home; last, so at the far end in either direction. -->
-    <button id="btn-close" type="button" class="toolbar-btn" hidden><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+    <!--@@TOOLBAR_BUTTON id="btn-close" icon="close" hidden@@-->
   </header>
 
   <div class="page safe-area safe-area-top-bar">

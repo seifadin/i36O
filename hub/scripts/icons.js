@@ -3,19 +3,20 @@
 // each icon as inline SVG (in their HTML, or as text in their scripts), tagged with its meaning
 // (src/icons.js) and the Lucide icon that meaning uses:
 //
-//   <svg data-icon="search" data-lucide="search" viewBox="0 0 24 24">…drawing…</svg>
+//   <svg data-icon="search" data-lucide="search" viewBox="0 0 24 24" aria-hidden="true">…drawing…</svg>
 //
 // The page keeps its own attributes on <svg> (size and stroke come from its CSS); the drawing
-// inside is exactly Lucide's.
+// inside is exactly Lucide's. Every icon is hidden from screen readers: each control names itself.
 //
 //   node scripts/icons.js           check (exit 1, listing what is wrong)
-//   node scripts/icons.js --write   set each icon's Lucide name from its meaning and redraw it
+//   node scripts/icons.js --write   set each icon's Lucide name from its meaning, hide it from
+//                                   screen readers and redraw it
 //                                   from the installed Lucide (after changing src/icons.js or
 //                                   Lucide's version)
 //
 // Wrong: an <svg> with no meaning, a meaning src/icons.js doesn't have, a Lucide name other than
-// its meaning's, a name Lucide doesn't have, a drawing that differs from Lucide's, or anything
-// left of Font Awesome. The tests run the check (test/icons.test.js).
+// its meaning's, a name Lucide doesn't have, no aria-hidden="true", a drawing that differs from
+// Lucide's, or anything left of Font Awesome. The tests run the check (test/icons.test.js).
 
 import fs from 'fs';
 import path from 'path';
@@ -30,6 +31,7 @@ const PAGES = fs.readdirSync(path.join(ROOT, 'src'), { recursive: true })
 const SVG = /<svg\b([^>]*)>([\s\S]*?)<\/svg>/g;
 const NAME = /\sdata-lucide="([a-z0-9-]+)"/;
 const MEANING = /\sdata-icon="([A-Za-z0-9.]+)"/;
+const HIDDEN = /\saria-hidden="true"/;
 const FONT_AWESOME = /font-?awesome|\bfa-(solid|regular|brands|[a-z]+-[a-z])|\bfa[srb]? fa-/i;
 
 const LUCIDE = path.join(ROOT, 'node_modules/lucide-static');
@@ -60,6 +62,7 @@ function check(html, icons = lucide(), semantics = ICON_SEMANTICS) {
     else if (typeof wanted !== 'string') problems.push({ line, problem: `"${meaning}" is not a meaning in src/icons.js` });
     else if (name !== wanted) problems.push({ line, problem: `"${meaning}" uses "${wanted}", not "${name || '(none)'}"` });
     else if (!icons[name]) problems.push({ line, problem: `"${name}" is not a Lucide icon` });
+    else if (!HIDDEN.test(m[1])) problems.push({ line, problem: `"${meaning}" is not hidden from screen readers (aria-hidden="true")` });
     else if (m[2] !== draw(icons[name])) problems.push({ line, problem: `"${name}" differs from Lucide ${version()}` });
   }
   const fa = html.match(FONT_AWESOME);
@@ -74,7 +77,8 @@ function write(html, icons = lucide(), semantics = ICON_SEMANTICS) {
     const meaning = (attrs.match(MEANING) || [])[1];
     const wanted = meaning && nameFor(meaning, semantics);
     if (typeof wanted !== 'string' || !icons[wanted]) return all;
-    const named = NAME.test(attrs) ? attrs.replace(NAME, ` data-lucide="${wanted}"`) : attrs.replace(MEANING, (m) => `${m} data-lucide="${wanted}"`);
+    let named = NAME.test(attrs) ? attrs.replace(NAME, ` data-lucide="${wanted}"`) : attrs.replace(MEANING, (m) => `${m} data-lucide="${wanted}"`);
+    if (!HIDDEN.test(named)) named += ' aria-hidden="true"';
     return `<svg${named}>${draw(icons[wanted])}</svg>`;
   });
 }

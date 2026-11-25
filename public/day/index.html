@@ -451,9 +451,14 @@ svg[data-lucide] {
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* A button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»): set off
-   from the icon-only buttons by a box and bold text. Its markup is written once, by the build
-   (scripts/components.js, <!--@@LABEL_BUTTON …@@-->): the icon's <svg> then the label, both direct
-   children, centred on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
+   from the icon-only buttons by a box and bold text. Its markup, like every shared component's, is
+   written once (src/components.js): the icon's <svg> then the label, both direct children, centred
+   on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
+/* A button that opens a list (src/components.js menuButton): its short text, bold, then a small
+   dropdown icon. */
+.toolbar-btn-menu { gap: var(--i360-space-xs, 0.25rem); font-weight: 700; line-height: 1; }
+.toolbar-btn-menu > svg { width: var(--i360-text-size-sm, 0.875rem); height: var(--i360-text-size-sm, 0.875rem); }
+
 .toolbar-btn-label {
   background-color: var(--i360-input, #FAF7F2);
   border: var(--i360-line-width, 1px) solid var(--toolbar-line);
@@ -641,8 +646,6 @@ svg[data-lucide] {
 /* Search matches. */
 mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); color: inherit; border-radius: var(--i360-radius-sm, 0.25rem); }
     .toolbar { --toolbar-row-w: var(--col); z-index: var(--i360-layer-bar); }
-    #btn-lang { gap: var(--i360-space-xs); font-weight: 700; line-height: 1; }
-    .toolbar-btn .tb-caret { width: 0.875rem; height: 0.875rem; }
     .tb-title { margin: 0; }
     .lang-wrap { position: relative; flex-shrink: 0; }
     /* The language list (its look: .i360-popup; each language: .i360-list-item). */
@@ -689,10 +692,9 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
   <header class="toolbar toolbar-sticky">
     <!-- The shared theme and numerals (the same order on every i360 page), then the language. -->
     <div class="tb-start">
-      <button id="btn-theme" type="button" class="toolbar-btn"></button>
-      <button id="btn-numerals" type="button" class="toolbar-btn numerals-btn"></button>
+      <button class="toolbar-btn" type="button" id="btn-theme"></button><button class="toolbar-btn numerals-btn" type="button" id="btn-numerals"></button>
       <div class="lang-wrap">
-        <button id="btn-lang" type="button" class="toolbar-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-list"><span id="lang-short"></span><svg data-icon="dropdown" data-lucide="chevrons-up-down" class="tb-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path></svg></button>
+        <button class="toolbar-btn toolbar-btn-menu" type="button" id="btn-lang" aria-controls="lang-list" aria-haspopup="true" aria-expanded="false"><span id="lang-short"></span><svg data-icon="dropdown" data-lucide="chevrons-up-down" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path></svg></button>
         <!-- dir="rtl" keeps the list in a fixed order; each language is written in its own language. -->
         <div id="lang-list" class="lang-list i360-popup" dir="rtl" role="group" aria-labelledby="btn-lang" hidden>
           <button type="button" data-lang="ar" id="lang-ar" lang="ar" class="i360-list-item">العربية</button>
@@ -703,9 +705,9 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
         </div>
       </div>
     </div>
-    <h1 data-i18n="title" class="tb-title">Daily Reflection</h1>
+    <h1 class="tb-title" data-i18n="title">Daily Reflection</h1>
     <!-- Inside the installed i360إ app only: back to its home; last, so at the far end in either direction. -->
-    <button id="btn-close" type="button" class="toolbar-btn" hidden><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+    <button class="toolbar-btn" type="button" id="btn-close" hidden><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
   </header>
 
   <div class="page safe-area safe-area-top-bar">

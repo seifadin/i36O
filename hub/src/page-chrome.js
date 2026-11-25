@@ -16,6 +16,13 @@ export function el(tag, cls, text) {
   return e;
 }
 
+// An element from a shared component's markup (src/components.js), for a page's script.
+export function fromMarkup(markup) {
+  const t = document.createElement('template');
+  t.innerHTML = markup;
+  return t.content.firstElementChild;
+}
+
 // Inside the installed i360إ app: Capacitor's bridge is in every page it serves.
 export const IN_APP = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
 

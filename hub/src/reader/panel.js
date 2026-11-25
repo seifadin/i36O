@@ -1,7 +1,8 @@
 // The Reader: the side panel (contents, bookmarks), reading mode, the toolbar's layout by
 // measurement, and keyboard shortcuts.
 import { oncePerFrame } from '../frame.js';
-import { el, fittingToolbar, setLabel } from '../page-chrome.js';
+import { el, fittingToolbar, fromMarkup, setLabel } from '../page-chrome.js';
+import { toolbarButton } from '../components.js';
 import { READER_FOLD } from './fold.js';
 import { ICON, PANEL_COVERS, ZOOM_STEP } from './text.js';
 import { btnCopyLink, btnExitReading, btnMore, btnPanel, btnPanelClose, btnReading, fmtNum, moreMenu, nextFrame, panelBody, searchPopup, sidePanel, state, t, tabBookmarks, tabContents, tbEnd, toolbar, viewerContainer } from './state.js';
@@ -99,10 +100,7 @@ function renderPanel() {
       const li = el('li', 'bm-row');
       const label = state.format === 'plain' ? fmtNum(idx + 1) : pageLabelText(state.pages[idx], tr);
       li.appendChild(panelItem(pageSummary(idx) || label, label, () => jumpToElement(idx, null)));
-      const del = el('button');
-      del.type = 'button';
-      del.className = 'toolbar-btn';
-      del.innerHTML = ICON.delete;
+      const del = fromMarkup(toolbarButton({ icon: ICON.delete }));
       setLabel(del, tr.removeBookmark);
       del.addEventListener('click', () => removeBookmarkAt(idx));
       li.appendChild(del);

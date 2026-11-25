@@ -1,43 +1,52 @@
-// The shared components' markup, written once (their style: src/page-chrome.css). A page names a
-// component with a placeholder, and the build (scripts/build.js) writes it here, so every page has
-// exactly the same structure and differs only in its own words, icon and id:
+// Writes the shared components into a page's HTML at build time (scripts/build.js): each
+// placeholder becomes the markup of its builder in src/components.js, the one place that markup is
+// written (page scripts call the same builders). An icon is named by its meaning (src/icons.js) and
+// drawn here from the pinned Lucide. Attributes the builders take: id, label, dir, aria-controls,
+// aria-expanded, aria-pressed, data-i18n, class (a page's own placement class), disabled, hidden.
 //
-//   <!--@@LABEL_BUTTON id="btn-exegesis" icon="exegesis" label="تفسير" label-id="exegesis-label" disabled@@-->
+//   <!--@@TOOLBAR_BUTTON id="btn-zoom-in" icon="zoomIn"@@-->        (no icon: its script draws it)
+//   <!--@@LABEL_BUTTON id="btn-exegesis" icon="exegesis" text="تفسير" label-id="exegesis-label" disabled@@-->
+//   <!--@@MENU_BUTTON id="btn-lang" icon="dropdown" text-id="lang-short" aria-controls="lang-list"@@-->
+//   <!--@@SETTINGS_BUTTONS@@-->
+//   <!--@@DIVIDER@@-->
+//   <!--@@TOOLBAR_TITLE data-i18n="title"@@-->Daily Reflection<!--@@/TOOLBAR_TITLE@@-->
 //
-// LABEL_BUTTON  a toolbar button with a word beside its icon: the icon (by its meaning in
-//               src/icons.js, drawn from the pinned Lucide) then the label, both direct children.
-//               id, icon and label are required; label-id names the label (for a script that
-//               changes its text); disabled starts it off.
+// A misspelled component, a missing field or an unknown meaning stops the build. A placeholder
+// with no attributes that isn't a component (<!--@@CSP@@-->) is build.js's own and is left for it;
+// build.js stops on any placeholder still left in a finished page.
 
 import { svgFor } from './icons.js';
+import * as C from '../src/components.js';
 
-const PLACEHOLDER = /<!--@@([A-Z_]+)((?:\s+[a-z-]+(?:="[^"]*")?)*)\s*@@-->/g;
-const ATTRIBUTE = /([a-z-]+)(?:="([^"]*)")?/g;
-const escapeText = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-const escapeAttr = (s) => escapeText(s).replace(/"/g, '&quot;');
+const PLACEHOLDER = /<!--@@([A-Z_]+)((?:\s+[a-z0-9-]+(?:="[^"]*")?)*)\s*@@-->/g;
+const TITLE = /<!--@@TOOLBAR_TITLE((?:\s+[a-z0-9-]+(?:="[^"]*")?)*)\s*@@-->([\s\S]*?)<!--@@\/TOOLBAR_TITLE@@-->/g;
 
-function labelButton({ id, icon, label, labelId, disabled = false }, draw = svgFor) {
-  if (!id || !icon || !label) throw new Error('LABEL_BUTTON needs id, icon and label');
-  const labelAttr = labelId ? ` id="${escapeAttr(labelId)}"` : '';
-  return `<button class="toolbar-btn toolbar-btn-label" id="${escapeAttr(id)}" type="button"${disabled ? ' disabled' : ''}>`
-    + `${draw(icon)}<span${labelAttr}>${escapeText(label)}</span></button>`;
+function parse(text) {
+  const a = {};
+  for (const m of text.matchAll(/([a-z0-9-]+)(?:="([^"]*)")?/g)) a[m[1]] = m[2] ?? true;
+  return a;
 }
 
 const COMPONENTS = Object.freeze({
-  LABEL_BUTTON: (a, draw) => labelButton({ id: a.id, icon: a.icon, label: a.label, labelId: a['label-id'], disabled: 'disabled' in a }, draw),
+  TOOLBAR_BUTTON: (a, draw) => C.toolbarButton({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
+  LABEL_BUTTON: (a, draw) => {
+    if (!a.id || !a.icon || !a.text) throw new Error('LABEL_BUTTON needs id, icon and text');
+    return C.labelButton({ ...a, icon: draw(a.icon), labelId: a['label-id'] });
+  },
+  MENU_BUTTON: (a, draw) => C.menuButton({ ...a, icon: a.icon ? draw(a.icon) : undefined, textId: a['text-id'] }),
+  SETTINGS_BUTTONS: () => C.settingsButtons(),
+  DIVIDER: (a) => C.divider(a),
 });
 
-// The page's HTML with every component placeholder written out. A placeholder without attributes
-// (<!--@@CSP@@-->) is build.js's own and is left for it; an unknown component throws.
+// The page's HTML with every component written out.
 function writeComponents(html, draw = svgFor) {
-  return html.replace(PLACEHOLDER, (all, name, attrs) => {
+  const titled = html.replace(TITLE, (_, attrs, inner) => C.toolbarTitle({ ...parse(attrs), html: inner.trim() }));
+  return titled.replace(PLACEHOLDER, (all, name, attrs) => {
     const make = COMPONENTS[name];
-    if (!make && !attrs.trim()) return all;
-    if (!make) throw new Error(`unknown component <!--@@${name}…@@-->`);
-    const a = {};
-    for (const m of attrs.matchAll(ATTRIBUTE)) a[m[1]] = m[2] ?? '';
-    return make(a, draw);
+    if (make) return make(parse(attrs), draw);
+    if (!attrs.trim() && name !== 'TOOLBAR_TITLE') return all;   // build.js's own; it fails on any left over
+    throw new Error(`unknown component <!--@@${name}…@@-->`);
   });
 }
 
-export { labelButton, writeComponents, COMPONENTS };
+export { writeComponents, COMPONENTS };

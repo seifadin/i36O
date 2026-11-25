@@ -451,9 +451,14 @@ svg[data-lucide] {
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* A button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»): set off
-   from the icon-only buttons by a box and bold text. Its markup is written once, by the build
-   (scripts/components.js, <!--@@LABEL_BUTTON …@@-->): the icon's <svg> then the label, both direct
-   children, centred on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
+   from the icon-only buttons by a box and bold text. Its markup, like every shared component's, is
+   written once (src/components.js): the icon's <svg> then the label, both direct children, centred
+   on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
+/* A button that opens a list (src/components.js menuButton): its short text, bold, then a small
+   dropdown icon. */
+.toolbar-btn-menu { gap: var(--i360-space-xs, 0.25rem); font-weight: 700; line-height: 1; }
+.toolbar-btn-menu > svg { width: var(--i360-text-size-sm, 0.875rem); height: var(--i360-text-size-sm, 0.875rem); }
+
 .toolbar-btn-label {
   background-color: var(--i360-input, #FAF7F2);
   border: var(--i360-line-width, 1px) solid var(--toolbar-line);
@@ -717,11 +722,10 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
          mark before the إ keeps it there with Eastern digits ("i٣٦٠إ"). -->
     <!-- In Arabic from the right: theme · numerals … title · ✕ (i360-hub.md §10 "Toolbars"; ✕ only inside the app). -->
     <div class="tb-start">
-      <button class="toolbar-btn" id="btn-theme" type="button"></button>
-      <button class="toolbar-btn numerals-btn" id="btn-numerals" type="button"></button>
+      <button class="toolbar-btn" type="button" id="btn-theme"></button><button class="toolbar-btn numerals-btn" type="button" id="btn-numerals"></button>
     </div>
-    <div class="tb-title">البحث في <bdi dir="ltr">i360&lrm;إ</bdi></div>
-    <button class="toolbar-btn" id="btn-close" type="button" aria-label="إغلاق" title="إغلاق" hidden><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+    <h1 class="tb-title">البحث في <bdi dir="ltr">i360&lrm;إ</bdi></h1>
+    <button class="toolbar-btn" type="button" id="btn-close" title="إغلاق" aria-label="إغلاق" hidden><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
   </header>
 
   <div class="scroller safe-area safe-area-top-bar" id="scroller" tabindex="-1">

@@ -443,9 +443,14 @@ svg[data-lucide] {
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* A button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»): set off
-   from the icon-only buttons by a box and bold text. Its markup is written once, by the build
-   (scripts/components.js, <!--@@LABEL_BUTTON …@@-->): the icon's <svg> then the label, both direct
-   children, centred on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
+   from the icon-only buttons by a box and bold text. Its markup, like every shared component's, is
+   written once (src/components.js): the icon's <svg> then the label, both direct children, centred
+   on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
+/* A button that opens a list (src/components.js menuButton): its short text, bold, then a small
+   dropdown icon. */
+.toolbar-btn-menu { gap: var(--i360-space-xs, 0.25rem); font-weight: 700; line-height: 1; }
+.toolbar-btn-menu > svg { width: var(--i360-text-size-sm, 0.875rem); height: var(--i360-text-size-sm, 0.875rem); }
+
 .toolbar-btn-label {
   background-color: var(--i360-input, #FAF7F2);
   border: var(--i360-line-width, 1px) solid var(--toolbar-line);
@@ -650,12 +655,11 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
        the app opens this page in the browser overlay, which has its own. -->
   <header class="toolbar">
     <div class="tb-start">
-      <button class="toolbar-btn" id="btn-theme" type="button"></button>
-      <button class="toolbar-btn numerals-btn" id="btn-numerals" type="button"></button>
+      <button class="toolbar-btn" type="button" id="btn-theme"></button><button class="toolbar-btn numerals-btn" type="button" id="btn-numerals"></button>
       <span class="divider" aria-hidden="true"></span>
-      <button class="toolbar-btn toolbar-btn-label" id="btn-exegesis" type="button" disabled><svg data-icon="exegesis" data-lucide="scroll-text" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12h-5"></path><path d="M15 8h-5"></path><path d="M19 17V5a2 2 0 0 0-2-2H4"></path><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"></path></svg><span id="exegesis-label">تفسير</span></button>
+      <button class="toolbar-btn toolbar-btn-label" type="button" id="btn-exegesis" disabled><svg data-icon="exegesis" data-lucide="scroll-text" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12h-5"></path><path d="M15 8h-5"></path><path d="M19 17V5a2 2 0 0 0-2-2H4"></path><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"></path></svg><span id="exegesis-label">تفسير</span></button>
     </div>
-    <div class="tb-title">القرآن الكريم</div>
+    <h1 class="tb-title">القرآن الكريم</h1>
   </header>
   <a class="banner" id="banner" href="https://tanzil.net/" target="_blank" rel="noopener"><img src="/img/header.png" width="768" height="72" alt="مشروع تنزيل — tanzil.net"></a>
   <iframe class="tanzil" id="tanzil" title="مشروع تنزيل — القرآن الكريم"></iframe>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-Ffze23imdQOrpo0MeWL/c/Ho/76E3Nelc7ZAyN6pDfc='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-6JC6fC0SLRKL+mLK72UJ20xnjFRoqfUE1TtzYy4sTkg='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -449,9 +449,14 @@ svg[data-lucide] {
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* A button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»): set off
-   from the icon-only buttons by a box and bold text. Its markup is written once, by the build
-   (scripts/components.js, <!--@@LABEL_BUTTON …@@-->): the icon's <svg> then the label, both direct
-   children, centred on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
+   from the icon-only buttons by a box and bold text. Its markup, like every shared component's, is
+   written once (src/components.js): the icon's <svg> then the label, both direct children, centred
+   on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
+/* A button that opens a list (src/components.js menuButton): its short text, bold, then a small
+   dropdown icon. */
+.toolbar-btn-menu { gap: var(--i360-space-xs, 0.25rem); font-weight: 700; line-height: 1; }
+.toolbar-btn-menu > svg { width: var(--i360-text-size-sm, 0.875rem); height: var(--i360-text-size-sm, 0.875rem); }
+
 .toolbar-btn-label {
   background-color: var(--i360-input, #FAF7F2);
   border: var(--i360-line-width, 1px) solid var(--toolbar-line);
@@ -1098,39 +1103,26 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
        src/reader/panel.js. -->
   <header class="toolbar" id="toolbar">
     <div class="tb-start">
-      <button class="toolbar-btn" id="btn-more" type="button" aria-controls="more-menu" aria-expanded="false">
-        <svg data-icon="menu" data-lucide="ellipsis-vertical" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-      </button>
-      <button class="toolbar-btn" id="btn-theme" type="button"></button>
-      <button class="toolbar-btn numerals-btn" id="btn-numerals" type="button"></button>
-      <div class="divider"></div>
+      <button class="toolbar-btn" type="button" id="btn-more" aria-controls="more-menu" aria-expanded="false"><svg data-icon="menu" data-lucide="ellipsis-vertical" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg></button>
+      <button class="toolbar-btn" type="button" id="btn-theme"></button><button class="toolbar-btn numerals-btn" type="button" id="btn-numerals"></button>
+      <span class="divider" aria-hidden="true"></span>
       <span class="status-icon" id="status-icon" role="img"></span>
-      <button class="toolbar-btn toolbar-btn-label" id="btn-open-file" type="button"><svg data-icon="openFile" data-lucide="folder-open" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg><span id="open-file-label">Open file</span></button>
+      <button class="toolbar-btn toolbar-btn-label" type="button" id="btn-open-file"><svg data-icon="openFile" data-lucide="folder-open" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg><span id="open-file-label">Open file</span></button>
     </div>
 
     <div class="tb-main">
       <div class="tb-group" id="group-text">
-        <button class="toolbar-btn text-size-btn" id="btn-text-smaller" type="button" dir="ltr"></button>
-        <button class="toolbar-btn text-size-btn" id="btn-text-larger" type="button" dir="ltr"></button>
+        <button class="toolbar-btn text-size-btn" type="button" id="btn-text-smaller" dir="ltr"></button>
+        <button class="toolbar-btn text-size-btn" type="button" id="btn-text-larger" dir="ltr"></button>
       </div>
       <div class="tb-group" id="group-zoom">
-        <button class="toolbar-btn" id="btn-zoom-out" type="button">
-          <svg data-icon="zoomOut" data-lucide="minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></svg>
-        </button>
-        <button class="toolbar-btn" id="btn-zoom-in" type="button">
-          <svg data-icon="zoomIn" data-lucide="plus" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
-        </button>
-        <button class="toolbar-btn" id="btn-fit-width" type="button">
-          <svg data-icon="fitWidth" data-lucide="move-horizontal" viewBox="0 0 24 24"><path d="m18 8 4 4-4 4"></path><path d="M2 12h20"></path><path d="m6 8-4 4 4 4"></path></svg>
-        </button>
-        <button class="toolbar-btn" id="btn-fit-page" type="button">
-          <svg data-icon="fitPage" data-lucide="move-vertical" viewBox="0 0 24 24"><path d="M12 2v20"></path><path d="m8 18 4 4 4-4"></path><path d="m8 6 4-4 4 4"></path></svg>
-        </button>
+        <button class="toolbar-btn" type="button" id="btn-zoom-out"><svg data-icon="zoomOut" data-lucide="minus" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+        <button class="toolbar-btn" type="button" id="btn-zoom-in"><svg data-icon="zoomIn" data-lucide="plus" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+        <button class="toolbar-btn" type="button" id="btn-fit-width"><svg data-icon="fitWidth" data-lucide="move-horizontal" viewBox="0 0 24 24" aria-hidden="true"><path d="m18 8 4 4-4 4"></path><path d="M2 12h20"></path><path d="m6 8-4 4 4 4"></path></svg></button>
+        <button class="toolbar-btn" type="button" id="btn-fit-page"><svg data-icon="fitPage" data-lucide="move-vertical" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20"></path><path d="m8 18 4 4 4-4"></path><path d="m8 6 4-4 4 4"></path></svg></button>
       </div>
       <div class="tb-group" id="group-nav">
-        <button class="toolbar-btn" id="btn-nav-left" type="button">
-          <svg data-icon="pageLeft" data-lucide="arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>
-        </button>
+        <button class="toolbar-btn" type="button" id="btn-nav-left"><svg data-icon="pageLeft" data-lucide="arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button>
         <div class="page-counter">
           <select id="vol-select" class="vol-select i360-field" hidden></select>
           <input type="text" inputmode="numeric" autocomplete="off" id="page-num-input" class="page-input i360-field" value="">
@@ -1138,41 +1130,25 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
           <span id="total-pages">0</span>
           <span id="page-pos" class="page-pos"></span>
         </div>
-        <button class="toolbar-btn" id="btn-nav-right" type="button">
-          <svg data-icon="pageRight" data-lucide="arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-        </button>
+        <button class="toolbar-btn" type="button" id="btn-nav-right"><svg data-icon="pageRight" data-lucide="arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button>
       </div>
-      <div class="divider" aria-hidden="true"></div>
-      <button class="toolbar-btn" id="btn-copy-link" type="button" hidden>
-        <svg data-icon="copyLink" data-lucide="link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-      </button>
+      <span class="divider" aria-hidden="true"></span>
+      <button class="toolbar-btn" type="button" id="btn-copy-link" hidden><svg data-icon="copyLink" data-lucide="link" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button>
       <div class="tb-group" id="group-mark">
         <template data-slot="copy-link"></template>
-        <button class="toolbar-btn" id="btn-bookmark" type="button" aria-pressed="false">
-          <svg data-icon="bookmark" data-lucide="bookmark" viewBox="0 0 24 24"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"></path></svg>
-        </button>
+        <button class="toolbar-btn" type="button" id="btn-bookmark" aria-pressed="false"><svg data-icon="bookmark" data-lucide="bookmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"></path></svg></button>
       </div>
       <div class="tb-group" id="group-acts">
-        <button class="toolbar-btn" id="btn-scan" type="button" hidden>
-          <svg data-icon="originalPage" data-lucide="scan-text" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 8h8"></path><path d="M7 12h10"></path><path d="M7 16h6"></path></svg>
-        </button>
-        <button class="toolbar-btn" id="btn-reading" type="button">
-          <svg data-icon="readingMode" data-lucide="maximize" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"></path><path d="M21 8V5a2 2 0 0 0-2-2h-3"></path><path d="M3 16v3a2 2 0 0 0 2 2h3"></path><path d="M16 21h3a2 2 0 0 0 2-2v-3"></path></svg>
-        </button>
+        <button class="toolbar-btn" type="button" id="btn-scan" hidden><svg data-icon="originalPage" data-lucide="scan-text" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 8h8"></path><path d="M7 12h10"></path><path d="M7 16h6"></path></svg></button>
+        <button class="toolbar-btn" type="button" id="btn-reading"><svg data-icon="readingMode" data-lucide="maximize" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"></path><path d="M21 8V5a2 2 0 0 0-2-2h-3"></path><path d="M3 16v3a2 2 0 0 0 2 2h3"></path><path d="M16 21h3a2 2 0 0 0 2-2v-3"></path></svg></button>
       </div>
     </div>
 
     <div class="tb-end">
-      <button class="toolbar-btn" id="btn-search-toggle" type="button" aria-controls="search-popup" aria-expanded="false">
-        <svg data-icon="search" data-lucide="search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
-      </button>
-      <button class="toolbar-btn" id="btn-panel" type="button" aria-controls="side-panel" aria-expanded="false">
-        <svg data-icon="contents" data-lucide="table-of-contents" viewBox="0 0 24 24"><path d="M16 5H3"></path><path d="M16 12H3"></path><path d="M16 19H3"></path><path d="M21 5h.01"></path><path d="M21 12h.01"></path><path d="M21 19h.01"></path></svg>
-      </button>
-      <span class="tb-title" id="tb-title"></span>
-      <button class="toolbar-btn" id="btn-close" type="button" hidden>
-        <svg data-icon="close" data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
-      </button>
+      <button class="toolbar-btn" type="button" id="btn-search-toggle" aria-controls="search-popup" aria-expanded="false"><svg data-icon="search" data-lucide="search" viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg></button>
+      <button class="toolbar-btn" type="button" id="btn-panel" aria-controls="side-panel" aria-expanded="false"><svg data-icon="contents" data-lucide="table-of-contents" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5H3"></path><path d="M16 12H3"></path><path d="M16 19H3"></path><path d="M21 5h.01"></path><path d="M21 12h.01"></path><path d="M21 19h.01"></path></svg></button>
+      <h1 class="tb-title" id="tb-title"></h1>
+      <button class="toolbar-btn" type="button" id="btn-close" hidden><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
     </div>
 
     <!-- The ⋮ menu: what doesn't fit on the bar folds into its slots (fittingToolbar, src/page-chrome.js). -->
@@ -1183,7 +1159,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       <template data-slot="text"></template>
       <template data-slot="actions"></template>
       <div class="tb-group" id="group-view">
-        <button class="toolbar-btn" id="btn-dir-toggle" type="button"></button>
+        <button class="toolbar-btn" type="button" id="btn-dir-toggle"></button>
       </div>
     </div>
   </header>
@@ -1200,18 +1176,10 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     <div class="search-row">
       <input type="search" id="search-input" class="search-input i360-field i360-field-search" autocomplete="off" enterkeyhint="search">
       <span class="search-count" id="search-count" aria-live="polite">0 of 0</span>
-      <button class="toolbar-btn" id="btn-search-prev" type="button">
-        <svg data-icon="resultPrevious" data-lucide="arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg>
-      </button>
-      <button class="toolbar-btn" id="btn-search-next" type="button">
-        <svg data-icon="resultNext" data-lucide="arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg>
-      </button>
-      <button class="toolbar-btn" id="btn-search-list" type="button" aria-pressed="false" aria-controls="search-results">
-        <svg data-icon="searchResults" data-lucide="list" viewBox="0 0 24 24"><path d="M3 5h.01"></path><path d="M3 12h.01"></path><path d="M3 19h.01"></path><path d="M8 5h13"></path><path d="M8 12h13"></path><path d="M8 19h13"></path></svg>
-      </button>
-      <button class="toolbar-btn" id="btn-search-close" type="button">
-        <svg data-icon="close" data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
-      </button>
+      <button class="toolbar-btn" type="button" id="btn-search-prev"><svg data-icon="resultPrevious" data-lucide="arrow-up" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 7-7 7 7"></path><path d="M12 19V5"></path></svg></button>
+      <button class="toolbar-btn" type="button" id="btn-search-next"><svg data-icon="resultNext" data-lucide="arrow-down" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg></button>
+      <button class="toolbar-btn" type="button" id="btn-search-list" aria-controls="search-results" aria-pressed="false"><svg data-icon="searchResults" data-lucide="list" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h.01"></path><path d="M3 12h.01"></path><path d="M3 19h.01"></path><path d="M8 5h13"></path><path d="M8 12h13"></path><path d="M8 19h13"></path></svg></button>
+      <button class="toolbar-btn" type="button" id="btn-search-close"><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
     </div>
     <div class="search-row">
       <button class="i360-chip" id="opt-diacritics" type="button" aria-pressed="false"><span class="i360-chip-box"></span><span class="chip-label"></span></button>
@@ -1225,15 +1193,13 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     <div class="panel-head" role="tablist">
       <button class="panel-tab" id="tab-contents" type="button" role="tab" aria-selected="true"></button>
       <button class="panel-tab" id="tab-bookmarks" type="button" role="tab" aria-selected="false"></button>
-      <button class="toolbar-btn" id="btn-panel-close" type="button">
-        <svg data-icon="close" data-lucide="x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
-      </button>
+      <button class="toolbar-btn" type="button" id="btn-panel-close"><svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
     </div>
     <div class="panel-body" id="panel-body"></div>
   </aside>
 
   <button class="floating-btn" id="btn-exit-reading" type="button">
-    <svg data-icon="exitReadingMode" data-lucide="minimize" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
+    <svg data-icon="exitReadingMode" data-lucide="minimize" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
   </button>
 
   <div class="toast i360-toast" id="toast" role="status" aria-live="polite"></div>
@@ -1242,7 +1208,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
 
   <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
     <div class="missing-pages-banner i360-banner" id="missing-pages-banner" role="status">
-      <svg data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+      <svg data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>
     </div>
 
@@ -1462,16 +1428,16 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     const next = toNumerals(v, numerals);
     if (next !== v) node.nodeValue = next;
   }
-  function convertAttributes(el2, attributes, skip, numerals) {
-    if (!attributes.length || skip && el2.closest(skip)) return;
-    for (const name of attributes) {
+  function convertAttributes(el2, attributes2, skip, numerals) {
+    if (!attributes2.length || skip && el2.closest(skip)) return;
+    for (const name of attributes2) {
       const v = el2.getAttribute(name);
       if (v === null || !ANY_DIGIT.test(v)) continue;
       const next = toNumerals(v, numerals);
       if (next !== v) el2.setAttribute(name, next);
     }
   }
-  function convertNumerals(root2, { skip = "", attributes = [], attributeSkip = skip, numerals = getNumerals() } = {}) {
+  function convertNumerals(root2, { skip = "", attributes: attributes2 = [], attributeSkip = skip, numerals = getNumerals() } = {}) {
     if (!root2) return;
     if (root2.nodeType === Node.TEXT_NODE) {
       convertText(
@@ -1486,11 +1452,11 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
     convertAttributes(
       /** @type {Element} */
       root2,
-      attributes,
+      attributes2,
       attributeSkip,
       numerals
     );
-    const walker = document.createTreeWalker(root2, attributes.length ? NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT : NodeFilter.SHOW_TEXT);
+    const walker = document.createTreeWalker(root2, attributes2.length ? NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT : NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       if (n.nodeType === Node.TEXT_NODE) convertText(
         /** @type {Text} */
@@ -1501,7 +1467,7 @@ mark.i360-mark, .i360-page mark { background: var(--i360-highlight, #fef08a); co
       else convertAttributes(
         /** @type {Element} */
         n,
-        attributes,
+        attributes2,
         attributeSkip,
         numerals
       );
@@ -1716,6 +1682,11 @@ ${body}`;
     if (text !== void 0) e.textContent = text;
     return e;
   }
+  function fromMarkup(markup) {
+    const t2 = document.createElement("template");
+    t2.innerHTML = markup;
+    return t2.content.firstElementChild;
+  }
   var IN_APP = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
   function setupClose(button, stepsBack = () => 1) {
     if (!IN_APP) return;
@@ -1835,11 +1806,11 @@ ${body}`;
 
   // src/reader/text.js
   var ICON = {
-    bookRtl: `<svg data-icon="bookRtl" data-lucide="step-forward" viewBox="0 0 24 24"><path d="M10.029 4.285A2 2 0 0 0 7 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z"></path><path d="M3 4v16"></path></svg>`,
-    bookLtr: `<svg data-icon="bookLtr" data-lucide="step-back" viewBox="0 0 24 24"><path d="M13.971 4.285A2 2 0 0 1 17 6v12a2 2 0 0 1-3.029 1.715l-9.997-5.998a2 2 0 0 1-.003-3.432z"></path><path d="M21 20V4"></path></svg>`,
-    offline: `<svg data-icon="offline" data-lucide="globe-x" viewBox="0 0 24 24"><path d="m16 3 5 5"></path><path d="M2 12h20A10 10 0 1 1 12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 4-10"></path><path d="m21 3-5 5"></path></svg>`,
-    online: `<svg data-icon="online" data-lucide="globe-check" viewBox="0 0 24 24"><path d="m15 6 2 2 4-4"></path><path d="M2 12h20A10 10 0 1 1 12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 4-10"></path></svg>`,
-    delete: `<svg data-icon="delete" data-lucide="trash" viewBox="0 0 24 24"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`
+    bookRtl: `<svg data-icon="bookRtl" data-lucide="step-forward" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.029 4.285A2 2 0 0 0 7 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z"></path><path d="M3 4v16"></path></svg>`,
+    bookLtr: `<svg data-icon="bookLtr" data-lucide="step-back" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.971 4.285A2 2 0 0 1 17 6v12a2 2 0 0 1-3.029 1.715l-9.997-5.998a2 2 0 0 1-.003-3.432z"></path><path d="M21 20V4"></path></svg>`,
+    offline: `<svg data-icon="offline" data-lucide="globe-x" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 5 5"></path><path d="M2 12h20A10 10 0 1 1 12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 4-10"></path><path d="m21 3-5 5"></path></svg>`,
+    online: `<svg data-icon="online" data-lucide="globe-check" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6 2 2 4-4"></path><path d="M2 12h20A10 10 0 1 1 12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 4-10"></path></svg>`,
+    delete: `<svg data-icon="delete" data-lucide="trash" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`
   };
   var QURAN_OPEN = "﴿";
   var QURAN_CLOSE = "﴾";
@@ -3664,6 +3635,26 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     };
   }
 
+  // src/components.js
+  var escapeText = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  var escapeAttr = (s) => escapeText(s).replace(/"/g, "&quot;");
+  var ATTRIBUTE_ORDER = ["id", "label", "dir", "aria-controls", "aria-haspopup", "aria-expanded", "aria-pressed", "data-i18n"];
+  function attributes(a) {
+    let out = "";
+    for (const name of ATTRIBUTE_ORDER) {
+      const value = a[name];
+      if (value === void 0 || value === null || value === false) continue;
+      if (name === "label") out += ` title="${escapeAttr(value)}" aria-label="${escapeAttr(value)}"`;
+      else out += ` ${name}="${escapeAttr(value)}"`;
+    }
+    return out;
+  }
+  var flags = (a) => `${a.disabled ? " disabled" : ""}${a.hidden ? " hidden" : ""}`;
+  var classes = (own, extra) => extra ? `${own} ${extra}` : own;
+  function toolbarButton(a = {}) {
+    return `<button class="${classes("toolbar-btn", a.class)}" type="button"${attributes(a)}${flags(a)}>${a.icon || ""}</button>`;
+  }
+
   // src/reader/fold.js
   var READER_FOLD = [
     { items: ["group-text"], to: "text" },
@@ -4126,10 +4117,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
         const li = el("li", "bm-row");
         const label = state.format === "plain" ? fmtNum(idx + 1) : pageLabelText(state.pages[idx], tr);
         li.appendChild(panelItem(pageSummary(idx) || label, label, () => jumpToElement(idx, null)));
-        const del = el("button");
-        del.type = "button";
-        del.className = "toolbar-btn";
-        del.innerHTML = ICON.delete;
+        const del = fromMarkup(toolbarButton({ icon: ICON.delete }));
         setLabel(del, tr.removeBookmark);
         del.addEventListener("click", () => removeBookmarkAt(idx));
         li.appendChild(del);

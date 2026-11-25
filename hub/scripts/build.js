@@ -124,6 +124,8 @@ function buildPage({ src, out, main, connectSrc, fills = [], imgSrc = "'none'", 
   ].join('; ');
   html = fill(html, '<!--@@CSP@@-->', `<meta http-equiv="Content-Security-Policy" content="${csp}">`);
   mkdirSync(dirname(join(root, out)), { recursive: true });
+  const left = html.match(/<!--@@[\s\S]*?@@-->/);
+  if (left) throw new Error(`${src}: placeholder left unfilled: ${left[0].slice(0, 80)}`);
   writeFileSync(join(root, out), html);
   console.log(`${out}: ${html.length} chars, ${hashes.length} scripts hashed`);
 }

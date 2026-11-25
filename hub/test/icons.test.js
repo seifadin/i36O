@@ -31,24 +31,32 @@ test('icons: the app (lucide-react) and the hub (lucide-static) pin the same Luc
   assert.equal(app, hub, `package.json: lucide-react "${app}" ≠ hub/package.json: lucide-static "${hub}" (fix: npm run lucide -- <version>)`);
 });
 
-test('icons: a missing or unknown meaning, a name other than its meaning\'s, an unknown or changed icon and Font Awesome are each reported', () => {
+test('icons: a missing or unknown meaning, a name other than its meaning\'s, an unknown, visible or changed icon and Font Awesome are each reported', () => {
   const page = [
-    `<svg data-icon="close" data-lucide="x" viewBox="0 0 24 24">${X}</svg>`,
-    `<svg data-icon="theme.dark" data-lucide="x">${X}</svg>`,
-    `<svg data-lucide="x" viewBox="0 0 24 24">${X}</svg>`,
-    `<svg data-icon="nope" data-lucide="x">${X}</svg>`,
-    `<svg data-icon="close" data-lucide="plus">${PLUS}</svg>`,
-    '<svg data-icon="add" data-lucide="no-such-icon"></svg>',
-    '<svg data-icon="close" data-lucide="x"><line x1="18" y1="6" x2="6" y2="18"></line></svg>',
+    `<svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true">${X}</svg>`,
+    `<svg data-icon="theme.dark" data-lucide="x" aria-hidden="true">${X}</svg>`,
+    `<svg data-lucide="x" viewBox="0 0 24 24" aria-hidden="true">${X}</svg>`,
+    `<svg data-icon="nope" data-lucide="x" aria-hidden="true">${X}</svg>`,
+    `<svg data-icon="close" data-lucide="plus" aria-hidden="true">${PLUS}</svg>`,
+    '<svg data-icon="add" data-lucide="no-such-icon" aria-hidden="true"></svg>',
+    '<svg data-icon="close" data-lucide="x" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line></svg>',
+    `<svg data-icon="close" data-lucide="x">${X}</svg>`,
     '<i class="fas fa-clock"></i>'
   ].join('\n');
-  assert.deepEqual(icons.check(page, FAKE, MEANINGS).map(p => p.line), [3, 4, 5, 6, 7, 8]);
-  assert.equal(icons.check(`<svg data-icon="add" data-lucide="plus">${PLUS}</svg>`, { x: FAKE.x }, MEANINGS)[0].problem, '"plus" is not a Lucide icon');
+  assert.deepEqual(icons.check(page, FAKE, MEANINGS).map(p => p.line), [3, 4, 5, 6, 7, 8, 9]);
+  assert.equal(icons.check(page, FAKE, MEANINGS)[5].problem, '"close" is not hidden from screen readers (aria-hidden="true")');
+  assert.equal(icons.check(`<svg data-icon="add" data-lucide="plus" aria-hidden="true">${PLUS}</svg>`, { x: FAKE.x }, MEANINGS)[0].problem, '"plus" is not a Lucide icon');
   assert.equal(icons.check('<link href="…/font-awesome/6.0.0/css/all.min.css">', FAKE, MEANINGS).length, 1);
 });
 
-test('icons: --write sets the name from the meaning and redraws, keeps the page\'s own attributes, leaves unknown meanings', () => {
+test('icons: --write sets the name from the meaning, hides it from screen readers and redraws, keeps the page\'s own attributes, leaves unknown meanings', () => {
   const page = '<svg data-icon="close" data-lucide="plus" class="icon" aria-hidden="true"><line x1="1"></line></svg> <svg data-icon="add" class="icon"></svg> <svg data-icon="nope" data-lucide="x"><b></b></svg>';
   assert.equal(icons.write(page, FAKE, MEANINGS),
-    `<svg data-icon="close" data-lucide="x" class="icon" aria-hidden="true">${X}</svg> <svg data-icon="add" data-lucide="plus" class="icon">${PLUS}</svg> <svg data-icon="nope" data-lucide="x"><b></b></svg>`);
+    `<svg data-icon="close" data-lucide="x" class="icon" aria-hidden="true">${X}</svg> <svg data-icon="add" data-lucide="plus" class="icon" aria-hidden="true">${PLUS}</svg> <svg data-icon="nope" data-lucide="x"><b></b></svg>`);
+});
+
+test('icons: svgFor draws an icon whole from its meaning; an unknown meaning or icon throws', () => {
+  assert.equal(icons.svgFor('close', FAKE, MEANINGS), `<svg data-icon="close" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true">${X}</svg>`);
+  assert.throws(() => icons.svgFor('nope', FAKE, MEANINGS), /not a meaning/);
+  assert.throws(() => icons.svgFor('add', { x: FAKE.x }, MEANINGS), /is not a Lucide/);
 });

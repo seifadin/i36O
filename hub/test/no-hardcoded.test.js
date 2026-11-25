@@ -33,7 +33,7 @@ const ALLOWED = {
   },
   'src/cse.src.html': { '2.75rem': 'search box and button height', '1.5rem': 'status line height (one line)' },
   'src/quran.src.html': { '48rem': 'tanzil\'s banner at most its own width (768 px)', '1px': 'the hidden status line for screen readers' },
-  'src/day.src.html': { '0.875rem': 'the language button\'s caret', '11rem': 'language list narrowest' }
+  'src/day.src.html': { '11rem': 'language list narrowest' }
 };
 
 // Drop comments, print styles (they keep black on white for paper), and the light values built
