@@ -13,7 +13,9 @@ export const REPO = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd:
 export const WORK = 'work';
 const CACHE = join(tmpdir(), 'i360-compare');
 
-const git = (...args) => execFileSync('git', args, { cwd: REPO, encoding: 'utf8', maxBuffer: 1 << 28 }).trim();
+// git's output as it is (encoding null: bytes), and trimmed text.
+export const gitRaw = (args, encoding = 'utf8') => execFileSync('git', args, { cwd: REPO, encoding, maxBuffer: 1 << 28 });
+const git = (...args) => gitRaw(args).trim();
 
 // --old / --new (and any other --name value) from the command line.
 export function options(defaults = {}) {

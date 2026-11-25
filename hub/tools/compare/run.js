@@ -10,22 +10,21 @@ import { execFileSync, spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { appHubFiles } from '../../scripts/app-inputs.js';
-import { REPO, WORK, options, label, pages, app } from './lib/versions.js';
+import { REPO, WORK, gitRaw, options, label, pages, app } from './lib/versions.js';
 import { BUILT, MULTI, SCRIPTS, select, everything } from './lib/select.js';
 
 const opts = options();
-const git = (args, encoding = 'utf8') => execFileSync('git', args, { cwd: REPO, encoding, maxBuffer: 1 << 28 });
 
 // The files that differ between the two versions (the working copy: its changes and new files).
 function changedFiles() {
   const list = (s) => s.split('\n').filter(Boolean);
-  if (opts.new !== WORK) return list(git(['diff', '--name-only', opts.old, opts.new]));
-  return [...new Set([...list(git(['diff', '--name-only', opts.old])), ...list(git(['ls-files', '--others', '--exclude-standard']))])];
+  if (opts.new !== WORK) return list(gitRaw(['diff', '--name-only', opts.old, opts.new]));
+  return [...new Set([...list(gitRaw(['diff', '--name-only', opts.old])), ...list(gitRaw(['ls-files', '--others', '--exclude-standard']))])];
 }
 
 // A file as it is in one version (null when it isn't there).
 function fileAt(ref, path) {
-  try { return ref === WORK ? readFileSync(join(REPO, path)) : git(['show', `${ref}:${path}`], null); } catch { return null; }
+  try { return ref === WORK ? readFileSync(join(REPO, path)) : gitRaw(['show', `${ref}:${path}`], null); } catch { return null; }
 }
 
 if (opts.new === WORK && !opts['no-build']) {

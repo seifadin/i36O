@@ -29,7 +29,7 @@ src/cse.src.html + src/cse/main.js         the i360 CSE      → ../public/cse/i
 src/day.src.html + src/day/main.js         Daily Reflection «التأمل اليومي» → ../public/day/index.html
 src/quran.src.html + src/quran/*.js        the quran page (tanzil + «تفسير») → quran/site/i360/index.html
                       (verse.js: which verse tanzil shows; served by the quran Worker at /i360/)
-src/locales.js        every page's interface text, one section per page, all its languages
+src/locales.js        every page's interface text and the app's (APP; alias @i360/locales), one section each, all its languages
 src/page-chrome.css   every toolbar (the app's too: it imports this file), the pages' base, the keyboard
                       focus ring, every Lucide icon's style — inlined into each page by the build
 src/page-chrome.js    shared by the pages: $, el(), setLabel(), in-app check, the ✕ back to the app, the theme
@@ -60,6 +60,7 @@ library/books/        our own books     → lib.i36o.workers.dev/books/ (publish
 indexer/wrangler.jsonc  the lib Worker (lib.i36o.workers.dev: the CSE build, our books and quran/, files only)
 indexer/quran-data.js tanzil's Quran texts and translations and the exegesis index → lib's quran/ (every CSE build)
 indexer/science-icons.js  once a quarter, the science icons in Baserow checked against the pinned Lucide (report only)
+indexer/map-limit.js  mapLimit(): many fetches or writes, a few at a time (every indexer step)
 quran/                the quran Worker (quran.i36o.workers.dev): tanzil's Navigator from our address, its two
                       data scripts answered from lib (worker/data.js), the page (site/i360/) — i360-quran.md
 forward/404.html      fallback for the forwarding sites

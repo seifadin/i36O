@@ -6,6 +6,8 @@
 const v = (name) => `var(--i360-${name})`;
 export default {
   content: ['./src/day.src.html', './src/day/**/*.js', './src/components.js'],
+  // components.js names the toolbar's variant "sticky" (its own .toolbar-sticky class): not a utility here.
+  blocklist: ['sticky'],
   theme: {
     // Three sizes: the fourth (xl) is the app title's alone.
     fontSize: {

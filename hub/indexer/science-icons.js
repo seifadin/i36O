@@ -57,4 +57,4 @@ function describe(findings) {
   ];
 }
 
-export { ICON_FIELDS, lucideNames, checkIcons, describe };
+export { lucideNames, checkIcons, describe };
