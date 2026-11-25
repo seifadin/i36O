@@ -1,7 +1,7 @@
 // The Reader: the side panel (contents, bookmarks), reading mode, the toolbar's layout by
 // measurement, and keyboard shortcuts.
 import { oncePerFrame } from '../frame.js';
-import { el, fittingToolbar, fromMarkup, setLabel } from '../page-chrome.js';
+import { el, fittingToolbar, fromMarkup, setLabel, setPressed } from '../page-chrome.js';
 import { listItem, toolbarButton } from '../components.js';
 import { READER_FOLD } from './fold.js';
 import { PANEL_COVERS, ZOOM_STEP } from './constants.js';
@@ -26,7 +26,7 @@ function openPanel() {
   sidePanel.classList.add('open');
   sidePanel.setAttribute('aria-hidden', 'false');
   btnPanel.setAttribute('aria-expanded', 'true');
-  btnPanel.setAttribute('aria-pressed', 'true');
+  setPressed(btnPanel, true);
   renderPanel();
 }
 
@@ -34,7 +34,7 @@ function closePanel() {
   sidePanel.classList.remove('open');
   sidePanel.setAttribute('aria-hidden', 'true');
   btnPanel.setAttribute('aria-expanded', 'false');
-  btnPanel.setAttribute('aria-pressed', 'false');
+  setPressed(btnPanel, false);
 }
 
 async function jumpToElement(idx, target) {
@@ -149,7 +149,7 @@ const queueFitToolbar = oncePerFrame(() => fitToolbar());
 function closeMore() {
   moreMenu.hidden = true;
   btnMore.setAttribute('aria-expanded', 'false');
-  btnMore.setAttribute('aria-pressed', 'false');
+  setPressed(btnMore, false);
 }
 
 /* ================================================================
@@ -176,7 +176,7 @@ function wirePanel() {
     const open = moreMenu.hidden;
     moreMenu.hidden = !open;
     btnMore.setAttribute('aria-expanded', open ? 'true' : 'false');
-    btnMore.setAttribute('aria-pressed', open ? 'true' : 'false');
+    setPressed(btnMore, open);
   });
 
   document.addEventListener('click', (e) => {

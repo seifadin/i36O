@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useId, useRef } from 'react'
 import { closeOnBack } from '@/lib/backButton'
 import { Button, Popup } from '@/components/shared'
+import { APP } from '@i360/locales'
 
 interface DialogProps {
   open: boolean
@@ -102,7 +103,7 @@ export default function Dialog({ open, title, message, onClose, secondaryAction,
           </Button>
         )}
         <Button ref={okButtonRef} primary={!emphasizeSecondary} className="w-full" onClick={onClose}>
-          موافق
+          {APP.ar.ok}
         </Button>
       </Popup>
     </div>

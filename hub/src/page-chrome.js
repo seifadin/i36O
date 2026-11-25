@@ -86,6 +86,11 @@ export function setLabel(control, text) {
   control.setAttribute('aria-label', text);
 }
 
+// An on/off control's state (an option chip, a toggle button, the chosen row of a list).
+export function setPressed(control, on) {
+  control.setAttribute('aria-pressed', on ? 'true' : 'false');
+}
+
 export function fittingToolbar({ bar, fold = [] }) {
   const DENSE = ['toolbar-dense', 'toolbar-densest'];
   // Each entry's changes, made once here: (folded) => void.
@@ -138,7 +143,7 @@ export function fittingToolbar({ bar, fold = [] }) {
   // Every button narrower than the bar is high widens to one width, as far as the room allows:
   // the buttons' widths at their narrowest, filled up evenly from the narrowest one.
   const widen = (room) => {
-    const buttons = [...bar.querySelectorAll(`.${CLASS.toolbarButton}`)].filter((b) => b.offsetParent && !b.closest('.toolbar-menu'));
+    const buttons = [...bar.querySelectorAll(`.${CLASS.toolbarButton}`)].filter((b) => b.offsetParent && !b.closest(`.${CLASS.toolbarMenu}`));
     if (!buttons.length || room <= 0) return;
     const narrow = buttons.map((b) => b.getBoundingClientRect().width).sort((a, b) => a - b);
     setWidth('var(--toolbar-h)');

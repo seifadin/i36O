@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-EyAbiJUtTDMke3FJwUlqw8Nt6OX5Nt+qMNglbZ1kjRQ='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-q9vDxX8GE3gK09tTLyPDqp4NkdpGjM1PWLc8xZeg6N8='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -1163,6 +1163,7 @@ svg[data-lucide] {
   }
 
   // src/cse-index.js
+  var num = (v) => v === "" || v == null || Number.isNaN(Number(v)) ? Infinity : Number(v);
   var FORMAT = 1;
   var SHARDS = 1024;
   var MIN_QUERY = 3;
@@ -1418,7 +1419,6 @@ svg[data-lucide] {
     if (hitText && hitText.trim()) return `${s.url.split("#")[0]}#:~:text=${fragment(hitText.trim())}`;
     return s.url;
   }
-  var num = (v) => v === "" || v == null || Number.isNaN(Number(v)) ? Infinity : Number(v);
   function candidateGroups(searcher, gps) {
     const majors = /* @__PURE__ */ new Map();
     for (const gp of gps) {
@@ -1530,16 +1530,27 @@ svg[data-lucide] {
     popup: { cls: "i360-popup", tags: ["div", "span"] },
     banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
     toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" },
-    fieldBox: { cls: "i360-field i360-field-search", tags: ["div"] }
+    fieldBox: { cls: "i360-field i360-field-search", tags: ["div"] },
+    // The toolbar (src/page-chrome.css): the bar, its parts, a group of its buttons and its ⋮ menu.
+    // A bar's variant (sticky: stays at the top while the page scrolls; bottom: the app's) is its own
+    // modifier class, never a page's.
+    toolbar: { cls: "toolbar", tags: ["header", "div"], variants: ["sticky", "bottom"] },
+    toolbarStart: { cls: "tb-start", tags: ["div"] },
+    toolbarMain: { cls: "tb-main", tags: ["div"] },
+    toolbarEnd: { cls: "tb-end", tags: ["div"] },
+    toolbarGroup: { cls: "tb-group", tags: ["div"] },
+    toolbarMenu: { cls: "toolbar-menu", tags: ["div"] }
   });
   function box(kind, a = {}) {
     const k = BOXES[kind];
     if (!k) throw new Error(`no container "${kind}"`);
     const tag = a.tag || k.tags[0];
     if (!k.tags.includes(tag)) throw new Error(`a ${kind} is a ${k.tags.join(" or ")}, not a ${tag}`);
+    if (a.variant && !(k.variants || []).includes(a.variant)) throw new Error(`a ${kind} has no variant "${a.variant}"`);
+    const own = a.variant ? `${k.cls} ${k.cls}-${a.variant}` : k.cls;
     const isButton = tag === "button";
     const all = { ...a, role: a.role ?? (isButton ? void 0 : k.role), "aria-live": a["aria-live"] ?? k.live };
-    return `<${tag} class="${classes(k.cls, a.class)}"${isButton ? ' type="button"' : ""}${attributes(all)}${flags(a)}>${a.html ?? ""}</${tag}>`;
+    return `<${tag} class="${classes(own, a.class)}"${isButton ? ' type="button"' : ""}${attributes(all)}${flags(a)}>${a.html ?? ""}</${tag}>`;
   }
   var CARD_TONES = Object.freeze({
     quran: { tile: "bg-quran-soft text-quran", text: "text-quran" },
@@ -1548,7 +1559,14 @@ svg[data-lucide] {
     converter: { tile: "bg-converter-bg text-converter", text: "text-converter" },
     event: { tile: "bg-event-bg text-event", text: "text-event" }
   });
-  var CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
+  var CLASS = Object.freeze({
+    banner: BOXES.banner.cls,
+    chipLabel: CLASS_CHIP_LABEL,
+    title: TITLE,
+    toolbarButton: TOOLBAR_BUTTON,
+    toolbarEnd: BOXES.toolbarEnd.cls,
+    toolbarMenu: BOXES.toolbarMenu.cls
+  });
 
   // i360:icons
   var icon_theme = { "system": '<svg data-icon="theme.system" data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>', "light": '<svg data-icon="theme.light" data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>', "sepia": '<svg data-icon="theme.sepia" data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>', "dark": '<svg data-icon="theme.dark" data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>' };
@@ -1598,6 +1616,9 @@ svg[data-lucide] {
   function setLabel(control, text) {
     control.title = text;
     control.setAttribute("aria-label", text);
+  }
+  function setPressed(control, on) {
+    control.setAttribute("aria-pressed", on ? "true" : "false");
   }
 
   // src/locales.js
@@ -1735,9 +1756,6 @@ svg[data-lucide] {
       document.head.append(m);
     }
     if (!q && m) m.remove();
-  }
-  function setOption(btn, on) {
-    btn.setAttribute("aria-pressed", on ? "true" : "false");
   }
   async function search(raw, { push = false } = {}) {
     const run = ++state.run;
@@ -1997,12 +2015,12 @@ svg[data-lucide] {
   });
   btnExact.addEventListener("click", () => {
     state.exact = !state.exact;
-    setOption(btnExact, state.exact);
+    setPressed(btnExact, state.exact);
     if (input.value.trim()) search(input.value);
   });
   btnWord.addEventListener("click", () => {
     state.word = !state.word;
-    setOption(btnWord, state.word);
+    setPressed(btnWord, state.word);
     if (input.value.trim()) search(input.value);
   });
   wireSettingsButtons(btnTheme, btnNumerals);
@@ -2022,8 +2040,8 @@ svg[data-lucide] {
     const a = readAddress(window.location.search, window.location.hostname, window.location.protocol);
     state.exact = a.exact;
     state.word = a.word;
-    setOption(btnExact, a.exact);
-    setOption(btnWord, a.word);
+    setPressed(btnExact, a.exact);
+    setPressed(btnWord, a.word);
     input.value = a.q;
     search(a.q);
   }

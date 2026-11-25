@@ -8,6 +8,9 @@ import { tryOpenNewTab } from '@/lib/openTab'
 import { openResource } from '@/lib/openResource'
 import { i360Theme } from '@/lib/theme'
 import { FieldBox, IconButton } from '@/components/shared'
+import { APP } from '@i360/locales'
+
+const T = APP.ar
 
 // Icon mapping confirmation:
 // Search   → search icon inside input LEFT side
@@ -197,17 +200,17 @@ export default function SearchBar() {
   // shared by both values (same state, same messages); null when nothing
   // transient applies, so each ?? falls through to its own default.
   const transientStatus: string | null =
-    flash === 'invalid' ? 'إدخال غير صالح' :
-    flash === 'notfound' ? 'لم يتم العثور على تفسير لهذه الآية' :
-    flash === 'openfailed' ? 'تعذر فتح الرابط' :
-    searchPhase === 'translating' ? 'جارٍ الترجمة' :
-    searchPhase === 'opening' ? 'جارٍ فتح النتائج' :
+    flash === 'invalid' ? T.invalidInput :
+    flash === 'notfound' ? T.noExegesis :
+    flash === 'openfailed' ? T.linkOpenFailed :
+    searchPhase === 'translating' ? T.translating :
+    searchPhase === 'opening' ? T.openingResults :
     null
 
   const searchIconLabel = transientStatus ?? (
-    overrideArmed ? 'وضع البحث المباشر مفعّل، اضغط للإلغاء' :
-    isExegesisMatch ? 'تم اكتشاف رقم آية، اضغط للبحث العادي بدلاً من ذلك' :
-    'خيارات البحث'
+    overrideArmed ? T.searchOnlyArmed :
+    isExegesisMatch ? T.verseDetected :
+    T.searchOptions
   )
 
   // Separate from the button label above: covers only the genuinely
@@ -219,8 +222,8 @@ export default function SearchBar() {
   // wrapped in a live region. Empty string when nothing transient is
   // happening, so the live region stays silent by default.
   const liveMessage = transientStatus ?? (
-    botFailed ? 'تعذر فتح المساعد الذكي' :
-    keyboardFailed ? 'تعذر فتح لوحة المفاتيح' :
+    botFailed ? T.assistantFailed :
+    keyboardFailed ? T.keyboardFailed :
     ''
   )
 
@@ -265,8 +268,8 @@ export default function SearchBar() {
           value={EntityQueryTerm}
           onChange={e => setEntityQueryTerm(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-          placeholder="بحث ... أو الآية#.السورة#"
-          aria-label="بحث"
+          placeholder={T.searchPlaceholder}
+          aria-label={T.search}
           // The standard form pattern: many screen readers announce
           // "invalid entry" when a focused field has aria-invalid
           // true. Only ever true for the same brief 500ms window the
@@ -276,14 +279,14 @@ export default function SearchBar() {
           dir="rtl"
         />
         {/* Search icon inside input on LEFT (last in RTL flex = leftmost) */}
-        <IconButton onClick={handleSubmit} label="بحث" icon={<ICON.search />} />
+        <IconButton onClick={handleSubmit} label={T.search} icon={<ICON.search />} />
       </FieldBox>
 
       {/* Bot — outside input LEFT */}
-      <IconButton onClick={handleBot} className="p-xs" disabled={!botUrl} label="المساعد الذكي" icon={botFailed ? <ICON.openFailed /> : <ICON.assistant />} />
+      <IconButton onClick={handleBot} className="p-xs" disabled={!botUrl} label={T.assistant} icon={botFailed ? <ICON.openFailed /> : <ICON.assistant />} />
 
       {/* Keyboard — leftmost */}
-      <IconButton onClick={handleKeyboard} className="p-xs" disabled={!keyboardUrl} label="لوحة المفاتيح" icon={keyboardFailed ? <ICON.openFailed /> : <ICON.keyboard />} />
+      <IconButton onClick={handleKeyboard} className="p-xs" disabled={!keyboardUrl} label={T.keyboard} icon={keyboardFailed ? <ICON.openFailed /> : <ICON.keyboard />} />
     </div>
   )
 }

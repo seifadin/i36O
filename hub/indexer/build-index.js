@@ -34,6 +34,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, copyFileSync, cpSync, rmSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as inventory from './inventory.js';
+import { mapLimit } from './map-limit.js';
 import * as extract from './extract.js';
 import { writeBuild } from './index-writer.js';
 import * as QuranData from './quran-data.js';
@@ -192,13 +193,6 @@ function hash(s) {
   let h = 0x811c9dc5;
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
   return (h >>> 0).toString(36);
-}
-
-async function mapLimit(items, limit, fn) {
-  let next = 0;
-  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, async () => {
-    while (next < items.length) { const i = next++; await fn(items[i], i); }
-  }));
 }
 
 async function run({

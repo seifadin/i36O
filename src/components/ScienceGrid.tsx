@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, Fragment, ReactNode } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { useAppState } from '@/store/appState'
-import { useDataCache, LOAD_ERROR } from '@/store/dataCache'
+import { useDataCache } from '@/store/dataCache'
 import { Science } from '@/api/dataSource'
 import { computeIsGMSorApple, computeUseHuawei, resolveEffectiveOS } from '@/hooks/usePlatform'
 import { groupSciences } from '@/lib/groupSciences'
@@ -10,10 +10,12 @@ import { wait } from '@i360/net'
 import { openResource, ownPagePath } from '@/lib/openResource'
 import { ICON } from '@/lib/icons'
 import { fetchIcon, iconLoaded, loadedIcon } from '@/lib/iconsLoader'
-import { REPORT_SUBJECTS } from '@/lib/feedbackReport'
+import { APP } from '@i360/locales'
 import Dialog from '@/components/Dialog'
 import ReportNotice from '@/components/ReportNotice'
 import { Banner, IconButton, Toast } from '@/components/shared'
+
+const T = APP.ar
 
 // Visible fallback for a missing/misnamed icon — silently rendering nothing
 // would make a bad icon name indistinguishable from "no icon set" (a failure
@@ -118,7 +120,7 @@ function MinorButton({
           // nothing and removes any doubt for a future reader.
           onClick={e => { e.stopPropagation(); onAppendixTap(science) }}
           className="px-sm py-xs"
-          label="فتح الملحق"
+          label={T.attachment}
           icon={<ICON.attachment />}
         />
       )}
@@ -220,7 +222,7 @@ export default function ScienceGrid() {
     return (
       <div className="flex items-center justify-center gap-sm p-md text-base text-brand-muted">
         <ICON.loading className="animate-spin" />
-        <span>جارٍ التحميل...</span>
+        <span>{T.loading}</span>
       </div>
     )
   }
@@ -240,7 +242,7 @@ export default function ScienceGrid() {
         {loading ? (
           <button type="button" onClick={() => setErrorDialogOpen(true)} className="flex w-full items-center justify-center gap-sm p-md text-center text-base">
             <ICON.loading className="animate-spin text-brand-muted" />
-            <span className="text-brand-muted">{isRetrying ? 'يُعاد المحاولة...' : 'جارٍ التحميل...'}</span>
+            <span className="text-brand-muted">{isRetrying ? T.retrying : T.loading}</span>
           </button>
         ) : (
           <Banner onClick={() => setErrorDialogOpen(true)} className="m-md flex w-[calc(100%-2*var(--i360-space-md,1rem))] items-center justify-center gap-sm text-center">
@@ -249,9 +251,9 @@ export default function ScienceGrid() {
         )}
         <ReportNotice
           open={errorDialogOpen}
-          title={LOAD_ERROR}
+          title={T.loadError}
           message={lastFailure.message}
-          subject={REPORT_SUBJECTS.dataLoad}
+          subject={T.reportDataLoad}
           details={`${lastFailure.message}\n\n${lastFailure.detail}`}
           onClose={() => setErrorDialogOpen(false)}
         />
@@ -261,19 +263,19 @@ export default function ScienceGrid() {
 
   return (
     <Fragment>
-      {checking && <StatusPill busy text="جارٍ التحقق من الموقع..." />}
-      {checkFlash && <StatusPill text="الموقع متاح" />}
+      {checking && <StatusPill busy text={T.checkingSite} />}
+      {checkFlash && <StatusPill text={T.siteAvailable} />}
       <Dialog
         open={!!unreachableUrl}
-        title="تعذر الوصول إلى الموقع"
-        message="يبدو أن هذا الموقع غير متاح حاليًا."
+        title={T.siteUnreachableTitle}
+        message={T.siteUnreachable}
         onClose={() => setUnreachableUrl(null)}
         // Native: the check is reliable, so "OK" stays the default. Web: CapacitorHttp
         // falls back to fetch, so CORS often makes this a false positive (§14q) —
         // "continue anyway" is emphasized there.
         emphasizeSecondary={!Capacitor.isNativePlatform()}
         secondaryAction={{
-          label: 'المتابعة على أي حال',
+          label: T.continueAnyway,
           onClick: () => {
             const url = unreachableUrl
             setUnreachableUrl(null)
@@ -283,12 +285,12 @@ export default function ScienceGrid() {
       />
       <Dialog
         open={!!blockedUrl}
-        title="تعذّر فتح الرابط تلقائيًا"
-        message="اضغط «فتح» لفتح الرابط."
+        title={T.openBlockedTitle}
+        message={T.openBlocked}
         onClose={() => setBlockedUrl(null)}
         emphasizeSecondary
         secondaryAction={{
-          label: 'فتح',
+          label: T.open,
           onClick: () => {
             const url = blockedUrl
             setBlockedUrl(null)

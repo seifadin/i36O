@@ -88,9 +88,9 @@
   <style id="tailwind">/*@@TAILWIND@@*/</style>   <!-- built from src/day.tailwind.js (scripts/build.js) -->
 </head>
 <body class="i360-page min-h-screen flex flex-col items-center">
-  <header class="toolbar toolbar-sticky">
+  <!--@@TOOLBAR variant="sticky"@@-->
     <!-- The shared theme and numerals (the same order on every i360 page), then the language. -->
-    <div class="tb-start">
+    <!--@@TOOLBAR_START@@-->
       <!--@@SETTINGS_BUTTONS@@-->
       <div class="lang-wrap">
         <!--@@MENU_BUTTON id="btn-lang" icon="dropdown" text-id="lang-short" aria-controls="lang-list"@@-->
@@ -103,11 +103,11 @@
           <!--@@LIST_ITEM id="lang-en" lang="en" dir="ltr" data-lang="en" text="English"@@-->
         <!--@@/POPUP@@-->
       </div>
-    </div>
+    <!--@@/TOOLBAR_START@@-->
     <!--@@TOOLBAR_TITLE data-i18n="title"@@-->Daily Reflection<!--@@/TOOLBAR_TITLE@@-->
     <!-- Inside the installed i360إ app only: back to its home; last, so at the far end in either direction. -->
     <!--@@TOOLBAR_BUTTON id="btn-close" icon="close" hidden@@-->
-  </header>
+  <!--@@/TOOLBAR@@-->
 
   <div class="page safe-area safe-area-top-bar">
   <div class="layout-stable flex flex-col gap-xs mb-lg text-center">
@@ -156,16 +156,16 @@
       <!--@@STATUS_LINE part="prayer" class="mb-md"@@-->
       <!--@@INSET class="flex flex-wrap gap-md text-sm text-custom-secondary p-md"@@-->
         <div class="flex flex-col gap-xs flex-auto">
-          <p><span class="font-bold" data-i18n="methodLabel">Method:</span> <span data-target="meta-method">...</span></p>
+          <p><span class="font-bold" data-i18n="methodLabel">Method:</span> <span data-target="meta-method">…</span></p>
           <p class="flex flex-wrap items-center gap-xs"><span class="font-bold" data-i18n="madhabLabel">Madhab:</span>
             <!--@@CHIP id="school-0" data-school="0" label-i18n="schoolStd"@@-->
             <!--@@CHIP id="school-1" data-school="1" label-i18n="schoolHanafi"@@-->
           </p>
         </div>
         <div class="flex flex-col gap-xs flex-auto">
-          <p class="flex flex-wrap items-center gap-xs"><span class="font-bold" data-i18n="locLabel">Location:</span> <span data-target="meta-location">...</span>
+          <p class="flex flex-wrap items-center gap-xs"><span class="font-bold" data-i18n="locLabel">Location:</span> <span data-target="meta-location">…</span>
             <!--@@BUTTON id="city-change" small data-i18n="cityChange" aria-controls="city-picker" aria-expanded="false"@@--></p>
-          <p><span class="font-bold" data-i18n="tzLabel">Timezone:</span> <span data-target="meta-timezone">...</span></p>
+          <p><span class="font-bold" data-i18n="tzLabel">Timezone:</span> <span data-target="meta-timezone">…</span></p>
         </div>
       <!--@@/INSET@@-->
       <!-- The city picker: Open-Meteo's place search (GeoNames data), asked only from here. -->

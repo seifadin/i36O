@@ -8,6 +8,7 @@ import { $, setLabel } from '../page-chrome.js';
 import { createStore } from '../storage.js';
 import { fetchWithTimeout } from '../net.js';
 import * as ICON from 'i360:icons';
+import { CLASS } from '../components.js';
 
 /* ================================================================
    State and elements
@@ -41,7 +42,7 @@ const search = {
 };
 
 const toolbar = $('toolbar');
-const tbEnd = toolbar.querySelector('.tb-end');
+const tbEnd = toolbar.querySelector(`.${CLASS.toolbarEnd}`);
 const pagesWrapper = $('pages-wrapper');
 const viewerContainer = $('viewer-container');
 const pageNumInput = $('page-num-input');

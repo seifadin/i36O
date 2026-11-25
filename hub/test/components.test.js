@@ -18,12 +18,14 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const markup = (html) => html.replace(/<(style|script)\b[^>]*>[\s\S]*?<\/\1>/g, '');
 
 // Every shared component's own class: only its builder writes it.
-const COMPONENT_CLASS = /(?<![\w-])(toolbar-btn|tb-title|divider|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast))(?![\w-])/;
+const COMPONENT_CLASS = /(?<![\w-])(toolbar-btn|toolbar-menu|tb-(?:title|start|main|end|group)|divider|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast))(?![\w-])/;
+// The bar itself, in a page's HTML (in a script, "toolbar" is also the Reader's id for it).
+const BAR_CLASS = /(?<![\w-])toolbar(?![\w-])/;
 
 test('components: no page writes a shared component itself — in its HTML each names its placeholder', () => {
   for (const page of PAGES) {
     const html = markup(fs.readFileSync(path.join(SRC, page), 'utf8'));
-    const found = [...html.matchAll(/class="([^"]*)"/g)].map((m) => m[1].match(COMPONENT_CLASS)).filter(Boolean);
+    const found = [...html.matchAll(/class="([^"]*)"/g)].map((m) => m[1].match(COMPONENT_CLASS) || m[1].match(BAR_CLASS)).filter(Boolean);
     assert.deepEqual(found.map((m) => m[1]), [], `${page}: hand-written component(s) — use their placeholders`);
   }
 });
@@ -108,6 +110,21 @@ test('components: each builder writes one fixed structure, attributes in one ord
   assert.throws(() => C.field({ kind: 'date' }), /search, number or select/);
   assert.throws(() => C.box('popup', { tag: 'section' }), /a popup is a div/);
   assert.throws(() => C.box('sidebar'), /no container/);
+});
+
+test('components: the toolbar and its parts — a header (the app\'s: a div), its variant its own modifier class', () => {
+  assert.equal(C.box('toolbar', { variant: 'sticky', html: 'x' }), '<header class="toolbar toolbar-sticky">x</header>');
+  assert.equal(C.box('toolbar', { id: 'toolbar' }), '<header class="toolbar" id="toolbar"></header>');
+  assert.equal(C.box('toolbar', { tag: 'div', variant: 'bottom', class: 'justify-between' }), '<div class="toolbar toolbar-bottom justify-between"></div>');
+  assert.throws(() => C.box('toolbar', { variant: 'floating' }), /no variant/);
+  assert.throws(() => C.box('card', { variant: 'sticky' }), /no variant/);
+  assert.equal(C.box('toolbarStart'), '<div class="tb-start"></div>');
+  assert.equal(C.box('toolbarMain'), '<div class="tb-main"></div>');
+  assert.equal(C.box('toolbarEnd'), '<div class="tb-end"></div>');
+  assert.equal(C.box('toolbarGroup', { id: 'g' }), '<div class="tb-group" id="g"></div>');
+  assert.equal(C.box('toolbarMenu', { id: 'm', hidden: true }), '<div class="toolbar-menu" id="m" hidden></div>');
+  assert.equal(writeComponents('<!--@@TOOLBAR variant="sticky"@@--><!--@@TOOLBAR_START@@-->s<!--@@/TOOLBAR_START@@--><!--@@TOOLBAR_MENU id="m" hidden@@--><!--@@TOOLBAR_GROUP id="g"@@-->x<!--@@/TOOLBAR_GROUP@@--><!--@@/TOOLBAR_MENU@@--><!--@@/TOOLBAR@@-->'),
+    '<header class="toolbar toolbar-sticky"><div class="tb-start">s</div><div class="toolbar-menu" id="m" hidden><div class="tb-group" id="g">x</div></div></header>');
   assert.throws(() => C.labelButton({ id: 'l', text: 't' }), /needs icon and text/);
   assert.throws(() => C.menuButton({ id: 'm', icon: SVG('x') }), /needs icon, textId and aria-controls/);
 });

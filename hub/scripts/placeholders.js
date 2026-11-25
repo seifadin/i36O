@@ -15,7 +15,8 @@
 //   <!--@@BUTTON id="btn-expand" icon="expandAll" label="…" small@@-->  (or text="…"; primary; type="submit")
 //   <!--@@LIST_ITEM id="lang-ar" lang="ar" data-lang="ar" text="العربية"@@-->
 //   <!--@@CARD id="quran-card" class="…"@@--> …the page's own contents… <!--@@/CARD@@-->
-//   (likewise INSET, POPUP, BANNER and TOAST; tag="…" where the container allows another element)
+//   (likewise INSET, POPUP, BANNER, TOAST and the toolbar's: TOOLBAR variant="sticky", TOOLBAR_START,
+//   TOOLBAR_MAIN, TOOLBAR_END, TOOLBAR_GROUP, TOOLBAR_MENU; tag="…" where the container allows another element)
 //   <!--@@CARD_HEADER tone="quran" icon="verse" data-i18n="quranLabel" text="Quranic Verse" class="mb-md"@@-->
 //   <!--@@STATUS_LINE part="quran" class="mt-md"@@-->
 //
@@ -35,6 +36,12 @@ const PAIRED = Object.freeze({
   POPUP: (a, inner) => C.box('popup', { ...a, html: inner }),
   BANNER: (a, inner) => C.box('banner', { ...a, html: inner }),
   TOAST: (a, inner) => C.box('toast', { ...a, html: inner }),
+  TOOLBAR: (a, inner) => C.box('toolbar', { ...a, html: inner }),
+  TOOLBAR_START: (a, inner) => C.box('toolbarStart', { ...a, html: inner }),
+  TOOLBAR_MAIN: (a, inner) => C.box('toolbarMain', { ...a, html: inner }),
+  TOOLBAR_END: (a, inner) => C.box('toolbarEnd', { ...a, html: inner }),
+  TOOLBAR_GROUP: (a, inner) => C.box('toolbarGroup', { ...a, html: inner }),
+  TOOLBAR_MENU: (a, inner) => C.box('toolbarMenu', { ...a, html: inner }),
 });
 // Its contents hold no opening of the same container, so the innermost pair is written first.
 const pairedPattern = (name) => new RegExp(`<!--@@${name}((?:\\s+[a-z0-9-]+(?:="[^"]*")?)*)\\s*@@-->((?:(?!<!--@@${name}[\\s@])[\\s\\S])*?)<!--@@\\/${name}@@-->`, 'g');

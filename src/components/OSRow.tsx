@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, CSSProperties } from 'react'
 import { ICON, THEME_ICON } from '@/lib/icons'
-import { Popup, ToolbarButton } from '@/components/shared'
+import { Popup, Toolbar, ToolbarButton, ToolbarStart } from '@/components/shared'
 import type { Numerals, ThemeChoice } from '@i360/theme-loader'
 import { dayFirstToNumeric } from '@i360/dates'
 import { getOtaBuild } from '@/lib/feedbackReport'
@@ -10,14 +10,17 @@ import { useDataCache } from '@/store/dataCache'
 import { detectOS, isDesktop, resolveEffectiveOS } from '@/hooks/usePlatform'
 import { AndroidIcon, AppleIcon, GoogleIcon, HuaweiIcon } from './BrandIcons'
 import Dialog from './Dialog'
+import { APP } from '@i360/locales'
+
+const T = APP.ar
 
 const TOOLTIP_MS = 1500 // how long a toggle's tooltip stays up
 
 // Fallback only — VersionMenu prefers the live Baserow `Version` field (i360dbc).
 // Deliberately placeholder-looking ("إصدار -"), so the moment before data loads
 // doesn't look like a real version number.
-const AppVersionFallback = 'إصدار -'
-const AppDeveloper = '© 2013 سيف الدين س. إبراهيم'
+const AppVersionFallback = T.versionUnknown
+const AppDeveloper = T.developer
 
 // Layout order: OS_WebToggle (leftmost) → MobileServicesToggle → [NumeralsButton,
 // ThemeButton, VersionMenu] (rightmost group)
@@ -189,7 +192,7 @@ export default function OSRow() {
   const osIcon = state.useWeb
     ? <ICON.web />
     : effectiveOS === 'ios' ? <AppleIcon /> : <AndroidIcon />
-  const osAriaLabel = state.useWeb ? 'ويب' : effectiveOS === 'ios' ? 'آبل' : 'أندرويد'
+  const osAriaLabel = state.useWeb ? T.web : effectiveOS === 'ios' ? T.apple : T.android
 
   // Middle slot, two distinct controls (never both):
   //
@@ -198,7 +201,7 @@ export default function OSRow() {
   const realOS = detectOS()
   const showBinaryServicesToggle = !state.useWeb && realOS === 'android'
   const hmsIcon = state.useHMS ? <HuaweiIcon /> : <GoogleIcon />
-  const hmsAriaLabel = state.useHMS ? 'هواوي' : 'جوجل'
+  const hmsAriaLabel = state.useHMS ? T.huawei : T.google
 
   // Desktop simulator — a three-way cycle: Google → Huawei → Apple → …
   // (the first tap does what the binary switch does). Each state is an explicit PAIR write so no
@@ -210,7 +213,7 @@ export default function OSRow() {
   // a real Chinese iPhone does (Apple store links + Huawei services).
   const isSimulating = isDesktop() && !state.useWeb
   const simIcon = state.simIOS ? <AppleIcon /> : state.useHMS ? <HuaweiIcon /> : <GoogleIcon />
-  const simAriaLabel = state.simIOS ? 'آبل' : state.useHMS ? 'هواوي' : 'جوجل'
+  const simAriaLabel = state.simIOS ? T.apple : state.useHMS ? T.huawei : T.google
   // Knob stop mirrors the cycle order, RTL first-is-right: Google=0
   // (right), Huawei=1 (center), Apple=2 (left) — each tap slides the knob
   // one stop leftward, wrapping back to the right.
@@ -222,7 +225,7 @@ export default function OSRow() {
   }
 
   return (
-    <div className={`toolbar toolbar-bottom justify-between${isSimulating ? ' bg-brand-highlight' : ''}`}>
+    <Toolbar variant="bottom" className={`justify-between${isSimulating ? ' bg-brand-highlight' : ''}`}>
 
       {/* Right group: VersionMenu — rightmost (first in HTML for RTL) — then
           the shared theme's theme and numerals buttons, the order of every i360
@@ -232,13 +235,13 @@ export default function OSRow() {
           every i360 toolbar's (hub/src/page-chrome.css, imported by index.css):
           height, widths, tap areas, colours, focus ring; the simulator keeps
           its own highlight. */}
-      <div className="tb-start">
-        <ToolbarButton icon={<ICON.menu />} label="معلومات الإصدار" onClick={() => setVersionOpen(true)} />
+      <ToolbarStart>
+        <ToolbarButton icon={<ICON.menu />} label={T.versionInfo} onClick={() => setVersionOpen(true)} />
         <ToolbarButton icon={<ThemeIcon />} label={i360Theme.themeLabel(choice)} onClick={() => { i360Theme.cycle() }} />
         <ToolbarButton className="numerals-btn" label={i360Theme.numeralsLabel(numerals)} data-i360-digits="keep" onClick={() => { i360Theme.cycleNumerals() }}>
           {i360Theme.NUMERALS_SAMPLE[numerals]}
         </ToolbarButton>
-      </div>
+      </ToolbarStart>
 
       {/* Middle — real Android: the original binary Google/Huawei switch */}
       {showBinaryServicesToggle && (
@@ -278,7 +281,7 @@ export default function OSRow() {
 
       <Dialog
         open={versionOpen}
-        title="معلومات التطبيق"
+        title={T.appInfo}
         message={
           <>
             {appVersion}
@@ -298,6 +301,6 @@ export default function OSRow() {
         }
         onClose={handleVersionClose}
       />
-    </div>
+    </Toolbar>
   )
 }

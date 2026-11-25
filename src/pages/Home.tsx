@@ -3,6 +3,7 @@ import OSRow from '@/components/OSRow'
 import SearchBar from '@/components/SearchBar'
 import ScienceGrid from '@/components/ScienceGrid'
 import OrnamentDivider from '@/components/OrnamentDivider'
+import { APP } from '@i360/locales'
 
 // Header sizing (§14i, §15al): the header is drawn, off-screen, at each of the theme's four text
 // sizes, largest first, and the largest whose real rendered width fits the space available is used —
@@ -10,7 +11,7 @@ import OrnamentDivider from '@/components/OrnamentDivider'
 const HEADER_STEPS = ['text-xl', 'text-lg', 'text-base', 'text-sm'] as const
 type HeaderStep = (typeof HEADER_STEPS)[number]
 
-const HEADER_TITLE = 'الموسوعة الإسلامية إi360'
+const HEADER_TITLE = APP.ar.title
 
 // A measurement-imprecision cushion, not a width guess: a real device measured a
 // dead-even 328/328, and a zero-margin tie can tip either way when rendered.
@@ -128,7 +129,7 @@ export default function Home() {
         <span aria-hidden="true">&#xFD3F;</span>
         <img
           src="/assets/icons/logo-512.png"
-          alt="i360إ"
+          alt={APP.ar.logoAlt}
           className="h-[1.33em] w-[1.33em] object-contain shrink-0"
         />
         <span>{HEADER_TITLE}</span>

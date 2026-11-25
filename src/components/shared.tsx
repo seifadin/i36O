@@ -70,6 +70,16 @@ export function Toast({ className, children, ...rest }: BoxProps) {
   return <div className={cx('i360-toast', className)} role="status" aria-live="polite" {...rest}>{children}</div>
 }
 
+// A toolbar (hub: box('toolbar')): the app's is the bottom one (variant 'bottom'); its parts below.
+export function Toolbar({ variant, className, children, ...rest }: BoxProps & { variant?: 'sticky' | 'bottom' }) {
+  return <div className={cx(variant ? `toolbar toolbar-${variant}` : 'toolbar', className)} {...rest}>{children}</div>
+}
+
+// A toolbar's start (hub: box('toolbarStart')): its settings — ⋮, theme, numerals.
+export function ToolbarStart({ className, children, ...rest }: BoxProps) {
+  return <div className={cx('tb-start', className)} {...rest}>{children}</div>
+}
+
 // A field's look round a field and its buttons (hub: box('fieldBox')) — the search bar.
 export function FieldBox({ className, children, ...rest }: BoxProps) {
   return <div className={cx('i360-field i360-field-search', className)} {...rest}>{children}</div>

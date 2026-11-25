@@ -6,7 +6,7 @@ import * as CseIndex from '../cse-index.js';
 import * as CseView from '../cse-view.js';
 import { fetchWithTimeout } from '../net.js';
 import { LIB } from '../sites.js';
-import { $, IN_APP, drawSettingsButtons, el, fromMarkup, setupClose, wireSettingsButtons } from '../page-chrome.js';
+import { $, IN_APP, drawSettingsButtons, el, fromMarkup, setPressed, setupClose, wireSettingsButtons } from '../page-chrome.js';
 import { CLASS, box as componentBox, button, listItem } from '../components.js';
 import { CSE as LOCALES } from '../locales.js';
 import { numericDate } from '../dates.js';
@@ -138,8 +138,6 @@ function setRobots(q) {
 }
 
 /* ---------------- Searching ---------------- */
-function setOption(btn, on) { btn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
-
 async function search(raw, { push = false } = {}) {
   const run = ++state.run;
   const q = raw.trim();
@@ -407,11 +405,11 @@ form.addEventListener('submit', (e) => {
   search(input.value, { push: true });
 });
 btnExact.addEventListener('click', () => {
-  state.exact = !state.exact; setOption(btnExact, state.exact);
+  state.exact = !state.exact; setPressed(btnExact, state.exact);
   if (input.value.trim()) search(input.value);
 });
 btnWord.addEventListener('click', () => {
-  state.word = !state.word; setOption(btnWord, state.word);
+  state.word = !state.word; setPressed(btnWord, state.word);
   if (input.value.trim()) search(input.value);
 });
 // Theme and numerals: the shared i360 choices, also followed when another app or tab changes them.
@@ -433,7 +431,7 @@ window.addEventListener('popstate', () => fromAddress());
 function fromAddress() {
   const a = CseView.readAddress(window.location.search, window.location.hostname, window.location.protocol);
   state.exact = a.exact; state.word = a.word;
-  setOption(btnExact, a.exact); setOption(btnWord, a.word);
+  setPressed(btnExact, a.exact); setPressed(btnWord, a.word);
   input.value = a.q;
   search(a.q);
 }

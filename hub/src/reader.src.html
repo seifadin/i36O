@@ -498,27 +498,27 @@
        «الصفحة الأصلية» and reading mode; end: search, contents, the title, ✕ (in the app only).
        What folds into ⋮ (its <template data-slot> places), in which order: READER_FOLD,
        src/reader/panel.js. -->
-  <header class="toolbar" id="toolbar">
-    <div class="tb-start">
+  <!--@@TOOLBAR id="toolbar"@@-->
+    <!--@@TOOLBAR_START@@-->
       <!--@@TOOLBAR_BUTTON id="btn-more" icon="menu" aria-controls="more-menu" aria-expanded="false"@@-->
       <!--@@SETTINGS_BUTTONS@@-->
       <!--@@DIVIDER@@-->
       <span class="status-icon" id="status-icon" role="img"></span>
       <!--@@LABEL_BUTTON id="btn-open-file" icon="openFile" text="Open file" label-id="open-file-label"@@-->
-    </div>
+    <!--@@/TOOLBAR_START@@-->
 
-    <div class="tb-main">
-      <div class="tb-group" id="group-text">
+    <!--@@TOOLBAR_MAIN@@-->
+      <!--@@TOOLBAR_GROUP id="group-text"@@-->
         <!--@@TOOLBAR_BUTTON id="btn-text-smaller" class="text-size-btn" dir="ltr"@@-->
         <!--@@TOOLBAR_BUTTON id="btn-text-larger" class="text-size-btn" dir="ltr"@@-->
-      </div>
-      <div class="tb-group" id="group-zoom">
+      <!--@@/TOOLBAR_GROUP@@-->
+      <!--@@TOOLBAR_GROUP id="group-zoom"@@-->
         <!--@@TOOLBAR_BUTTON id="btn-zoom-out" icon="zoomOut"@@-->
         <!--@@TOOLBAR_BUTTON id="btn-zoom-in" icon="zoomIn"@@-->
         <!--@@TOOLBAR_BUTTON id="btn-fit-width" icon="fitWidth"@@-->
         <!--@@TOOLBAR_BUTTON id="btn-fit-page" icon="fitPage"@@-->
-      </div>
-      <div class="tb-group" id="group-nav">
+      <!--@@/TOOLBAR_GROUP@@-->
+      <!--@@TOOLBAR_GROUP id="group-nav"@@-->
         <!--@@TOOLBAR_BUTTON id="btn-nav-left" icon="pageLeft"@@-->
         <div class="page-counter">
           <!--@@FIELD kind="select" id="vol-select" class="vol-select" hidden@@-->
@@ -528,38 +528,38 @@
           <span id="page-pos" class="page-pos"></span>
         </div>
         <!--@@TOOLBAR_BUTTON id="btn-nav-right" icon="pageRight"@@-->
-      </div>
+      <!--@@/TOOLBAR_GROUP@@-->
       <!--@@DIVIDER@@-->
       <!--@@TOOLBAR_BUTTON id="btn-copy-link" icon="copyLink" hidden@@-->
-      <div class="tb-group" id="group-mark">
+      <!--@@TOOLBAR_GROUP id="group-mark"@@-->
         <template data-slot="copy-link"></template>
         <!--@@TOOLBAR_BUTTON id="btn-bookmark" icon="bookmark" aria-pressed="false"@@-->
-      </div>
-      <div class="tb-group" id="group-acts">
+      <!--@@/TOOLBAR_GROUP@@-->
+      <!--@@TOOLBAR_GROUP id="group-acts"@@-->
         <!--@@TOOLBAR_BUTTON id="btn-scan" icon="originalPage" hidden@@-->
         <!--@@TOOLBAR_BUTTON id="btn-reading" icon="readingMode"@@-->
-      </div>
-    </div>
+      <!--@@/TOOLBAR_GROUP@@-->
+    <!--@@/TOOLBAR_MAIN@@-->
 
-    <div class="tb-end">
+    <!--@@TOOLBAR_END@@-->
       <!--@@TOOLBAR_BUTTON id="btn-search-toggle" icon="search" aria-controls="search-popup" aria-expanded="false"@@-->
       <!--@@TOOLBAR_BUTTON id="btn-panel" icon="contents" aria-controls="side-panel" aria-expanded="false"@@-->
       <!--@@TOOLBAR_TITLE id="tb-title"@@--><!--@@/TOOLBAR_TITLE@@-->
       <!--@@TOOLBAR_BUTTON id="btn-close" icon="close" hidden@@-->
-    </div>
+    <!--@@/TOOLBAR_END@@-->
 
     <!-- The ⋮ menu: what doesn't fit on the bar folds into its slots (fittingToolbar, src/page-chrome.js). -->
-    <div class="toolbar-menu" id="more-menu" hidden>
+    <!--@@TOOLBAR_MENU id="more-menu" hidden@@-->
       <template data-slot="volume"></template>
-      <div class="tb-group" id="group-fold"><template data-slot="fold-row"></template></div>
+      <!--@@TOOLBAR_GROUP id="group-fold"@@--><template data-slot="fold-row"></template><!--@@/TOOLBAR_GROUP@@-->
       <template data-slot="zoom"></template>
       <template data-slot="text"></template>
       <template data-slot="actions"></template>
-      <div class="tb-group" id="group-view">
+      <!--@@TOOLBAR_GROUP id="group-view"@@-->
         <!--@@TOOLBAR_BUTTON id="btn-dir-toggle"@@-->
-      </div>
-    </div>
-  </header>
+      <!--@@/TOOLBAR_GROUP@@-->
+    <!--@@/TOOLBAR_MENU@@-->
+  <!--@@/TOOLBAR@@-->
 
   <!-- Progress while a book downloads and while its pages are built: a row of its own
        under the toolbar, so it never covers the book. -->

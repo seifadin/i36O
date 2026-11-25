@@ -5,7 +5,7 @@
 import * as i360Theme from '../../theme/site/theme-loader.js';
 import * as LibCopy from '../lib-copy.js';
 import { fetchWithTimeout } from '../net.js';
-import { setupClose } from '../page-chrome.js';
+import { setPressed, setupClose } from '../page-chrome.js';
 import { TEXT_SCALES } from './constants.js';
 import { btnClose, btnOpenFile, btnSearchList, checkConnection, fileInput, hashText, optDiacritics, optWord, parseBook, search, state, storeGet, wireState } from './state.js';
 import { renderDocument, setProgress, wirePages } from './pages.js';
@@ -14,7 +14,7 @@ import { renderEmpty, wireLibrary } from './library.js';
 import { applyLocalization, setTextScale, setZoom, updatePageWidth, wireView } from './view.js';
 import { wireNav } from './nav.js';
 import { fitToolbar, wirePanel } from './panel.js';
-import { setOption, wireSearch } from './search.js';
+import { wireSearch } from './search.js';
 
 /* ================================================================
    Opening files
@@ -37,9 +37,9 @@ async function initApp() {
   const scale = Number(storeGet('textScale', 1));
   search.exact = storeGet('searchExact', false) === true;
   search.word = storeGet('searchWord', false) === true;
-  setOption(optDiacritics, search.exact);
-  setOption(optWord, search.word);
-  setOption(btnSearchList, false);
+  setPressed(optDiacritics, search.exact);
+  setPressed(optWord, search.word);
+  setPressed(btnSearchList, false);
 
   fitToolbar();
   updatePageWidth();

@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as CseIndex from '../src/cse-index.js';
 import * as SearchCore from '../src/search-core.js';
+import { pageLabel } from '../src/cse-view.js';
 
 async function search(distDir, raw, opts = {}) {
   const { buildId } = JSON.parse(readFileSync(join(distDir, 'latest.json'), 'utf8'));
@@ -20,11 +21,6 @@ async function search(distDir, raw, opts = {}) {
   const candidates = await searcher.candidates(raw);
   const hits = await searcher.confirm(candidates, raw, opts);
   return { catalog, candidates: candidates.length, hits, groups: CseIndex.groupResults(hits) };
-}
-
-function pageLabel(h) {
-  if (!h.label) return h.source.pageCount > 1 ? `(${h.local + 1})` : '';
-  return h.vol ? `ج ${h.vol} ص ${h.label}` : `ص ${h.label}`;
 }
 
 async function main() {
@@ -57,6 +53,6 @@ async function main() {
   }
 }
 
-export { search, pageLabel };
+export { search };
 
 if (process.argv[1] === import.meta.filename) main().catch((e) => { console.error(e.message); process.exitCode = 1; });

@@ -50,6 +50,9 @@
       ],
       "@i360/components": [
         "./hub/src/components.js"
+      ],
+      "@i360/locales": [
+        "./hub/src/locales.js"
       ]
     },
     "noImplicitReturns": true,

@@ -21,6 +21,9 @@
    An ES module (bundled into the CSE page, imported by the indexer). */
 import * as SearchCore from './search-core.js';
 
+// A Baserow ID as a number for sorting (strings and numbers both arrive, §3); a missing one sorts last.
+const num = (v) => (v === '' || v == null || Number.isNaN(Number(v)) ? Infinity : Number(v));
+
 const FORMAT = 1;
 const SHARDS = 1024;
 const MIN_QUERY = 3;           // normalized characters, spaces included
@@ -277,7 +280,6 @@ function groupResults(hits) {
       I.sources.get(h.source.key).pages.push(h);
     }
   }
-  const num = (v) => (v === '' || v == null || Number.isNaN(Number(v)) ? Infinity : Number(v));
   return [...majors.values()].sort((a, b) => num(a.majorId) - num(b.majorId)).map((M) => ({
     major: M.major,
     intermediates: [...M.inters.values()].sort((a, b) => num(a.intermediateId) - num(b.intermediateId)).map((I) => ({
@@ -287,4 +289,4 @@ function groupResults(hits) {
   }));
 }
 
-export { FORMAT, SHARDS, MIN_QUERY, searchPage, trigrams, shardOf, shardName, queryTrigrams, intersect, encodeShard, decodeShard, createSearcher, groupResults };
+export { FORMAT, SHARDS, MIN_QUERY, searchPage, trigrams, shardOf, shardName, queryTrigrams, intersect, encodeShard, decodeShard, createSearcher, groupResults, num };

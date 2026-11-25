@@ -1,6 +1,6 @@
 // The Reader: the toast, the reading position kept per book, links to a page (#p=…), and
 // page bookmarks.
-import { IN_APP } from '../page-chrome.js';
+import { IN_APP, setPressed } from '../page-chrome.js';
 import { MD_READER_KEY, createStore } from '../storage.js';
 import { POSITIONS_MAX, SAVE_DEBOUNCE_MS, TOAST_MS } from './constants.js';
 import { btnBookmark, sidePanel, state, storeGet, storeSet, t, toWestern, toastEl } from './state.js';
@@ -178,7 +178,7 @@ function applyBookmarkRibbons() {
 function updateBookmarkButton(set) {
   const idx = findCurrentIdx();
   const on = idx >= 0 && (set || bookmarkedSet()).has(idx);
-  btnBookmark.setAttribute('aria-pressed', on ? 'true' : 'false');
+  setPressed(btnBookmark, on);
   btnBookmark.title = on ? t().bookmarkRemove : t().bookmarkAdd;
   btnBookmark.setAttribute('aria-label', btnBookmark.title);
   btnBookmark.disabled = idx < 0 || !state.bookKey;

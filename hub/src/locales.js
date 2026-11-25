@@ -1,9 +1,80 @@
 // Every hub page's interface text, in each language it offers: one section per page, each
-// language beside the others (claude/i360-hub.md §10). The theme and numerals buttons' text
+// language beside the others (claude/i360-hub.md §10) — and the i360إ app's (APP, Arabic only;
+// alias @i360/locales). The theme and numerals buttons' text
 // is the theme loader's (theme/site/theme-loader.js), and the Hijri date's labels are
 // hijri/calc.js's: both are shared beyond these pages. Each page picks its own language:
 // the Reader by the book's direction, Daily Reflection by the visitor's choice.
 // Bundled into each page by scripts/build.js; a page carries only its own section.
+
+// The i360إ app (Arabic only): its home, search bar, science list, notices, crash screen and
+// reports. Its build keeps only this section.
+export const APP = {
+  ar: {
+    title: 'الموسوعة الإسلامية إi360',
+    logoAlt: 'i360إ',
+    ok: 'موافق',
+    open: 'فتح',
+    // The search bar
+    search: 'بحث',
+    searchPlaceholder: 'بحث … أو الآية#.السورة#',
+    searchOptions: 'خيارات البحث',
+    searchOnlyArmed: 'وضع البحث المباشر مفعّل، اضغط للإلغاء',
+    verseDetected: 'تم اكتشاف رقم آية، اضغط للبحث العادي بدلاً من ذلك',
+    invalidInput: 'إدخال غير صالح',
+    noExegesis: 'لم يتم العثور على تفسير لهذه الآية',
+    linkOpenFailed: 'تعذّر فتح الرابط',
+    translating: 'جارٍ الترجمة',
+    openingResults: 'جارٍ فتح النتائج',
+    assistant: 'المساعد الذكي',
+    assistantFailed: 'تعذّر فتح المساعد الذكي',
+    keyboard: 'لوحة المفاتيح',
+    keyboardFailed: 'تعذّر فتح لوحة المفاتيح',
+    // The science list
+    attachment: 'فتح الملحق',
+    loading: 'جارٍ التحميل…',
+    retrying: 'إعادة المحاولة…',
+    loadError: 'تعذّر تحميل البيانات',
+    checkingSite: 'جارٍ التحقق من الموقع…',
+    siteAvailable: 'الموقع متاح',
+    siteUnreachableTitle: 'تعذّر الوصول إلى الموقع',
+    siteUnreachable: 'يبدو أن هذا الموقع غير متاح حاليًا.',
+    continueAnyway: 'المتابعة على أي حال',
+    openBlockedTitle: 'تعذّر فتح الرابط تلقائيًا',
+    openBlocked: 'اضغط «فتح» لفتح الرابط.',
+    // Notices at start
+    privacyTitle: 'سلامة البيانات',
+    privacy: 'لا يتم جمع البيانات (غير الوظيفية) أو مشاركتها. سياسة الخصوصية: https://tinyurl.com/i360Privacy',
+    editionTitle: 'طبعة جديدة',
+    edition: 'تمت إضافة / تعديل محتوى مُحدَّث لإثراء تجربتك',
+    versionTitle: 'إصدار جديد',
+    version: 'تم إطلاق إصدار مُحدَّث لإثراء تجربتك',
+    revisionTitle: 'مراجعة جديدة',
+    revision: 'تم إضافة / تعديل فهرسة تفسير مُحدَّث لإثراء تجربتك',
+    rollbackTitle: 'تم التراجع عن آخر تحديث',
+    rollback: 'واجه آخر تحديث للتطبيق مشكلة، فتم التراجع تلقائيًا إلى النسخة السابقة العاملة.',
+    // The crash screen and reports
+    crashTitle: 'حدث خطأ غير متوقع',
+    crash: 'يرجى إعادة تحميل الصفحة',
+    reload: 'إعادة التحميل',
+    report: 'الإبلاغ عن المشكلة',
+    copyDetails: 'نسخ تفاصيل الخطأ',
+    copied: 'تم النسخ',
+    copiedAndMailOpened: 'تم النسخ، وفُتح تطبيق البريد',
+    reportCrash: 'تقرير خطأ - i360إ',
+    reportRollback: 'تقرير تراجع تحديث - i360إ',
+    reportDataLoad: 'تقرير تعذّر تحميل البيانات - i360إ',
+    // The bottom bar and «معلومات التطبيق»
+    versionInfo: 'معلومات الإصدار',
+    appInfo: 'معلومات التطبيق',
+    versionUnknown: 'إصدار -',
+    developer: '© 2013 سيف الدين س. إبراهيم',
+    web: 'ويب',
+    apple: 'آبل',
+    android: 'أندرويد',
+    huawei: 'هواوي',
+    google: 'جوجل'
+  }
+};
 
 // The i360 CSE (Arabic only).
 export const CSE = {
@@ -76,7 +147,7 @@ export const READER = {
     copyFailed: 'تعذّر النسخ',
     volume: 'الجزء',
     search: 'بحث في المستند (Ctrl+F)',
-    searchInput: 'بحث في النص...',
+    searchInput: 'بحث في النص…',
     prevMatch: 'النتيجة السابقة (Shift+Enter)',
     nextMatch: 'النتيجة التالية (Enter)',
     showResults: 'قائمة النتائج',
@@ -142,7 +213,7 @@ export const READER = {
     copyFailed: 'Could not copy',
     volume: 'Volume',
     search: 'Search within document (Ctrl+F)',
-    searchInput: 'Search text...',
+    searchInput: 'Search text…',
     prevMatch: 'Previous match (Shift+Enter)',
     nextMatch: 'Next match (Enter)',
     showResults: 'Results list',

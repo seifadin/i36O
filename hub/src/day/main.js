@@ -8,7 +8,7 @@ import * as i360Theme from '../../theme/site/theme-loader.js';
 import * as HijriCalc from '../../hijri/calc.js';
 import * as HijriClient from '../../hijri/client.js';
 import DAY_CITIES from '../day-cities.json';
-import { $, drawSettingsButtons, el, fromMarkup, setLabel, setupClose, wireSettingsButtons } from '../page-chrome.js';
+import { $, drawSettingsButtons, el, fromMarkup, setLabel, setPressed, setupClose, wireSettingsButtons } from '../page-chrome.js';
 import { box as componentBox, listItem } from '../components.js';
 import { oncePerFrame } from '../frame.js';
 import { createStore } from '../storage.js';
@@ -30,6 +30,7 @@ const CONFIG = {
   HADEETH_EXCLUDE_ROOTS: ['2'],
   EDITIONS: { quran: { ar: 'ar.jalalayn', en: 'en.sahih', tr: 'tr.ates', id: 'id.indonesian', ur: 'ur.ahmedali' } },
   REVEAL_STAGGER_MS: 120,   // the cards enter one after another, this far apart
+  CITY_SEARCH_DEBOUNCE_MS: 500,   // the city search asks Open-Meteo once typing pauses this long
   P_KEYS: ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'],
   P_NEXT_KEYS: ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'],   // Sunrise is shown but is not a prayer
   // Arabic Gregorian months also by their Levantine names (كانون الثاني …), from the browser's own
@@ -322,7 +323,7 @@ const Picker = {
     this.input = $('city-search');
     this.btn = $('city-change');
     this.btn.addEventListener('click', () => this.toggle());
-    this.input.addEventListener('input', () => { clearTimeout(this.timer); this.timer = setTimeout(() => this.search(), 500); });
+    this.input.addEventListener('input', () => { clearTimeout(this.timer); this.timer = setTimeout(() => this.search(), CONFIG.CITY_SEARCH_DEBOUNCE_MS); });
     this.input.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.toggle(false); });
   },
   toggle(on = !this.open) {
@@ -566,7 +567,7 @@ const UI = {
     const L = this.L, lang = App.lang;
     document.documentElement.lang = lang; document.documentElement.dir = L.dir;
     document.querySelectorAll('[data-i18n]').forEach(node => { node.textContent = L[node.dataset.i18n] || LOCALES.en[node.dataset.i18n]; });
-    document.querySelectorAll('[data-lang]').forEach(node => { const on = node.dataset.lang === lang; node.classList.toggle('active-btn', on); node.setAttribute('aria-pressed', on); });
+    document.querySelectorAll('[data-lang]').forEach(node => { const on = node.dataset.lang === lang; node.classList.toggle('active-btn', on); setPressed(node, on); });
     const lb = $('btn-lang'), cur = $(`lang-${lang}`);
     $('lang-short').textContent = LANG_SHORT[lang];
     setLabel(lb, `${L.language}: ${cur.textContent}`);
@@ -592,7 +593,7 @@ const UI = {
       link('Adhan', 'https://github.com/batoulapps/adhan-js'));
   },
   renderSchool() {
-    [0, 1].forEach(s => { const b = $(`school-${s}`); if (!b) return; const on = App.school === s; b.setAttribute('aria-pressed', on); });
+    [0, 1].forEach(s => { const b = $(`school-${s}`); if (!b) return; const on = App.school === s; setPressed(b, on); });
   },
   renderHijri() {
     const L = this.L, h = App.state.hijri; if (!h) return;

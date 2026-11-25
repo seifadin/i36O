@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import * as Hub from '@i360/components'
-import { Banner, Button, FieldBox, Popup, Toast, ToolbarButton } from './shared'
+import { Banner, Button, FieldBox, Popup, Toast, Toolbar, ToolbarButton, ToolbarStart } from './shared'
 
 // The app's shared components (shared.tsx) against the hub builders (hub/src/components.js): the
 // same element, classes and attributes for the same inputs. An icon's drawing is left out (each
@@ -36,6 +36,8 @@ describe('the app\'s shared components write the hub builders\' structure', () =
     ['notice', h(Banner, { className: 'm-md' }), Hub.box('banner', { class: 'm-md' })],
     ['notice as a button', h(Banner, { onClick: () => {} }), Hub.box('banner', { tag: 'button' })],
     ['toast', h(Toast, { className: 'fixed' }), Hub.box('toast', { class: 'fixed' })],
+    ['the bottom toolbar', h(Toolbar, { variant: 'bottom', className: 'justify-between' }), Hub.box('toolbar', { tag: 'div', variant: 'bottom', class: 'justify-between' })],
+    ['a toolbar\'s start', h(ToolbarStart), Hub.box('toolbarStart')],
     ['field box', h(FieldBox, { className: 'flex' }), Hub.box('fieldBox', { class: 'flex' })],
   ]
   it.each(cases)('%s', (_, el, hub) => {
@@ -48,7 +50,7 @@ describe('the app\'s shared components write the hub builders\' structure', () =
 })
 
 describe('no app component writes a shared component\'s class itself', () => {
-  const COMPONENT_CLASS = /(?<![\w-])(toolbar-btn|tb-title|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast))(?![\w-])/
+  const COMPONENT_CLASS = /(?<![\w-])(toolbar|toolbar-btn|toolbar-menu|tb-(?:title|start|main|end|group)|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast))(?![\w-])/
   const dir = join(process.cwd(), 'src')
   const files = (readdirSync(dir, { recursive: true }) as string[])
     .filter((f) => f.endsWith('.tsx') && !f.endsWith('shared.tsx'))

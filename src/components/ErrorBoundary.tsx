@@ -1,6 +1,9 @@
 import { Component, ErrorInfo, ReactNode } from 'react'
-import { resolveFeedbackMailto, copyAndEmailReport, REPORT_LABEL, REPORT_SUBJECTS } from '@/lib/feedbackReport'
+import { resolveFeedbackMailto, copyAndEmailReport } from '@/lib/feedbackReport'
 import { Button } from '@/components/shared'
+import { APP } from '@i360/locales'
+
+const T = APP.ar
 
 interface Props {
   children: ReactNode
@@ -51,7 +54,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     // (why clipboard always gets the full text, why the mailto body is
     // trimmed, why the return value is worded to what's actually
     // verifiable).
-    copyAndEmailReport(REPORT_SUBJECTS.crash, this.state.errorDetails)
+    copyAndEmailReport(T.reportCrash, this.state.errorDetails)
     this.setState({ reported: true })
   }
 
@@ -65,8 +68,8 @@ export default class ErrorBoundary extends Component<Props, State> {
       // (reported). Confirmation text stays accurate to what's actually
       // verifiable (see handleReport's own comment on this).
       const reportLabel = reported
-        ? (canEmail ? 'تم النسخ، وفُتح تطبيق البريد' : 'تم النسخ')
-        : (canEmail ? REPORT_LABEL : 'نسخ تفاصيل الخطأ')
+        ? (canEmail ? T.copiedAndMailOpened : T.copied)
+        : (canEmail ? T.report : T.copyDetails)
       return (
         <div
           dir="rtl"
@@ -75,13 +78,13 @@ export default class ErrorBoundary extends Component<Props, State> {
           // crash screen for consistency.
         >
           <p className="text-lg font-bold text-brand-blue">
-            حدث خطأ غير متوقع
+            {T.crashTitle}
           </p>
           <p className="text-base text-brand-blue">
-            يرجى إعادة تحميل الصفحة
+            {T.crash}
           </p>
           <Button primary onClick={() => window.location.reload()}>
-            إعادة التحميل
+            {T.reload}
           </Button>
           <Button className={`transition-colors${reported ? ' border-brand-green text-brand-green' : ''}`} onClick={this.handleReport}>
             {/* aria-live on this inner span, not the button itself —

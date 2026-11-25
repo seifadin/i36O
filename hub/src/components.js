@@ -134,6 +134,15 @@ const BOXES = Object.freeze({
   banner: { cls: 'i360-banner', tags: ['div', 'button'], role: 'status' },
   toast: { cls: 'i360-toast', tags: ['div'], role: 'status', live: 'polite' },
   fieldBox: { cls: 'i360-field i360-field-search', tags: ['div'] },
+  // The toolbar (src/page-chrome.css): the bar, its parts, a group of its buttons and its ⋮ menu.
+  // A bar's variant (sticky: stays at the top while the page scrolls; bottom: the app's) is its own
+  // modifier class, never a page's.
+  toolbar: { cls: 'toolbar', tags: ['header', 'div'], variants: ['sticky', 'bottom'] },
+  toolbarStart: { cls: 'tb-start', tags: ['div'] },
+  toolbarMain: { cls: 'tb-main', tags: ['div'] },
+  toolbarEnd: { cls: 'tb-end', tags: ['div'] },
+  toolbarGroup: { cls: 'tb-group', tags: ['div'] },
+  toolbarMenu: { cls: 'toolbar-menu', tags: ['div'] },
 });
 
 function box(kind, a = {}) {
@@ -141,9 +150,11 @@ function box(kind, a = {}) {
   if (!k) throw new Error(`no container "${kind}"`);
   const tag = a.tag || k.tags[0];
   if (!k.tags.includes(tag)) throw new Error(`a ${kind} is a ${k.tags.join(' or ')}, not a ${tag}`);
+  if (a.variant && !(k.variants || []).includes(a.variant)) throw new Error(`a ${kind} has no variant "${a.variant}"`);
+  const own = a.variant ? `${k.cls} ${k.cls}-${a.variant}` : k.cls;
   const isButton = tag === 'button';
   const all = { ...a, role: a.role ?? (isButton ? undefined : k.role), 'aria-live': a['aria-live'] ?? k.live };
-  return `<${tag} class="${classes(k.cls, a.class)}"${isButton ? ' type="button"' : ''}${attributes(all)}${flags(a)}>${a.html ?? ''}</${tag}>`;
+  return `<${tag} class="${classes(own, a.class)}"${isButton ? ' type="button"' : ''}${attributes(all)}${flags(a)}>${a.html ?? ''}</${tag}>`;
 }
 
 // A card's header (Daily Reflection): its icon on a tile in the card's colour, then its name.
@@ -176,7 +187,8 @@ function statusLine(a = {}) {
 // The component classes a script needs — to turn a component's look on and off (the CSE's status
 // line becomes a banner on an error) or to find components (a toolbar's buttons) — never written
 // out by hand.
-const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
+const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON,
+  toolbarEnd: BOXES.toolbarEnd.cls, toolbarMenu: BOXES.toolbarMenu.cls });
 
 export { toolbarButton, labelButton, menuButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box,
   cardHeader, statusLine, CLASS };

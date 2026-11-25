@@ -10,13 +10,6 @@ import { Science, feedbackMailto } from '@/api/dataSource'
 import { timestamp } from '@i360/dates'
 import { detectOS } from '@/hooks/usePlatform'
 
-// Shared report wording — one definition for every report path.
-export const REPORT_LABEL = 'الإبلاغ عن المشكلة'
-export const REPORT_SUBJECTS = {
-  crash: 'تقرير خطأ - i360إ',
-  otaRollback: 'تقرير تراجع تحديث - i360إ',
-  dataLoad: 'تقرير تعذّر تحميل البيانات - i360إ',
-} as const
 
 // Two-tier lookup, both reading localStorage directly — this needs to work
 // even from ErrorBoundary, which sits ABOVE DataCacheProvider in the tree

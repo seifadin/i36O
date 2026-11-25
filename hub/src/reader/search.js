@@ -1,6 +1,6 @@
 // The Reader: search within the book (src/search-core.js).
 import * as SearchCore from '../search-core.js';
-import { el, fromMarkup } from '../page-chrome.js';
+import { el, fromMarkup, setPressed } from '../page-chrome.js';
 import { listItem } from '../components.js';
 import { BLOCK_SEL, SEARCH_DEBOUNCE_MS, SEARCH_LIST_MAX, SEARCH_MAX_MATCHES, SEARCH_MIN_CHARS, SNIPPET_CHARS } from './constants.js';
 import { btnSearchClose, btnSearchList, btnSearchNext, btnSearchPrev, btnSearchToggle, fmtNum, nextFrame, optDiacritics, optWord, search, searchCount, searchInput, searchPopup, searchResults, state, storeSet, t, viewerContainer } from './state.js';
@@ -201,8 +201,6 @@ function markActiveResult() {
   if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest' });
 }
 
-function setOption(btn, value) { btn.setAttribute('aria-pressed', value ? 'true' : 'false'); }
-
 function openSearch() {
   closeMore();
   searchPopup.classList.add('active');
@@ -222,19 +220,19 @@ function closeSearch() {
 function wireSearch() {
   optDiacritics.addEventListener('click', () => {
     search.exact = !search.exact;
-    setOption(optDiacritics, search.exact);
+    setPressed(optDiacritics, search.exact);
     storeSet('searchExact', search.exact);
     rerunSearch();
   });
   optWord.addEventListener('click', () => {
     search.word = !search.word;
-    setOption(optWord, search.word);
+    setPressed(optWord, search.word);
     storeSet('searchWord', search.word);
     rerunSearch();
   });
   btnSearchList.addEventListener('click', () => {
     search.listOpen = !search.listOpen;
-    setOption(btnSearchList, search.listOpen);
+    setPressed(btnSearchList, search.listOpen);
     renderResultsList();
   });
 
@@ -264,4 +262,4 @@ function wireSearch() {
   });
 }
 
-export { clearSearch, closeSearch, openSearch, performSearch, rerunSearch, setOption, updateSearchCountDisplay, wireSearch };
+export { clearSearch, closeSearch, openSearch, performSearch, rerunSearch, updateSearchCountDisplay, wireSearch };

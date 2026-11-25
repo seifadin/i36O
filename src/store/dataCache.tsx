@@ -13,8 +13,8 @@ import { exegesisRows, findExegesisUrl as findExegesisUrlFn } from '@i360/exeges
 import { deviceStore } from '@/lib/deviceStorage'
 import { hasChanged, commitBaseline } from '@/lib/changeBaseline'
 import { isNetworkFailure } from '@/lib/startupHealth'
+import { APP } from '@i360/locales'
 
-export const LOAD_ERROR = 'تعذّر تحميل البيانات'
 
 // A missing or unreadable cache is treated as absent: a fresh fetch.
 function loadCached<T>(cacheKey: string): T[] | null {
@@ -215,9 +215,9 @@ export function DataCacheProvider({ children }: { children: ReactNode }): JSX.El
         }
       } catch (err) {
         if (!cancelled) {
-          setError(LOAD_ERROR)
+          setError(APP.ar.loadError)
           setLastFailure({
-            message: LOAD_ERROR,
+            message: APP.ar.loadError,
             detail: `${stage}: ${err instanceof Error ? `${err.name}: ${err.message}` : String(err)}`,
             network: isNetworkFailure(err),   // for the OTA safety net (useOtaHealth.ts)
           })

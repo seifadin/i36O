@@ -3,6 +3,7 @@
    here, so it can be tested in Node. An ES module (bundled into
    the CSE page). */
 import { LIB_HOST } from './sites.js';
+import { num } from './cse-index.js';
 // The Reader on the same site as this page (i36o.web.app or the app's own copy).
 // Always /md/index.html: inside the app, Capacitor's server answers /md/ with the app's
 // home page (i360-hub.md §10).
@@ -102,8 +103,6 @@ function resultLink(hit, query, hitText) {
    ID; IDs compared as numbers, as groupSciences() does). Each unit lists
    its candidate pages in order, source by source; the page confirms them
    a step at a time. A source used by several rows shows under each. */
-const num = (v) => (v === '' || v == null || Number.isNaN(Number(v)) ? Infinity : Number(v));
-
 function candidateGroups(searcher, gps) {
   const majors = new Map();
   for (const gp of gps) {

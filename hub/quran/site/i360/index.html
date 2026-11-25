@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-v5bil0tLTSzNMb98dWCbZ9bFZXEGha+xjb/lYOqa5+g='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-9NjG+LG9bNbDk4rLGjMZoSyMnoDTCZHcYU4J8UdleyM='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>القرآن الكريم — مشروع تنزيل</title>
   <meta name="description" content="القرآن الكريم من مشروع تنزيل (tanzil.net)، مع زر لتفسير الآية الظاهرة من فهرس الموسوعة الإسلامية i360إ.">
@@ -936,7 +936,16 @@ svg[data-lucide] {
     popup: { cls: "i360-popup", tags: ["div", "span"] },
     banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
     toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" },
-    fieldBox: { cls: "i360-field i360-field-search", tags: ["div"] }
+    fieldBox: { cls: "i360-field i360-field-search", tags: ["div"] },
+    // The toolbar (src/page-chrome.css): the bar, its parts, a group of its buttons and its ⋮ menu.
+    // A bar's variant (sticky: stays at the top while the page scrolls; bottom: the app's) is its own
+    // modifier class, never a page's.
+    toolbar: { cls: "toolbar", tags: ["header", "div"], variants: ["sticky", "bottom"] },
+    toolbarStart: { cls: "tb-start", tags: ["div"] },
+    toolbarMain: { cls: "tb-main", tags: ["div"] },
+    toolbarEnd: { cls: "tb-end", tags: ["div"] },
+    toolbarGroup: { cls: "tb-group", tags: ["div"] },
+    toolbarMenu: { cls: "toolbar-menu", tags: ["div"] }
   });
   var CARD_TONES = Object.freeze({
     quran: { tile: "bg-quran-soft text-quran", text: "text-quran" },
@@ -945,7 +954,14 @@ svg[data-lucide] {
     converter: { tile: "bg-converter-bg text-converter", text: "text-converter" },
     event: { tile: "bg-event-bg text-event", text: "text-event" }
   });
-  var CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
+  var CLASS = Object.freeze({
+    banner: BOXES.banner.cls,
+    chipLabel: CLASS_CHIP_LABEL,
+    title: TITLE,
+    toolbarButton: TOOLBAR_BUTTON,
+    toolbarEnd: BOXES.toolbarEnd.cls,
+    toolbarMenu: BOXES.toolbarMenu.cls
+  });
 
   // i360:icons
   var icon_theme = { "system": '<svg data-icon="theme.system" data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>', "light": '<svg data-icon="theme.light" data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>', "sepia": '<svg data-icon="theme.sepia" data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>', "dark": '<svg data-icon="theme.dark" data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>' };

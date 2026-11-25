@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import Dialog from '@/components/Dialog'
-import { copyAndEmailReport, resolveFeedbackMailto, REPORT_LABEL } from '@/lib/feedbackReport'
+import { copyAndEmailReport, resolveFeedbackMailto } from '@/lib/feedbackReport'
+import { APP } from '@i360/locales'
 
 interface Props {
   open: boolean
@@ -26,7 +27,7 @@ export default function ReportNotice({ open, title, message, subject, details, o
       onClose={onClose}
       secondaryAction={
         canReport
-          ? { label: REPORT_LABEL, onClick: () => { copyAndEmailReport(subject, details); onClose() } }
+          ? { label: APP.ar.report, onClick: () => { copyAndEmailReport(subject, details); onClose() } }
           : undefined
       }
     />

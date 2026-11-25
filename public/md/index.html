@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-Ip8oSQ4t/yRPafWTqNUcNbH1phdiUVXJfc1cLTa4TJM='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-2KyJAjw8qUBBOMDYo1eNsh2sFHXAcF/SBaJ8dn0Ie1A='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -1737,7 +1737,16 @@ ${body}`;
     popup: { cls: "i360-popup", tags: ["div", "span"] },
     banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
     toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" },
-    fieldBox: { cls: "i360-field i360-field-search", tags: ["div"] }
+    fieldBox: { cls: "i360-field i360-field-search", tags: ["div"] },
+    // The toolbar (src/page-chrome.css): the bar, its parts, a group of its buttons and its ⋮ menu.
+    // A bar's variant (sticky: stays at the top while the page scrolls; bottom: the app's) is its own
+    // modifier class, never a page's.
+    toolbar: { cls: "toolbar", tags: ["header", "div"], variants: ["sticky", "bottom"] },
+    toolbarStart: { cls: "tb-start", tags: ["div"] },
+    toolbarMain: { cls: "tb-main", tags: ["div"] },
+    toolbarEnd: { cls: "tb-end", tags: ["div"] },
+    toolbarGroup: { cls: "tb-group", tags: ["div"] },
+    toolbarMenu: { cls: "toolbar-menu", tags: ["div"] }
   });
   var CARD_TONES = Object.freeze({
     quran: { tile: "bg-quran-soft text-quran", text: "text-quran" },
@@ -1746,7 +1755,14 @@ ${body}`;
     converter: { tile: "bg-converter-bg text-converter", text: "text-converter" },
     event: { tile: "bg-event-bg text-event", text: "text-event" }
   });
-  var CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON });
+  var CLASS = Object.freeze({
+    banner: BOXES.banner.cls,
+    chipLabel: CLASS_CHIP_LABEL,
+    title: TITLE,
+    toolbarButton: TOOLBAR_BUTTON,
+    toolbarEnd: BOXES.toolbarEnd.cls,
+    toolbarMenu: BOXES.toolbarMenu.cls
+  });
 
   // i360:icons
   var icon_theme = { "system": '<svg data-icon="theme.system" data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>', "light": '<svg data-icon="theme.light" data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>', "sepia": '<svg data-icon="theme.sepia" data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>', "dark": '<svg data-icon="theme.dark" data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>' };
@@ -1807,6 +1823,9 @@ ${body}`;
     control.title = text;
     control.setAttribute("aria-label", text);
   }
+  function setPressed(control, on) {
+    control.setAttribute("aria-pressed", on ? "true" : "false");
+  }
   function fittingToolbar({ bar, fold = [] }) {
     const DENSE = ["toolbar-dense", "toolbar-densest"];
     const levels = fold.map(({ items = [], to, flag, dense }) => {
@@ -1852,7 +1871,7 @@ ${body}`;
     };
     const setWidth = (value) => bar.style.setProperty("--toolbar-btn-w", value);
     const widen = (room) => {
-      const buttons = [...bar.querySelectorAll(`.${CLASS.toolbarButton}`)].filter((b) => b.offsetParent && !b.closest(".toolbar-menu"));
+      const buttons = [...bar.querySelectorAll(`.${CLASS.toolbarButton}`)].filter((b) => b.offsetParent && !b.closest(`.${CLASS.toolbarMenu}`));
       if (!buttons.length || room <= 0) return;
       const narrow = buttons.map((b) => b.getBoundingClientRect().width).sort((a, b) => a - b);
       setWidth("var(--toolbar-h)");
@@ -1937,7 +1956,7 @@ ${body}`;
       copyFailed: "تعذّر النسخ",
       volume: "الجزء",
       search: "بحث في المستند (Ctrl+F)",
-      searchInput: "بحث في النص...",
+      searchInput: "بحث في النص…",
       prevMatch: "النتيجة السابقة (Shift+Enter)",
       nextMatch: "النتيجة التالية (Enter)",
       showResults: "قائمة النتائج",
@@ -2003,7 +2022,7 @@ ${body}`;
       copyFailed: "Could not copy",
       volume: "Volume",
       search: "Search within document (Ctrl+F)",
-      searchInput: "Search text...",
+      searchInput: "Search text…",
       prevMatch: "Previous match (Shift+Enter)",
       nextMatch: "Next match (Enter)",
       showResults: "Results list",
@@ -2219,7 +2238,7 @@ ${body}`;
     listOpen: false
   };
   var toolbar = $("toolbar");
-  var tbEnd = toolbar.querySelector(".tb-end");
+  var tbEnd = toolbar.querySelector(`.${CLASS.toolbarEnd}`);
   var pagesWrapper = $("pages-wrapper");
   var viewerContainer = $("viewer-container");
   var pageNumInput = $("page-num-input");
@@ -2334,7 +2353,7 @@ ${body}`;
     }, CONNECTION_CHECK_MS);
   }
 
-  // node_modules/marked/lib/marked.esm.js
+  // ../../../home/claude/repo/i36O/hub/node_modules/marked/lib/marked.esm.js
   var marked_esm_exports = {};
   __export(marked_esm_exports, {
     Hooks: () => _,
@@ -4018,9 +4037,6 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     const active = items[search.current];
     if (active && active.scrollIntoView) active.scrollIntoView({ block: "nearest" });
   }
-  function setOption(btn, value) {
-    btn.setAttribute("aria-pressed", value ? "true" : "false");
-  }
   function openSearch() {
     closeMore();
     searchPopup.classList.add("active");
@@ -4037,19 +4053,19 @@ Please report this to https://github.com/markedjs/marked.`, e) {
   function wireSearch() {
     optDiacritics.addEventListener("click", () => {
       search.exact = !search.exact;
-      setOption(optDiacritics, search.exact);
+      setPressed(optDiacritics, search.exact);
       storeSet("searchExact", search.exact);
       rerunSearch();
     });
     optWord.addEventListener("click", () => {
       search.word = !search.word;
-      setOption(optWord, search.word);
+      setPressed(optWord, search.word);
       storeSet("searchWord", search.word);
       rerunSearch();
     });
     btnSearchList.addEventListener("click", () => {
       search.listOpen = !search.listOpen;
-      setOption(btnSearchList, search.listOpen);
+      setPressed(btnSearchList, search.listOpen);
       renderResultsList();
     });
     btnSearchToggle.addEventListener("click", () => {
@@ -4087,14 +4103,14 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     sidePanel.classList.add("open");
     sidePanel.setAttribute("aria-hidden", "false");
     btnPanel.setAttribute("aria-expanded", "true");
-    btnPanel.setAttribute("aria-pressed", "true");
+    setPressed(btnPanel, true);
     renderPanel();
   }
   function closePanel() {
     sidePanel.classList.remove("open");
     sidePanel.setAttribute("aria-hidden", "true");
     btnPanel.setAttribute("aria-expanded", "false");
-    btnPanel.setAttribute("aria-pressed", "false");
+    setPressed(btnPanel, false);
   }
   async function jumpToElement(idx, target) {
     scrollToSheet(idx);
@@ -4206,7 +4222,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
   function closeMore() {
     moreMenu.hidden = true;
     btnMore.setAttribute("aria-expanded", "false");
-    btnMore.setAttribute("aria-pressed", "false");
+    setPressed(btnMore, false);
   }
   function wirePanel() {
     btnPanel.addEventListener("click", () => {
@@ -4232,7 +4248,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
       const open2 = moreMenu.hidden;
       moreMenu.hidden = !open2;
       btnMore.setAttribute("aria-expanded", open2 ? "true" : "false");
-      btnMore.setAttribute("aria-pressed", open2 ? "true" : "false");
+      setPressed(btnMore, open2);
     });
     document.addEventListener("click", (e) => {
       if (!moreMenu.hidden && !moreMenu.contains(e.target) && !btnMore.contains(e.target)) closeMore();
@@ -4891,7 +4907,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
   function updateBookmarkButton(set) {
     const idx = findCurrentIdx();
     const on = idx >= 0 && (set || bookmarkedSet()).has(idx);
-    btnBookmark.setAttribute("aria-pressed", on ? "true" : "false");
+    setPressed(btnBookmark, on);
     btnBookmark.title = on ? t().bookmarkRemove : t().bookmarkAdd;
     btnBookmark.setAttribute("aria-label", btnBookmark.title);
     btnBookmark.disabled = idx < 0 || !state.bookKey;
@@ -5491,9 +5507,9 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     const scale = Number(storeGet("textScale", 1));
     search.exact = storeGet("searchExact", false) === true;
     search.word = storeGet("searchWord", false) === true;
-    setOption(optDiacritics, search.exact);
-    setOption(optWord, search.word);
-    setOption(btnSearchList, false);
+    setPressed(optDiacritics, search.exact);
+    setPressed(optWord, search.word);
+    setPressed(btnSearchList, false);
     fitToolbar();
     updatePageWidth();
     setTextScale(TEXT_SCALES.includes(scale) ? scale : 1);

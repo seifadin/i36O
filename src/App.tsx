@@ -4,9 +4,11 @@ import { DataCacheProvider, useDataCache } from '@/store/dataCache'
 import { usePlatform } from '@/hooks/usePlatform'
 import { useOtaHealth } from '@/hooks/useOtaHealth'
 import { deviceStore } from '@/lib/deviceStorage'
-import { REPORT_SUBJECTS } from '@/lib/feedbackReport'
+import { APP } from '@i360/locales'
 import Dialog from '@/components/Dialog'
 import ReportNotice from '@/components/ReportNotice'
+
+const T = APP.ar
 
 const Home = lazy(() => import('@/pages/Home'))
 
@@ -50,9 +52,9 @@ function AppShell() {
   // new change flags), set while rendering like the privacy notice above.
   if (!cacheLoading && resource && (queuedFor?.resource !== resource || queuedFor.changeFlags !== changeFlags)) {
     const queue: QueuedDialog[] = []
-    if (changeFlags.editionChanged) queue.push({ title: 'طبعة جديدة', message: 'تمت إضافة / تعديل محتوى مُحدَّث لإثراء تجربتك' })
-    if (changeFlags.versionChanged) queue.push({ title: 'إصدار جديد', message: 'تم إطلاق إصدار مُحدَّث لإثراء تجربتك' })
-    if (changeFlags.revisionChanged) queue.push({ title: 'مراجعة جديدة', message: 'تم إضافة / تعديل فهرسة تفسير مُحدَّث لإثراء تجربتك' })
+    if (changeFlags.editionChanged) queue.push({ title: T.editionTitle, message: T.edition })
+    if (changeFlags.versionChanged) queue.push({ title: T.versionTitle, message: T.version })
+    if (changeFlags.revisionChanged) queue.push({ title: T.revisionTitle, message: T.revision })
     setQueuedFor({ resource, changeFlags })
     setDialogQueue(queue)
   }
@@ -66,7 +68,7 @@ function AppShell() {
       <Suspense fallback={null}>
         <Home />
       </Suspense>
-      <Dialog open={privacyOpen} title="سلامة البيانات" message="لا يتم جمع البيانات (غير الوظيفية) أو مشاركتها. سياسة الخصوصية: https://tinyurl.com/i360Privacy" onClose={handlePrivacyClose} />
+      <Dialog open={privacyOpen} title={T.privacyTitle} message={T.privacy} onClose={handlePrivacyClose} />
       <Dialog
         open={dialogQueue.length > 0}
         title={dialogQueue[0]?.title ?? ''}
@@ -75,9 +77,9 @@ function AppShell() {
       />
       <ReportNotice
         open={!!rollbackDetails}
-        title="تم التراجع عن آخر تحديث"
-        message="واجه آخر تحديث للتطبيق مشكلة، فتم التراجع تلقائيًا إلى النسخة السابقة العاملة."
-        subject={REPORT_SUBJECTS.otaRollback}
+        title={T.rollbackTitle}
+        message={T.rollback}
+        subject={T.reportRollback}
         details={rollbackDetails ?? ''}
         onClose={dismissRollback}
       />

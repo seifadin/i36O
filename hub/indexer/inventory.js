@@ -22,6 +22,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fetchWithTimeout, httpError, retrying } from '../src/net.js';
+import { safeDecode } from '../src/lib-copy.js';
+import { mapLimit } from './map-limit.js';
 import { APP_ORIGIN } from '../src/sites.js';
 
 const BASEROW_ROWS = 'https://api.baserow.io/api/database/rows/table/';
@@ -109,10 +111,6 @@ function typeFromName(name) {
   if (n.endsWith('.txt')) return 'txt';
   if (n.endsWith('.html') || n.endsWith('.htm')) return 'html';
   return null;
-}
-
-function safeDecode(s) {
-  try { return decodeURIComponent(s); } catch { return s; }
 }
 
 // The address a source is fetched from, its kind, and its identity (two
@@ -343,21 +341,6 @@ async function probe(fetchFn, src) {
     const e = err instanceof ProbeError ? err : new ProbeError('check', null, causeText(err));
     return { ...(err.partial || {}), ok: false, error: e.message, step: e.step, where: e.where, why: e.why, checkedAt };
   }
-}
-
-async function mapLimit(items, limit, fn, onDone) {
-  const results = new Array(items.length);
-  let next = 0;
-  let done = 0;
-  async function worker() {
-    while (next < items.length) {
-      const i = next++;
-      results[i] = await fn(items[i], i);
-      onDone(++done, items.length);
-    }
-  }
-  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
-  return results;
 }
 
 /* ---------------- Building the inventory ---------------- */

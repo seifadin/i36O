@@ -26,6 +26,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as inventory from './inventory.js';
+import { mapLimit } from './map-limit.js';
 import { TANZIL_ORIGIN } from '../src/sites.js';
 import { exegesisRows } from '../src/exegesis.js';
 
@@ -110,13 +111,6 @@ async function readRevision(fetchFn, key, table) {
 async function readExegesis(fetchFn, key, table) {
   const { rows } = await inventory.readRows(fetchFn, key, table, [...EXEGESIS_FIELDS]);
   return exegesisRows(rows.map((r) => Object.fromEntries(EXEGESIS_FIELDS.map((f) => [f, inventory.fieldText(r[f])]))));
-}
-
-async function mapLimit(items, limit, fn) {
-  let next = 0;
-  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, async () => {
-    while (next < items.length) { const i = next++; await fn(items[i], i); }
-  }));
 }
 
 /* ---------------- The plan ----------------
