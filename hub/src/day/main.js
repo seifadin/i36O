@@ -23,12 +23,16 @@ const CONFIG = {
   S: { T: 'th-v8', L: 'ln-v8', M: 'sm-v8', Q: 'qd-v8', H: 'hd-v8', CITY: 'ct-v1' },
   API: {
     Q: 'https://api.alquran.cloud/v1/ayah',
+    Q_PAGE: 'https://alquran.cloud/ayah',   // the verse's own page there, linked as the card's source
     HE: 'https://hadeethenc.com/api/v1',
     CITY: 'https://geocoding-api.open-meteo.com/v1/search'   // the city picker only
   },
   // HadeethEnc root categories left out of the daily pick (2 = "The Hadith and Hadith Sciences", technical, 10 items).
   HADEETH_EXCLUDE_ROOTS: ['2'],
   EDITIONS: { quran: { ar: 'ar.jalalayn', en: 'en.sahih', tr: 'tr.ates', id: 'id.indonesian', ur: 'ur.ahmedali' } },
+  // An edition's name for the source line where Al Quran Cloud's isn't the translator's (id.indonesian:
+  // "Bahasa Indonesia" / "Unknown"); its terms ask for the translator by name (Seif, 2026-11-27).
+  EDITION_NAMES: { 'id.indonesian': 'Kementerian Agama RI' },
   REVEAL_STAGGER_MS: 120,   // the cards enter one after another, this far apart
   CITY_SEARCH_DEBOUNCE_MS: 500,   // the city search asks Open-Meteo once typing pauses this long
   P_KEYS: ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'],
@@ -612,10 +616,18 @@ const UI = {
   },
   renderQuran() {
     const q = App.state.quran, lang = App.lang;
-    if (!q) { ['quran-arabic', 'quran-translation', 'quran-ref'].forEach(t => this.set(t, '')); return; }
+    const line = this.targets['quran-source'];
+    if (!q) { ['quran-arabic', 'quran-translation', 'quran-ref', 'quran-edition'].forEach(t => this.set(t, '')); line?.classList.add('hidden'); return; }
     this.set('quran-arabic', q.data[0].text);
     this.set('quran-translation', q.data[1].text);
     this.set('quran-ref', `${(lang === 'ar' || lang === 'ur') ? q.data[0].surah.name : q.data[0].surah.englishName} (${q.data[0].surah.number}:${q.data[0].numberInSurah})`);
+    /* The source line, like the hadith's: the verse's page on Al Quran Cloud, then the edition shown,
+       by its own name (in its own spelling: «Süleyman Ateş»); CONFIG.EDITION_NAMES where that name isn't one. */
+    const ed = q.data[1].edition || {};
+    const name = CONFIG.EDITION_NAMES[ed.identifier] || ed.name || '';
+    this.set('quran-edition', name ? ` · ${name}` : '');
+    const a = this.targets['quran-link']; if (a) a.href = `${CONFIG.API.Q_PAGE}/${q.data[0].surah.number}:${q.data[0].numberInSurah}`;
+    line?.classList.remove('hidden');
   },
   renderHadith() {
     const h = App.state.hadith, L = this.L, lang = App.lang;

@@ -48,6 +48,7 @@ i360إ is an Arabic-only Islamic knowledge discovery app that organizes Islamic 
 - The Markdown Reader opens only the i360 library's books — our own books and the books the i360 search has indexed — and reads them from the library itself. «نسخ رابط هذه الصفحة» copies the Reader's public link, also inside the app (2026-10-22)
 
 ### Added
+- The Daily Reflection's verse card names its source, like the hadith card: «المصدر: AlQuran.cloud», linking to that verse there, followed by the tafsir or translation shown (Tafsir al-Jalalayn in Arabic; Saheeh International, Süleyman Ateş, Kementerian Agama RI and Ahmed Ali in the other languages) (2026-11-28)
 - Tanzil's Quran Navigator («مشروع تنزيل») now opens with a «تفسير» button: it opens the exegesis of the verse being read — the one last tapped, or the first verse of the page turned to — from the encyclopedia's own exegesis index, in a new tab on a computer and in place on a phone (back returns to the Quran). Tanzil's banner credits it on every screen, and its translation opens on تفسير الجلالين. If the page's data can't be reached, tanzil still opens, with the button off (2026-11-24)
 - The Daily Reflection has a date converter: Gregorian to Hijri or Hijri to Gregorian, one tap to swap, opening on today, with a note that the calculated date may differ by a day or two (2026-11-15)
 - Browsers too old for the encyclopedia now show a short note instead of a blank page: «متصفحك قديم ولا يدعم الموسوعة الإسلامية i360إ؛ يُرجى استخدام متصفح أحدث», with a link to the support page for more (2026-11-04)
