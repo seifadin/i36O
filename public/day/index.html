@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-p2zXB8NRMWMYyLSY9PjfWx9owQMUU08mtP2YtuR43cI='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-RUDmWyZ4poV5qgxL05neOoo4ONs4+hxIfo58wlSDzmA='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -732,6 +732,7 @@ svg[data-lucide] {
         <p data-target="quran-arabic" class="arabic-script quran-verse text-lg font-bold text-justify mb-md"></p>
         <p data-target="quran-translation" class="text-base leading-reading italic text-custom-secondary text-justify"></p>
         <p data-target="quran-ref" class="text-base font-bold text-quran border-t border-rule pt-md"></p>
+        <p data-target="quran-source" class="hidden font-bold text-sm text-quran"><span data-i18n="sourceLabel">Source</span>: <a data-target="quran-link" href="https://alquran.cloud/" target="_blank" rel="noopener noreferrer" class="underline">AlQuran.cloud</a><span data-target="quran-edition"></span></p>
       </div>
       <div data-status="quran" class="hidden items-center gap-sm text-sm text-custom-secondary mt-md"><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry></button></div>
     </section>
@@ -840,7 +841,7 @@ svg[data-lucide] {
       __defProp(target, name, { get: all[name], enumerable: true });
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/Adhan.js
+  // node_modules/adhan/lib/esm/Adhan.js
   var Adhan_exports = {};
   __export(Adhan_exports, {
     CalculationMethod: () => CalculationMethod_default,
@@ -857,7 +858,7 @@ svg[data-lucide] {
     SunnahTimes: () => SunnahTimes
   });
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/Madhab.js
+  // node_modules/adhan/lib/esm/Madhab.js
   var Madhab = {
     Shafi: "shafi",
     Hanafi: "hanafi"
@@ -873,7 +874,7 @@ svg[data-lucide] {
     }
   }
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/HighLatitudeRule.js
+  // node_modules/adhan/lib/esm/HighLatitudeRule.js
   var HighLatitudeRule = {
     MiddleOfTheNight: "middleofthenight",
     SeventhOfTheNight: "seventhofthenight",
@@ -888,7 +889,7 @@ svg[data-lucide] {
   };
   var HighLatitudeRule_default = HighLatitudeRule;
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/Coordinates.js
+  // node_modules/adhan/lib/esm/Coordinates.js
   var Coordinates = class {
     constructor(latitude, longitude) {
       this.latitude = latitude;
@@ -896,14 +897,14 @@ svg[data-lucide] {
     }
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/Rounding.js
+  // node_modules/adhan/lib/esm/Rounding.js
   var Rounding = {
     Nearest: "nearest",
     Up: "up",
     None: "none"
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/DateUtils.js
+  // node_modules/adhan/lib/esm/DateUtils.js
   function dateByAddingDays(date, days) {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -952,7 +953,7 @@ svg[data-lucide] {
     return date instanceof Date && !isNaN(date.valueOf());
   }
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/MathUtils.js
+  // node_modules/adhan/lib/esm/MathUtils.js
   function degreesToRadians(degrees) {
     return degrees * Math.PI / 180;
   }
@@ -972,7 +973,7 @@ svg[data-lucide] {
     return angle - 360 * Math.round(angle / 360);
   }
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/Shafaq.js
+  // node_modules/adhan/lib/esm/Shafaq.js
   var Shafaq = {
     // General is a combination of Ahmer and Abyad.
     General: "general",
@@ -982,7 +983,7 @@ svg[data-lucide] {
     Abyad: "abyad"
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/Astronomical.js
+  // node_modules/adhan/lib/esm/Astronomical.js
   var Astronomical = {
     /* The geometric mean longitude of the sun in degrees. */
     meanSolarLongitude(julianCentury) {
@@ -1265,7 +1266,7 @@ svg[data-lucide] {
   };
   var Astronomical_default = Astronomical;
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/SolarCoordinates.js
+  // node_modules/adhan/lib/esm/SolarCoordinates.js
   var SolarCoordinates = class {
     constructor(julianDay) {
       const T = Astronomical_default.julianCentury(julianDay);
@@ -1284,7 +1285,7 @@ svg[data-lucide] {
     }
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/SolarTime.js
+  // node_modules/adhan/lib/esm/SolarTime.js
   var SolarTime = class {
     constructor(date, coordinates) {
       const julianDay = Astronomical_default.julianDay(date.getFullYear(), date.getMonth() + 1, date.getDate(), 0);
@@ -1310,7 +1311,7 @@ svg[data-lucide] {
     }
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/PolarCircleResolution.js
+  // node_modules/adhan/lib/esm/PolarCircleResolution.js
   var PolarCircleResolution = {
     AqrabBalad: "AqrabBalad",
     AqrabYaum: "AqrabYaum",
@@ -1384,7 +1385,7 @@ svg[data-lucide] {
     }
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/CalculationParameters.js
+  // node_modules/adhan/lib/esm/CalculationParameters.js
   var CalculationParameters = class {
     // Madhab to determine how Asr is calculated.
     madhab = Madhab.Shafi;
@@ -1451,7 +1452,7 @@ svg[data-lucide] {
     }
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/CalculationMethod.js
+  // node_modules/adhan/lib/esm/CalculationMethod.js
   var CalculationMethod = {
     // Muslim World League
     MuslimWorldLeague() {
@@ -1542,7 +1543,7 @@ svg[data-lucide] {
   };
   var CalculationMethod_default = CalculationMethod;
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/Prayer.js
+  // node_modules/adhan/lib/esm/Prayer.js
   var Prayer = {
     Fajr: "fajr",
     Sunrise: "sunrise",
@@ -1554,7 +1555,7 @@ svg[data-lucide] {
   };
   var Prayer_default = Prayer;
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/TimeComponents.js
+  // node_modules/adhan/lib/esm/TimeComponents.js
   var TimeComponents = class {
     constructor(num) {
       this.hours = Math.floor(num);
@@ -1567,7 +1568,7 @@ svg[data-lucide] {
     }
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/PrayerTimes.js
+  // node_modules/adhan/lib/esm/PrayerTimes.js
   var HIGH_LATITUDE_THRESHOLD = 55;
   var PrayerTimes = class {
     constructor(coordinates, date, calculationParameters) {
@@ -1713,7 +1714,7 @@ svg[data-lucide] {
     }
   };
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/Qibla.js
+  // node_modules/adhan/lib/esm/Qibla.js
   function qibla(coordinates) {
     const makkah = new Coordinates(21.4225241, 39.8261818);
     const term1 = Math.sin(degreesToRadians(makkah.longitude) - degreesToRadians(coordinates.longitude));
@@ -1723,7 +1724,7 @@ svg[data-lucide] {
     return unwindAngle(radiansToDegrees(angle));
   }
 
-  // ../../../home/claude/repo/i36O/hub/node_modules/adhan/lib/esm/SunnahTimes.js
+  // node_modules/adhan/lib/esm/SunnahTimes.js
   var SunnahTimes = class {
     constructor(prayerTimes) {
       const date = prayerTimes.date;
@@ -2854,6 +2855,8 @@ svg[data-lucide] {
     S: { T: "th-v8", L: "ln-v8", M: "sm-v8", Q: "qd-v8", H: "hd-v8", CITY: "ct-v1" },
     API: {
       Q: "https://api.alquran.cloud/v1/ayah",
+      Q_PAGE: "https://alquran.cloud/ayah",
+      // the verse's own page there, linked as the card's source
       HE: "https://hadeethenc.com/api/v1",
       CITY: "https://geocoding-api.open-meteo.com/v1/search"
       // the city picker only
@@ -2861,6 +2864,9 @@ svg[data-lucide] {
     // HadeethEnc root categories left out of the daily pick (2 = "The Hadith and Hadith Sciences", technical, 10 items).
     HADEETH_EXCLUDE_ROOTS: ["2"],
     EDITIONS: { quran: { ar: "ar.jalalayn", en: "en.sahih", tr: "tr.ates", id: "id.indonesian", ur: "ur.ahmedali" } },
+    // An edition's name for the source line where Al Quran Cloud's isn't the translator's (id.indonesian:
+    // "Bahasa Indonesia" / "Unknown"); its terms ask for the translator by name (Seif, 2026-11-27).
+    EDITION_NAMES: { "id.indonesian": "Kementerian Agama RI" },
     REVEAL_STAGGER_MS: 120,
     // the cards enter one after another, this far apart
     CITY_SEARCH_DEBOUNCE_MS: 500,
@@ -3643,13 +3649,21 @@ svg[data-lucide] {
     },
     renderQuran() {
       const q = App.state.quran, lang = App.lang;
+      const line = this.targets["quran-source"];
       if (!q) {
-        ["quran-arabic", "quran-translation", "quran-ref"].forEach((t) => this.set(t, ""));
+        ["quran-arabic", "quran-translation", "quran-ref", "quran-edition"].forEach((t) => this.set(t, ""));
+        line?.classList.add("hidden");
         return;
       }
       this.set("quran-arabic", q.data[0].text);
       this.set("quran-translation", q.data[1].text);
       this.set("quran-ref", `${lang === "ar" || lang === "ur" ? q.data[0].surah.name : q.data[0].surah.englishName} (${q.data[0].surah.number}:${q.data[0].numberInSurah})`);
+      const ed = q.data[1].edition || {};
+      const name = CONFIG.EDITION_NAMES[ed.identifier] || ed.name || "";
+      this.set("quran-edition", name ? ` · ${name}` : "");
+      const a = this.targets["quran-link"];
+      if (a) a.href = `${CONFIG.API.Q_PAGE}/${q.data[0].surah.number}:${q.data[0].numberInSurah}`;
+      line?.classList.remove("hidden");
     },
     renderHadith() {
       const h = App.state.hadith, L = this.L, lang = App.lang;
