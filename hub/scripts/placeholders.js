@@ -18,6 +18,7 @@
 //   (likewise INSET, POPUP, BANNER, TOAST and the toolbar's: TOOLBAR variant="sticky", TOOLBAR_START,
 //   TOOLBAR_MAIN, TOOLBAR_END, TOOLBAR_GROUP, TOOLBAR_MENU; tag="…" where the container allows another element)
 //   <!--@@CARD_HEADER tone="quran" icon="verse" data-i18n="quranLabel" text="Quranic Verse" class="mb-md"@@-->
+//   <!--@@CARD_FOOTER tone="hadith" part="hadith" citation reference="details" reference-i18n="refsLabel" source="link" source-text="HadeethEnc.com" source-href="https://hadeethenc.com/" class="mt-md"@@-->
 //   <!--@@STATUS_LINE part="quran" class="mt-md"@@-->
 //
 // A misspelled component, a missing field or an unknown meaning stops the build. A placeholder
@@ -66,6 +67,7 @@ const COMPONENTS = Object.freeze({
   BUTTON: (a, draw) => C.button({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
   LIST_ITEM: (a) => C.listItem(a),
   CARD_HEADER: (a, draw) => C.cardHeader({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
+  CARD_FOOTER: (a) => C.cardFooter(a),
   STATUS_LINE: (a) => C.statusLine(a),
 });
 

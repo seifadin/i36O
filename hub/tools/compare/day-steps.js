@@ -20,8 +20,8 @@ const state = () => {
   return {
     lang: document.documentElement.lang, dir: document.documentElement.dir, theme: document.documentElement.dataset.theme,
     title: document.querySelector('.tb-title').textContent.trim(), date: text('current-date'), hijri: text('hijri-date'), hijriSrc: text('hijri-source'),
-    verse: (text('quran-arabic') || '').slice(0, 20), tr: (text('quran-translation') || '').slice(0, 30), ref: text('quran-ref'),
-    hadith: text('hadith-title'), grade: text('hadith-grade'),
+    verse: (text('quran-arabic') || '').slice(0, 20), tr: (text('quran-translation') || '').slice(0, 30), ref: text('quran-citation') ?? text('quran-ref'),
+    hadith: text('hadith-title'), grade: text('hadith-citation') ?? text('hadith-grade'),
     prayers: [...grid.children].map((b) => b.textContent.trim().replace(/\s+/g, ' ')), prayerRows: new Set([...grid.children].map((b) => b.offsetTop)).size,
     next: next ? next.textContent.trim().replace(/\s+/g, ' ') : null,
     method: text('meta-method'), loc: text('meta-window.location'), tz: text('meta-timezone'),
@@ -35,7 +35,7 @@ const state = () => {
     conv: {
       dir: text('conv-dir'), d: document.getElementById('conv-d').value, m: document.getElementById('conv-m').value, y: document.getElementById('conv-y').value,
       days: document.getElementById('conv-d').options.length - 1, alpha: text('conv-alpha'), iso: text('conv-iso'),
-      error: document.querySelector('[data-target="conv-error"]').hidden ? null : text('conv-error'), label: text('conv-label')
+      error: document.querySelector('[data-target="conv-error"]').hidden ? null : text('conv-error'), label: text('conv-source') ?? text('conv-label')
     },
     overflow: document.documentElement.scrollWidth > window.innerWidth
   };

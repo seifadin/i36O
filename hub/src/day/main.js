@@ -520,8 +520,8 @@ const Conv = {
     // The numeric date left to right (year first) and the mark after it, at the line's end.
     if (r && !r.error) isoBox.replaceChildren(`${r.iso} ${r.mark}`); else isoBox.replaceChildren();
     err.hidden = !(r && r.error); err.textContent = r && r.error ? r.error : '';
-    // The label and the note on one line: the label ends its sentence (Urdu: «۔»).
-    UI.set('conv-label', `${HijriCalc.label(HijriCalc.SOURCES.CALC, lang)}${lang === 'ur' ? '۔' : '.'}`);
+    // The card's source line: the label, ending its sentence (Urdu: «۔»), then the note.
+    UI.set('conv-source', `${HijriCalc.label(HijriCalc.SOURCES.CALC, lang)}${lang === 'ur' ? '۔' : '.'} ${L.convNote}`);
     Cols.queue();
   }
 };
@@ -616,25 +616,22 @@ const UI = {
   },
   renderQuran() {
     const q = App.state.quran, lang = App.lang;
-    const line = this.targets['quran-source'];
-    if (!q) { ['quran-arabic', 'quran-translation', 'quran-ref', 'quran-edition'].forEach(t => this.set(t, '')); line?.classList.add('hidden'); return; }
+    if (!q) { ['quran-arabic', 'quran-translation', 'quran-citation', 'quran-reference'].forEach(t => this.set(t, '')); return; }
     this.set('quran-arabic', q.data[0].text);
     this.set('quran-translation', q.data[1].text);
-    this.set('quran-ref', `${(lang === 'ar' || lang === 'ur') ? q.data[0].surah.name : q.data[0].surah.englishName} (${q.data[0].surah.number}:${q.data[0].numberInSurah})`);
-    /* The source line, like the hadith's: the verse's page on Al Quran Cloud, then the edition shown,
-       by its own name (in its own spelling: «Süleyman Ateş»); CONFIG.EDITION_NAMES where that name isn't one. */
+    this.set('quran-citation', `${(lang === 'ar' || lang === 'ur') ? q.data[0].surah.name : q.data[0].surah.englishName} (${q.data[0].surah.number}:${q.data[0].numberInSurah})`);
+    /* The footer's reference: the edition shown, by its own name (in its own spelling: «Süleyman Ateş»);
+       CONFIG.EDITION_NAMES where that name isn't one. Its source: the verse's page on Al Quran Cloud. */
     const ed = q.data[1].edition || {};
-    const name = CONFIG.EDITION_NAMES[ed.identifier] || ed.name || '';
-    this.set('quran-edition', name ? ` · ${name}` : '');
+    this.set('quran-reference', CONFIG.EDITION_NAMES[ed.identifier] || ed.name || '');
     const a = this.targets['quran-link']; if (a) a.href = `${CONFIG.API.Q_PAGE}/${q.data[0].surah.number}:${q.data[0].numberInSurah}`;
-    line?.classList.remove('hidden');
   },
   renderHadith() {
     const h = App.state.hadith, L = this.L, lang = App.lang;
     const hide = (node, on) => { if (node) node.classList.toggle('hidden', on); };
     if (!h) {
-      ['hadith-title', 'hadith-narrator', 'hadith-text', 'hadith-grade', 'hadith-ref'].forEach(t => this.set(t, ''));
-      hide(this.targets['hadith-narrator'], true); hide($('hadith-refs'), true); return;
+      ['hadith-title', 'hadith-narrator', 'hadith-text', 'hadith-citation', 'hadith-reference'].forEach(t => this.set(t, ''));
+      hide(this.targets['hadith-narrator'], true); return;
     }
     this.set('hadith-title', h.title || '');
     /* HadeethEnc returns the opening line naming the Companion (the highest narrator) as `hadeeth_intro`.
@@ -648,10 +645,10 @@ const UI = {
     }
     this.set('hadith-narrator', narrator); hide(this.targets['hadith-narrator'], !narrator);
     this.set('hadith-text', body);
-    this.set('hadith-grade', [h.grade ? `${L.gradeLabel}: ${h.grade}` : '', h.attribution || ''].filter(Boolean).join(' · '));
+    this.set('hadith-citation', [h.grade ? `${L.gradeLabel}: ${h.grade}` : '', h.attribution || ''].filter(Boolean).join(' · '));
     /* `reference` is HadeethEnc's bibliography (editions used), Arabic only. Kept in full, collapsed by default. */
     const refs = (h.reference || '').trim();
-    this.set('hadith-ref', refs); hide($('hadith-refs'), !refs);
+    this.set('hadith-reference', refs);   // the footer hides an empty reference by itself
     const a = this.targets['hadith-link']; if (a) a.href = `https://hadeethenc.com/${lang}/browse/hadith/${encodeURIComponent(h.id)}`;
   },
   renderPrayers() {

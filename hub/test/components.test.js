@@ -106,6 +106,18 @@ test('components: each builder writes one fixed structure, attributes in one ord
     '<div class="flex items-center gap-sm mb-md"><span class="bg-quran-soft text-quran p-sm rounded-lg"><svg class="icon" data-icon="verse" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path></path></svg></span><h2 data-i18n="quranLabel" class="text-base font-bold uppercase tracking-widest text-quran">Quranic Verse</h2></div>');
   assert.equal(C.statusLine({ part: 'prayer', class: 'mb-md' }), '<div data-status="prayer" class="hidden items-center gap-sm text-sm text-custom-secondary mb-md"><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry></button></div>');
   assert.throws(() => C.cardHeader({ tone: 'pink', icon: SVG('x'), text: 't' }), /needs a tone/);
+  assert.equal(C.cardFooter({ tone: 'quran', part: 'quran', citation: true, reference: 'text', source: 'link', 'source-text': 'AlQuran.cloud', 'source-href': 'https://alquran.cloud/', class: 'mt-md' }),
+    '<div class="border-t border-rule pt-md space-y-xs font-bold text-quran mt-md"><p data-target="quran-citation" class="text-base empty:hidden"></p><p data-target="quran-reference" class="text-sm empty:hidden"></p>'
+    + '<p class="text-sm"><span data-i18n="sourceLabel">Source</span>: <a data-target="quran-link" href="https://alquran.cloud/" target="_blank" rel="noopener noreferrer" class="underline">AlQuran.cloud</a></p></div>');
+  assert.equal(C.cardFooter({ tone: 'hadith', part: 'hadith', reference: 'details', 'reference-i18n': 'refsLabel' }),
+    '<div class="border-t border-rule pt-md space-y-xs font-bold text-hadith"><details class="text-sm has-[>p:empty]:hidden"><summary data-i18n="refsLabel" class="cursor-pointer text-base"></summary><p data-target="hadith-reference" class="mt-sm whitespace-pre-line"></p></details></div>');
+  assert.equal(C.cardFooter({ tone: 'converter', part: 'conv', source: 'text' }),
+    '<div class="border-t border-rule pt-md space-y-xs font-bold text-converter"><p data-target="conv-source" class="text-sm empty:hidden"></p></div>');
+  assert.throws(() => C.cardFooter({ tone: 'quran', part: 'q' }), /at least one row/);
+  assert.throws(() => C.cardFooter({ tone: 'pink', part: 'q', citation: true }), /needs a tone/);
+  assert.throws(() => C.cardFooter({ tone: 'quran', part: 'q', reference: 'details' }), /reference-i18n/);
+  assert.throws(() => C.cardFooter({ tone: 'quran', part: 'q', source: 'link' }), /source-text and source-href/);
+  assert.throws(() => C.cardFooter({ tone: 'quran', part: 'q', source: 'image' }), /"link" or "text"/);
   assert.throws(() => C.statusLine({}), /needs its part/);
   assert.throws(() => C.field({ kind: 'date' }), /search, number or select/);
   assert.throws(() => C.box('popup', { tag: 'section' }), /a popup is a div/);
@@ -149,4 +161,11 @@ test('components: page-chrome.css has every comment closed, and the label button
   const css = fs.readFileSync(path.join(SRC, 'page-chrome.css'), 'utf8');
   assert.equal((css.match(/\/\*/g) || []).length, (css.match(/\*\//g) || []).length, 'a comment is never closed');
   assert.match(css.replace(/\/\*[\s\S]*?\*\//g, ''), /\.toolbar-btn-label\s*\{/, '.toolbar-btn-label { … } is missing or commented out');
+});
+
+test('components: Daily Reflection\'s verse, hadith and converter cards end with the shared footer, nothing hand-written', () => {
+  const html = fs.readFileSync(path.join(ROOT, 'src', 'day.src.html'), 'utf8');
+  for (const part of ['quran', 'hadith', 'conv']) assert.match(html, new RegExp(`<!--@@CARD_FOOTER [^@]*part="${part}"`), part);
+  assert.doesNotMatch(html, /border-t border-rule pt-md space-y-xs/, 'a footer written by hand');
+  assert.doesNotMatch(html, /data-i18n="sourceLabel"/, 'a source line written by hand');
 });

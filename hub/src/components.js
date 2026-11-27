@@ -184,6 +184,35 @@ function statusLine(a = {}) {
     + `<span data-status-text></span>${button({ small: true, 'data-retry': true })}</div>`;
 }
 
+// A card's footer (Daily Reflection): under one divider, in the card's colour, its rows 0.25 rem
+// apart — what the card's contents are cited as, the work they come from, and their source. Each
+// row is optional and filled by the page script through `<part>-<row>` targets; a row left empty
+// is hidden, so a card that has only a source shows just that line.
+//   citation: the reference line (سورة البقرة (2:186); a hadith's grade and attribution)
+//   reference: "text" (the edition shown) or "details" (a collapsed list, `reference-i18n` its label)
+//   source: "link" — «المصدر: <a>» with `source-text` and `source-href` — or "text"
+// `class` places it (a margin).
+function cardFooter(a = {}) {
+  const tone = CARD_TONES[a.tone];
+  if (!tone || !a.part) throw new Error(`a card footer needs a tone (${Object.keys(CARD_TONES).join(', ')}) and its part`);
+  if (!a.citation && !a.reference && !a.source) throw new Error('a card footer needs at least one row');
+  const t = (row) => escapeAttr(`${a.part}-${row}`);
+  const rows = [];
+  if (a.citation) rows.push(`<p data-target="${t('citation')}" class="text-base empty:hidden"></p>`);
+  if (a.reference === 'text') rows.push(`<p data-target="${t('reference')}" class="text-sm empty:hidden"></p>`);
+  else if (a.reference === 'details') {
+    if (!a['reference-i18n']) throw new Error('a collapsed reference needs its label (reference-i18n)');
+    rows.push(`<details class="text-sm has-[>p:empty]:hidden"><summary data-i18n="${escapeAttr(a['reference-i18n'])}" class="cursor-pointer text-base"></summary>`
+      + `<p data-target="${t('reference')}" class="mt-sm whitespace-pre-line"></p></details>`);
+  } else if (a.reference) throw new Error('a card footer\'s reference is "text" or "details"');
+  if (a.source === 'link') {
+    if (!a['source-text'] || !a['source-href']) throw new Error('a source link needs source-text and source-href');
+    rows.push(`<p class="text-sm"><span data-i18n="sourceLabel">Source</span>: <a data-target="${t('link')}" href="${escapeAttr(a['source-href'])}" target="_blank" rel="noopener noreferrer" class="underline">${escapeText(a['source-text'])}</a></p>`);
+  } else if (a.source === 'text') rows.push(`<p data-target="${t('source')}" class="text-sm empty:hidden"></p>`);
+  else if (a.source) throw new Error('a card footer\'s source is "link" or "text"');
+  return `<div class="${classes(`border-t border-rule pt-md space-y-xs font-bold ${tone.text}`, a.class)}">${rows.join('')}</div>`;
+}
+
 // The component classes a script needs — to turn a component's look on and off (the CSE's status
 // line becomes a banner on an error) or to find components (a toolbar's buttons) — never written
 // out by hand.
@@ -191,4 +220,4 @@ const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LA
   toolbarEnd: BOXES.toolbarEnd.cls, toolbarMenu: BOXES.toolbarMenu.cls });
 
 export { toolbarButton, labelButton, menuButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box,
-  cardHeader, statusLine, CLASS };
+  cardHeader, cardFooter, statusLine, CLASS };

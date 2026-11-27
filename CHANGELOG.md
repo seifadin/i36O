@@ -14,6 +14,7 @@ i360إ is an Arabic-only Islamic knowledge discovery app that organizes Islamic 
 - On phones, the "last update was rolled back" notice no longer reappears at every start (it shows once per failure), and a slow connection no longer makes the app undo an update that works (2026-11-16)
 
 ### Changed
+- The Daily Reflection's verse, hadith and date converter cards end the same way: under one line, in the card's colour, what the text is cited as, the work it comes from and its source. The converter's long date now has the numeric date's colour, its calculation note sits at the card's foot, and the prayer card's loading and retry line is at its bottom, like every other card's (2026-11-28)
 - The app's wording is written in one place and reads the same everywhere: «…» in its status lines and search box (and the Markdown Reader's search box), «إعادة المحاولة…» while retrying, «تعذّر» in every "couldn't" message (2026-11-25)
 - One set of icons everywhere, each with one meaning: the «تفسير» button and a typed verse number show a scroll, loading shows a turning circle, the Markdown Reader's page arrows and search-result arrows are arrows, its contents button has its own icon and deleting a bookmark shows a bin, the Daily Reflection's language button shows a list icon and a Hijri date awaiting Dar al-Ifta's announcement a fading clock (2026-11-25)
 - The Quran page's tanzil.net banner lines up with the Navigator below it (2026-11-25)
@@ -48,7 +49,7 @@ i360إ is an Arabic-only Islamic knowledge discovery app that organizes Islamic 
 - The Markdown Reader opens only the i360 library's books — our own books and the books the i360 search has indexed — and reads them from the library itself. «نسخ رابط هذه الصفحة» copies the Reader's public link, also inside the app (2026-10-22)
 
 ### Added
-- The Daily Reflection's verse card names its source, like the hadith card: «المصدر: AlQuran.cloud», linking to that verse there, followed by the tafsir or translation shown (Tafsir al-Jalalayn in Arabic; Saheeh International, Süleyman Ateş, Kementerian Agama RI and Ahmed Ali in the other languages) (2026-11-28)
+- The Daily Reflection's verse card names its source, like the hadith card: «المصدر: AlQuran.cloud», linking to that verse there, with the tafsir or translation shown on its own line above it (Tafsir al-Jalalayn in Arabic; Saheeh International, Süleyman Ateş, Kementerian Agama RI and Ahmed Ali in the other languages) (2026-11-28)
 - Tanzil's Quran Navigator («مشروع تنزيل») now opens with a «تفسير» button: it opens the exegesis of the verse being read — the one last tapped, or the first verse of the page turned to — from the encyclopedia's own exegesis index, in a new tab on a computer and in place on a phone (back returns to the Quran). Tanzil's banner credits it on every screen, and its translation opens on تفسير الجلالين. If the page's data can't be reached, tanzil still opens, with the button off (2026-11-24)
 - The Daily Reflection has a date converter: Gregorian to Hijri or Hijri to Gregorian, one tap to swap, opening on today, with a note that the calculated date may differ by a day or two (2026-11-15)
 - Browsers too old for the encyclopedia now show a short note instead of a blank page: «متصفحك قديم ولا يدعم الموسوعة الإسلامية i360إ؛ يُرجى استخدام متصفح أحدث», with a link to the support page for more (2026-11-04)

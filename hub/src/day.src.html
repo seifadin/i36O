@@ -123,9 +123,8 @@
       <div class="space-y-md">
         <p data-target="quran-arabic" class="arabic-script quran-verse text-lg font-bold text-justify mb-md"></p>
         <p data-target="quran-translation" class="text-base leading-reading italic text-custom-secondary text-justify"></p>
-        <p data-target="quran-ref" class="text-base font-bold text-quran border-t border-rule pt-md"></p>
-        <p data-target="quran-source" class="hidden font-bold text-sm text-quran"><span data-i18n="sourceLabel">Source</span>: <a data-target="quran-link" href="https://alquran.cloud/" target="_blank" rel="noopener noreferrer" class="underline">AlQuran.cloud</a><span data-target="quran-edition"></span></p>
       </div>
+      <!--@@CARD_FOOTER tone="quran" part="quran" citation reference="text" source="link" source-text="AlQuran.cloud" source-href="https://alquran.cloud/" class="mt-md"@@-->
       <!--@@STATUS_LINE part="quran" class="mt-md"@@-->
     <!--@@/CARD@@-->
 
@@ -137,15 +136,8 @@
           <p data-target="hadith-narrator" class="hidden hadith-text-style text-base text-hadith font-bold"></p>
           <p data-target="hadith-text" class="hadith-text-style text-base text-custom-secondary font-bold text-justify"></p>
         </div>
-        <div class="border-t border-rule pt-md space-y-xs text-base font-bold text-hadith">
-          <p data-target="hadith-grade"></p>
-          <details id="hadith-refs" class="hidden font-bold text-sm">
-            <summary data-i18n="refsLabel" class="cursor-pointer font-bold text-base">References</summary>
-            <p data-target="hadith-ref" class="mt-sm font-bold whitespace-pre-line"></p>
-          </details>
-          <p class="font-bold text-sm"><span data-i18n="sourceLabel">Source</span>: <a data-target="hadith-link" href="https://hadeethenc.com/" target="_blank" rel="noopener noreferrer" class="underline">HadeethEnc.com</a></p>
-        </div>
       </div>
+      <!--@@CARD_FOOTER tone="hadith" part="hadith" citation reference="details" reference-i18n="refsLabel" source="link" source-text="HadeethEnc.com" source-href="https://hadeethenc.com/" class="mt-md"@@-->
       <!--@@STATUS_LINE part="hadith" class="mt-md"@@-->
     <!--@@/CARD@@-->
 
@@ -154,7 +146,6 @@
     <!--@@CARD id="prayer-card" class="day-card"@@-->
       <!--@@CARD_HEADER tone="prayer" icon="prayerTimes" data-i18n="prayerLabel" text="Prayer Times" class="mb-md"@@-->
       <div data-target="prayer-grid" class="grid grid-cols-3 gap-sm mb-md"></div>
-      <!--@@STATUS_LINE part="prayer" class="mb-md"@@-->
       <!--@@INSET class="flex flex-wrap gap-md text-sm text-custom-secondary p-md"@@-->
         <div class="flex flex-col gap-xs flex-auto">
           <p><span class="font-bold" data-i18n="methodLabel">Method:</span> <span data-target="meta-method">…</span></p>
@@ -175,6 +166,7 @@
         <p data-target="city-status" class="text-sm text-custom-secondary" role="status" aria-live="polite"></p>
         <div data-target="city-results" class="flex flex-col gap-xs" role="listbox"></div>
       <!--@@/INSET@@-->
+      <!--@@STATUS_LINE part="prayer" class="mt-md"@@-->
     <!--@@/CARD@@-->
 
     <!--@@CARD id="converter-card" class="day-card"@@-->
@@ -203,12 +195,12 @@
           </span>
         </div>
         <div class="border-t border-rule pt-md flex flex-col gap-xs" aria-live="polite">
-          <p data-target="conv-alpha" class="text-base font-bold"></p>
+          <p data-target="conv-alpha" class="text-base font-bold text-custom-secondary"></p>
           <p data-target="conv-iso" class="text-base font-bold text-custom-secondary"></p>
           <p data-target="conv-error" class="conv-error text-sm font-bold" hidden></p>
         </div>
       <!--@@/INSET@@-->
-      <p class="text-sm text-custom-secondary mt-md"><span data-target="conv-label" class="font-bold"></span> <span data-i18n="convNote"></span></p>
+      <!--@@CARD_FOOTER tone="converter" part="conv" source="text" class="mt-md"@@-->
     <!--@@/CARD@@-->
     </div>
     <!--@@CARD id="events-card" class="cards-wide day-card"@@-->
