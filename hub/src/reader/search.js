@@ -1,7 +1,7 @@
 // The Reader: search within the book (src/search-core.js).
 import * as SearchCore from '../search-core.js';
 import { el, fromMarkup, setPressed } from '../page-chrome.js';
-import { listItem } from '../components.js';
+import { resultRow } from '../components.js';
 import { BLOCK_SEL, SEARCH_DEBOUNCE_MS, SEARCH_LIST_MAX, SEARCH_MAX_MATCHES, SEARCH_MIN_CHARS, SNIPPET_CHARS } from './constants.js';
 import { btnSearchClose, btnSearchList, btnSearchNext, btnSearchPrev, btnSearchToggle, fmtNum, nextFrame, optDiacritics, optWord, search, searchCount, searchInput, searchPopup, searchResults, state, storeSet, t, viewerContainer } from './state.js';
 import { isBuilding, pageLabelText } from './pages.js';
@@ -168,15 +168,8 @@ function renderResultsList() {
   for (let i = 0; i < shown; i++) {
     const m = search.matches[i];
     const li = el('li');
-    const btn = fromMarkup(listItem());
-    const page = el('span', 'res-page', state.format === 'plain' ? '' : pageLabelText(state.pages[m.page.idx], tr));
-    const text = el('span');
-    text.dir = 'auto';
-    const sn = SearchCore.snippet(m, SNIPPET_CHARS);
-    const mark = el('mark');
-    mark.textContent = sn.hit;
-    text.append(document.createTextNode(sn.before), mark, document.createTextNode(sn.after));
-    btn.append(page, text);
+    const where = state.format === 'plain' ? '' : pageLabelText(state.pages[m.page.idx], tr);
+    const btn = fromMarkup(resultRow({ where: where || undefined, snippet: SearchCore.snippet(m, SNIPPET_CHARS) }));
     btn.addEventListener('click', () => showMatch(i));
     li.appendChild(btn);
     frag.appendChild(li);

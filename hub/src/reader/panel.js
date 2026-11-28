@@ -2,7 +2,7 @@
 // measurement, and keyboard shortcuts.
 import { oncePerFrame } from '../frame.js';
 import { el, fittingToolbar, fromMarkup, setLabel, setPressed } from '../page-chrome.js';
-import { emptyState, ghostButton, listItem } from '../components.js';
+import { emptyState, ghostButton, resultRow } from '../components.js';
 import { READER_FOLD } from './fold.js';
 import { PANEL_COVERS, ZOOM_STEP } from './constants.js';
 import * as ICON from 'i360:icons';
@@ -49,12 +49,9 @@ async function jumpToElement(idx, target) {
   if (panelCoversPage()) closePanel();
 }
 
-function panelItem(text, pageText, onClick, extraClass) {
-  const btn = fromMarkup(listItem({ class: 'panel-item' + (extraClass ? ' ' + extraClass : '') }));
-  const s1 = el('span', 'item-text', text);
-  s1.dir = 'auto';
-  const s2 = el('span', 'item-page', pageText);
-  btn.append(s1, s2);
+// A contents or bookmark row (resultRow, inline): its text, then its page; `level` a heading's (1–4).
+function panelItem(text, pageText, onClick, level) {
+  const btn = fromMarkup(resultRow({ layout: 'inline', class: 'panel-item', text, where: pageText || undefined, level }));
   btn.addEventListener('click', onClick);
   return btn;
 }
@@ -87,7 +84,7 @@ function renderPanel() {
         if (!text) continue;
         const li = el('li');
         li.appendChild(panelItem(text, state.format === 'plain' ? '' : pageLabelText(state.pages[idx], tr),
-          () => jumpToElement(idx, h), `lvl-${h.tagName.slice(1)}`));
+          () => jumpToElement(idx, h), Number(h.tagName.slice(1))));
         ul.appendChild(li);
       }
     });

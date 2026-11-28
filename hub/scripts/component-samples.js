@@ -76,6 +76,13 @@ const SAMPLES = Object.freeze({
     { name: 'محدّد', args: { text: 'English', 'aria-selected': 'true' } },
     { name: 'رابط', args: { text: 'صفحة الكتاب', href: '#' } },
   ],
+  resultRow: [
+    { name: 'نتيجة بحث', args: { href: '#', where: 'ص 12', more: 'مواضع: 3', snippet: { before: '…قال الشيخ: ', hit: 'العلم', after: ' نور يقذفه الله في القلب…' } } },
+    { name: 'نتيجة بحث، زر', args: { where: 'ص 4', snippet: { before: 'باب ', hit: 'العلم', after: ' وفضله' } } },
+    { name: 'فهرس', args: { layout: 'inline', level: 1, text: 'باب العلم', where: 'ص 1' } },
+    { name: 'فهرس، مستوى ٣', args: { layout: 'inline', level: 3, text: 'فصل في آداب طالب العلم', where: 'ص 7' } },
+    { name: 'علامة', args: { layout: 'inline', text: 'قال الشيخ رحمه الله…', where: 'ص 9' } },
+  ],
   'box:card': [{ name: 'بطاقة', args: { tag: 'div', class: 'p-md', html: '<p>محتوى البطاقة</p>' } }],
   'box:inset': [{ name: 'صندوق داخلي', args: { class: 'p-md', html: '<p>محتوى داخلي</p>' } }],
   'box:popup': [{ name: 'قائمة منبثقة', args: { class: 'p-sm', html: C.listItem({ text: 'العربية' }) + C.listItem({ text: 'English' }) } }],

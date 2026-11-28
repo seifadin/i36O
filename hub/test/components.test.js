@@ -19,7 +19,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const markup = (html) => html.replace(/<(style|script)\b[^>]*>[\s\S]*?<\/\1>/g, '');
 
 // Every shared component's own class: only its builder writes it.
-const COMPONENT_CLASS = /(?<![\w-])(toolbar-menu|tb-(?:title|start|main|end|group)|divider|sr-only|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast|status|empty|rows|disclosure(?:-[a-z0-9]+)?))(?![\w-])/;
+const COMPONENT_CLASS = /(?<![\w-])(toolbar-menu|tb-(?:title|start|main|end|group)|divider|sr-only|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast|status|empty|rows|disclosure(?:-[a-z0-9]+)?|result(?:-[a-z0-9]+)?))(?![\w-])/;
 // The bar itself, in a page's HTML (in a script, "toolbar" is also the Reader's id for it).
 const BAR_CLASS = /(?<![\w-])toolbar(?![\w-])/;
 
@@ -223,4 +223,20 @@ test('components: every row that opens and closes is a disclosure — no page or
     assert.doesNotMatch(f.endsWith('.html') ? markup(text) : text, OWN, `${f}: use disclosure() / <!--@@DISCLOSURE@@-->`);
   }
   assert.throws(() => C.box('card', { tag: 'details' }), /not a details/);
+});
+
+test('components: a result row — where it is and what it says, stacked (search results) or inline (contents, bookmarks)', () => {
+  assert.equal(C.resultRow({ href: '/md/x', class: 'hit', where: 'ص 1', more: 'مواضع: 3', snippet: { before: 'قال <', hit: 'العلم', after: '> نور' } }),
+    '<a class="i360-list-item i360-result i360-result-stacked hit" href="/md/x"><span class="i360-result-where"><span>ص 1</span><span class="i360-result-more">مواضع: 3</span></span>'
+    + '<span class="i360-result-text" dir="auto">قال &lt;<mark>العلم</mark>> نور</span></a>');
+  assert.equal(C.resultRow({ snippet: { before: '', hit: 'x', after: '' } }),
+    '<button class="i360-list-item i360-result i360-result-stacked" type="button"><span class="i360-result-text" dir="auto"><mark>x</mark></span></button>', 'no where: no line for it');
+  assert.equal(C.resultRow({ layout: 'inline', level: 3, class: 'panel-item', text: 'فصل', where: 'ص 7' }),
+    '<button class="i360-list-item i360-result i360-result-inline i360-result-level-3 panel-item" type="button"><span class="i360-result-text" dir="auto">فصل</span><span class="i360-result-where"><span>ص 7</span></span></button>');
+  assert.throws(() => C.resultRow({ where: 'ص 1' }), /text or snippet/);
+  assert.throws(() => C.resultRow({ layout: 'grid', text: 'x' }), /stacked or inline/);
+  assert.throws(() => C.resultRow({ text: 'x', level: 1 }), /inline result row/);
+  assert.throws(() => C.resultRow({ layout: 'inline', text: 'x', level: 5 }), /inline result row/);
+  assert.equal(C.box('card', { tag: 'article', class: 'page-sheet' }), '<article class="i360-card page-sheet"></article>');
+  assert.equal(C.CLASS.card, 'i360-card');
 });

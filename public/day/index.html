@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-XwVe8gK4Ada8CpWmoR0+y//tOkBK98KCRY3E/2iev90='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-aXKcwNlaujpprtzxxMiLLT622TgDg6ijKxm49drv6VE='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -604,6 +604,20 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
 }
 .i360-list-item:hover, .i360-list-item.active, .i360-list-item.current { background: var(--i360-hover, #EEF2FF); }
 .i360-list-item[aria-selected="true"], .i360-list-item.active-btn { background: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
+
+/* A result row (resultRow(), on .i360-list-item): where something is, small and muted as every page
+   number and count, and what it says. Stacked (search results): where above, the snippet in reading
+   text; inline (contents, bookmarks): the text, then where at the line's end; a heading's level: 1
+   and 2 bold, 3 and 4 further in. */
+.i360-result-where { font-size: var(--i360-text-size-sm, 0.875rem); line-height: var(--i360-line-height-ui, 1.6); color: var(--i360-muted, #5A62C9); font-weight: 400; font-variant-numeric: tabular-nums; }
+.i360-result-stacked > .i360-result-where { display: flex; gap: var(--i360-space-sm, 0.5rem); }
+.i360-result-stacked > .i360-result-text { display: block; line-height: var(--i360-line-height, 2); }
+.i360-result-inline { display: flex; align-items: baseline; gap: var(--i360-space-sm, 0.5rem); }
+.i360-result-inline > .i360-result-text { flex: 1; min-width: 0; }
+.i360-result-inline > .i360-result-where { white-space: nowrap; }
+.i360-result.i360-result-level-1, .i360-result.i360-result-level-2 { font-weight: 700; }
+.i360-result.i360-result-level-3 { padding-inline-start: calc(2 * var(--i360-space-md, 1rem)); }
+.i360-result.i360-result-level-4 { padding-inline-start: calc(3 * var(--i360-space-md, 1rem)); }
 
 /* Floating surfaces: pop-ups, menus, dialogs, tooltips (the toolbar's ⋮ menu above has the same look). */
 .i360-popup {
@@ -2370,8 +2384,9 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     const inner = escapeText(a.text ?? "");
     return a.href !== void 0 ? `<a class="${classes("i360-list-item", a.class)}"${attributes(a)}>${inner}</a>` : `<button class="${classes("i360-list-item", a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
   }
+  var RESULT_LAYOUTS = Object.freeze(["stacked", "inline"]);
   var BOXES = Object.freeze({
-    card: { cls: "i360-card", tags: ["section", "div"] },
+    card: { cls: "i360-card", tags: ["section", "article", "div"] },
     inset: { cls: "i360-inset", tags: ["div"] },
     popup: { cls: "i360-popup", tags: ["div", "span"] },
     banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
@@ -2409,6 +2424,7 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
   });
   var CLASS = Object.freeze({
     banner: BOXES.banner.cls,
+    card: BOXES.card.cls,
     chipLabel: CLASS_CHIP_LABEL,
     title: TITLE,
     ghostButton: GHOST_BUTTON,

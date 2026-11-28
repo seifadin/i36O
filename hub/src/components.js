@@ -123,8 +123,37 @@ function listItem(a = {}) {
     : `<button class="${classes('i360-list-item', a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
 }
 
+const RESULT = 'i360-result';
+const RESULT_LAYOUTS = Object.freeze(['stacked', 'inline']);
+
+// A result row: where something is and what it says — a list row (listItem's look: a link with
+// `href`, else a button) holding `where` (a page label, small and muted, as every page number and
+// count) and its text: `text`, or a search `snippet` ({ before, hit, after }, the hit marked).
+//   stacked  where above, then the snippet in reading text (it is the book's own words) — search
+//            results (the CSE's, the Reader's); `more` adds a second muted note beside where
+//            (the CSE's «مواضع: N»)
+//   inline   the text, then where at the line's end — a table of contents, bookmarks; `level`
+//            1–4 (a heading's: 1 and 2 bold, 3 and 4 further in)
+// The text takes its direction from itself (dir="auto": a book may be Arabic or English). `class`
+// places the row; `title` names where it goes.
+function resultRow(a = {}) {
+  const layout = a.layout || 'stacked';
+  if (!RESULT_LAYOUTS.includes(layout)) throw new Error(`a result row's layout is stacked or inline, not "${a.layout}"`);
+  if (a.text === undefined && !a.snippet) throw new Error('a result row needs its text or snippet');
+  if (a.level !== undefined && (layout !== 'inline' || ![1, 2, 3, 4].includes(Number(a.level)))) throw new Error('a level (1–4) is for an inline result row');
+  const s = a.snippet;
+  const text = `<span class="${RESULT}-text" dir="auto">${s ? `${escapeText(s.before)}<mark>${escapeText(s.hit)}</mark>${escapeText(s.after)}` : escapeText(a.text)}</span>`;
+  const notes = [a.where ? `<span>${escapeText(a.where)}</span>` : '', a.more ? `<span class="${RESULT}-more">${escapeText(a.more)}</span>` : ''].join('');
+  const where = notes ? `<span class="${RESULT}-where">${notes}</span>` : '';
+  const own = [`i360-list-item ${RESULT} ${RESULT}-${layout}`, a.level !== undefined && `${RESULT}-level-${Number(a.level)}`].filter(Boolean).join(' ');
+  const inner = layout === 'stacked' ? where + text : text + where;
+  return a.href !== undefined
+    ? `<a class="${classes(own, a.class)}"${attributes(a)}>${inner}</a>`
+    : `<button class="${classes(own, a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
+}
+
 // The containers: their element and class; what is inside is the page's own (`html`, or what its
-// script adds). A card may be a <section>; a popup
+// script adds). A card may be a <section> or an <article> (the Reader's page sheets); a popup
 // a <span> when it is a tooltip; a banner a <button> when tapping it opens its details (the app's
 // load error) — then a button, not a status. fieldBox: a field's look round a field and its
 // buttons (the app's search bar). The app's React versions: src/components/shared.tsx, checked
@@ -144,7 +173,7 @@ function listItem(a = {}) {
 //   toolbarMenu   A toolbar's ⋮ menu
 //   rows          A list of rows, a line between each (the science accordions)
 const BOXES = Object.freeze({
-  card: { cls: 'i360-card', tags: ['section', 'div'] },
+  card: { cls: 'i360-card', tags: ['section', 'article', 'div'] },
   inset: { cls: 'i360-inset', tags: ['div'] },
   popup: { cls: 'i360-popup', tags: ['div', 'span'] },
   banner: { cls: 'i360-banner', tags: ['div', 'button'], role: 'status' },
@@ -287,12 +316,13 @@ function cardFooter(a = {}) {
 }
 
 // The component classes a script needs — to turn a component's look on and off (the CSE's status
-// line becomes a banner on an error) or to find components (a toolbar's buttons) — never written
-// out by hand.
-const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, ghostButton: GHOST_BUTTON,
+// line becomes a banner on an error), to find components (a toolbar's buttons), or to give one to an
+// element made in bulk (the Reader's page sheets, thousands in a big book, are cards) — never
+// written out by hand.
+const CLASS = Object.freeze({ banner: BOXES.banner.cls, card: BOXES.card.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, ghostButton: GHOST_BUTTON,
   toolbarEnd: BOXES.toolbarEnd.cls, toolbarMenu: BOXES.toolbarMenu.cls });
 
 // BOXES and CARD_TONES are exported for the components' inventory and catalogue
 // (scripts/list-components.js, tools/catalogue/), which list every container and card colour.
-export { ghostButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box, disclosure, dataIcon,
+export { ghostButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box, disclosure, resultRow, dataIcon,
   cardHeader, cardFooter, statusLine, announcer, emptyState, CLASS, BOXES, CARD_TONES };

@@ -1,6 +1,7 @@
 // The Reader: from book text to pages — Markdown rendering (src/book-format.js), the integrity
 // check, footnotes, text maps, building the pages in slices, and rendering a book.
 import { el, setLabel } from '../page-chrome.js';
+import { CLASS } from '../components.js';
 import { wait } from '../net.js';
 import * as BookFormat from '../book-format.js';
 import * as marked from 'marked';
@@ -288,9 +289,9 @@ function enhanceBody(root) {
 }
 
 // An empty page, sized like a printed sheet until fillSheet() gives it its text.
-// Its page number shows until its text arrives.
+// Its page number shows until its text arrives. Its look is a card's (box('card')).
 function sheetShell(idx) {
-  const sheet = el('article', 'page-sheet');
+  const sheet = el('article', `page-sheet ${CLASS.card}`);
   sheet.id = `page-${idx}`;
   sheet.dataset.idx = String(idx);
   sheet.dir = state.dir;

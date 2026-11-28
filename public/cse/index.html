@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-bnHt4GtGOaA4dRaXuA30LS7ZRSC2KmGY8mFAW81REuI='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-yYeUS+Q3aypZid9eNh2OrWtZp1QmWAfC6KfPx6UfCuo='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -610,6 +610,20 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
 .i360-list-item:hover, .i360-list-item.active, .i360-list-item.current { background: var(--i360-hover, #EEF2FF); }
 .i360-list-item[aria-selected="true"], .i360-list-item.active-btn { background: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
 
+/* A result row (resultRow(), on .i360-list-item): where something is, small and muted as every page
+   number and count, and what it says. Stacked (search results): where above, the snippet in reading
+   text; inline (contents, bookmarks): the text, then where at the line's end; a heading's level: 1
+   and 2 bold, 3 and 4 further in. */
+.i360-result-where { font-size: var(--i360-text-size-sm, 0.875rem); line-height: var(--i360-line-height-ui, 1.6); color: var(--i360-muted, #5A62C9); font-weight: 400; font-variant-numeric: tabular-nums; }
+.i360-result-stacked > .i360-result-where { display: flex; gap: var(--i360-space-sm, 0.5rem); }
+.i360-result-stacked > .i360-result-text { display: block; line-height: var(--i360-line-height, 2); }
+.i360-result-inline { display: flex; align-items: baseline; gap: var(--i360-space-sm, 0.5rem); }
+.i360-result-inline > .i360-result-text { flex: 1; min-width: 0; }
+.i360-result-inline > .i360-result-where { white-space: nowrap; }
+.i360-result.i360-result-level-1, .i360-result.i360-result-level-2 { font-weight: 700; }
+.i360-result.i360-result-level-3 { padding-inline-start: calc(2 * var(--i360-space-md, 1rem)); }
+.i360-result.i360-result-level-4 { padding-inline-start: calc(3 * var(--i360-space-md, 1rem)); }
+
 /* Floating surfaces: pop-ups, menus, dialogs, tooltips (the toolbar's ⋮ menu above has the same look). */
 .i360-popup {
   background: var(--i360-surface, #FAF7F2);
@@ -758,9 +772,6 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     .source-name .file { font-weight: 700; }
 
     .hit { margin-top: var(--i360-space-xs); padding: var(--i360-space-xs) var(--i360-space-sm); }   /* .i360-list-item */
-    .hit-meta { display: flex; gap: var(--i360-space-sm); font-size: var(--i360-text-size-sm); color: var(--i360-link); font-weight: 700; }
-    .hit-meta .more-spots { color: var(--i360-muted); font-weight: 400; }
-    .hit-text { font-family: var(--i360-font); font-size: var(--i360-text-size); line-height: var(--i360-line-height); }
 
     .group-foot { margin-top: var(--i360-space-sm); display: flex; align-items: center; gap: var(--i360-space-sm); color: var(--i360-muted); font-size: var(--i360-text-size-sm); }
   </style>
@@ -1463,12 +1474,23 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     const inner = icon ? icon + span : span.replace(/^<span>|<\/span>$/g, "");
     return `<button class="${classes(own, a.class)}" type="${a.type === "submit" ? "submit" : "button"}"${attributes(a)}${flags(a)}>${inner}</button>`;
   }
-  function listItem(a = {}) {
-    const inner = escapeText(a.text ?? "");
-    return a.href !== void 0 ? `<a class="${classes("i360-list-item", a.class)}"${attributes(a)}>${inner}</a>` : `<button class="${classes("i360-list-item", a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
+  var RESULT = "i360-result";
+  var RESULT_LAYOUTS = Object.freeze(["stacked", "inline"]);
+  function resultRow(a = {}) {
+    const layout = a.layout || "stacked";
+    if (!RESULT_LAYOUTS.includes(layout)) throw new Error(`a result row's layout is stacked or inline, not "${a.layout}"`);
+    if (a.text === void 0 && !a.snippet) throw new Error("a result row needs its text or snippet");
+    if (a.level !== void 0 && (layout !== "inline" || ![1, 2, 3, 4].includes(Number(a.level)))) throw new Error("a level (1–4) is for an inline result row");
+    const s = a.snippet;
+    const text = `<span class="${RESULT}-text" dir="auto">${s ? `${escapeText(s.before)}<mark>${escapeText(s.hit)}</mark>${escapeText(s.after)}` : escapeText(a.text)}</span>`;
+    const notes = [a.where ? `<span>${escapeText(a.where)}</span>` : "", a.more ? `<span class="${RESULT}-more">${escapeText(a.more)}</span>` : ""].join("");
+    const where = notes ? `<span class="${RESULT}-where">${notes}</span>` : "";
+    const own = [`i360-list-item ${RESULT} ${RESULT}-${layout}`, a.level !== void 0 && `${RESULT}-level-${Number(a.level)}`].filter(Boolean).join(" ");
+    const inner = layout === "stacked" ? where + text : text + where;
+    return a.href !== void 0 ? `<a class="${classes(own, a.class)}"${attributes(a)}>${inner}</a>` : `<button class="${classes(own, a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
   }
   var BOXES = Object.freeze({
-    card: { cls: "i360-card", tags: ["section", "div"] },
+    card: { cls: "i360-card", tags: ["section", "article", "div"] },
     inset: { cls: "i360-inset", tags: ["div"] },
     popup: { cls: "i360-popup", tags: ["div", "span"] },
     banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
@@ -1523,6 +1545,7 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
   });
   var CLASS = Object.freeze({
     banner: BOXES.banner.cls,
+    card: BOXES.card.cls,
     chipLabel: CLASS_CHIP_LABEL,
     title: TITLE,
     ghostButton: GHOST_BUTTON,
@@ -2068,7 +2091,14 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     const sn = hit.snippets[0];
     const link = resultLink(hit, ctx.q, sn ? sn.hit : "");
     const toReader = link.startsWith(READER);
-    const a = fromMarkup(listItem({ href: link, class: "hit" }));
+    const label = pageLabel(hit);
+    const a = fromMarkup(resultRow({
+      href: link,
+      class: "hit",
+      where: label || void 0,
+      more: hit.count > 1 ? T.spots(hit.count) : void 0,
+      ...sn ? { snippet: sn } : { text: "" }
+    }));
     if (IN_APP) {
       if (!toReader) a.addEventListener("click", openOutside);
     } else {
@@ -2076,18 +2106,6 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
       a.rel = "noopener noreferrer";
     }
     a.title = toReader ? T.openReader : T.openTitle;
-    const label = pageLabel(hit);
-    if (label || hit.count > 1) {
-      const meta = el("div", "hit-meta");
-      if (label) meta.append(el("span", "", label));
-      if (hit.count > 1) meta.append(el("span", "more-spots", T.spots(hit.count)));
-      a.append(meta);
-    }
-    if (sn) {
-      const t = el("div", "hit-text");
-      t.append(sn.before, el("mark", "", sn.hit), sn.after);
-      a.append(t);
-    }
     block.append(a);
   }
   form.addEventListener("submit", (e) => {

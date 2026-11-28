@@ -7,7 +7,7 @@ import * as CseView from '../cse-view.js';
 import { fetchWithTimeout } from '../net.js';
 import { LIB } from '../sites.js';
 import { $, IN_APP, drawSettingsButtons, el, fromMarkup, setPressed, setStatus as setLineStatus, setupClose, wireSettingsButtons } from '../page-chrome.js';
-import { CLASS, box as componentBox, button, disclosure, listItem } from '../components.js';
+import { CLASS, box as componentBox, button, disclosure, resultRow } from '../components.js';
 import * as ICON from 'i360:icons';
 import { CSE as LOCALES } from '../locales.js';
 import { numericDate } from '../dates.js';
@@ -367,7 +367,9 @@ function addHit(ctx, g, hit) {
   const sn = hit.snippets[0];
   const link = CseView.resultLink(hit, ctx.q, sn ? sn.hit : '');
   const toReader = link.startsWith(CseView.READER);
-  const a = fromMarkup(listItem({ href: link, class: 'hit' }));
+  const label = CseView.pageLabel(hit);
+  const a = fromMarkup(resultRow({ href: link, class: 'hit', where: label || undefined, more: hit.count > 1 ? T.spots(hit.count) : undefined,
+    ...(sn ? { snippet: sn } : { text: '' }) }));
   if (IN_APP) {
     // Inside the app: the Reader in this same view (its ✕ and the back button return
     // here); anything else in the phone's browser overlay, like every resource in the app.
@@ -377,18 +379,6 @@ function addHit(ctx, g, hit) {
     a.rel = 'noopener noreferrer';
   }
   a.title = toReader ? T.openReader : T.openTitle;
-  const label = CseView.pageLabel(hit);
-  if (label || hit.count > 1) {
-    const meta = el('div', 'hit-meta');
-    if (label) meta.append(el('span', '', label));
-    if (hit.count > 1) meta.append(el('span', 'more-spots', T.spots(hit.count)));
-    a.append(meta);
-  }
-  if (sn) {
-    const t = el('div', 'hit-text');
-    t.append(sn.before, el('mark', '', sn.hit), sn.after);
-    a.append(t);
-  }
   block.append(a);
 }
 

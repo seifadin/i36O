@@ -169,14 +169,11 @@
       margin-inline: auto;
     }
 
-    .page-sheet {
-      background-color: var(--i360-bg);
+    .page-sheet {   /* its look: .i360-card (a page is a card) */
       color: var(--i360-text);
       width: 100%;
       min-height: calc(var(--page-w) * 1.4142);
       padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 3.5vw, 3rem) clamp(1rem, 2vw, 1.5rem);
-      box-shadow: var(--i360-page-shadow);
-      border-radius: var(--i360-radius-sm);
       position: relative;
       overflow-wrap: break-word;
       display: flex;
@@ -378,7 +375,6 @@
       padding: var(--i360-space-xs) 0;
     }
     /* Each result: .i360-list-item. */
-    .search-results .res-page { display: block; font-family: var(--i360-font); font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
     .search-results .res-more { padding: var(--i360-space-sm); font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
 
     ::highlight(search) { background-color: var(--i360-highlight); color: inherit; }
@@ -426,12 +422,7 @@
     /* Its close and remove buttons: ghost buttons (.i360-btn-ghost). */
     .panel-body { flex: 1; overflow-y: auto; padding: var(--i360-space-xs) 0; }
     .panel-list { list-style: none; }
-    .panel-item { display: flex; align-items: baseline; gap: var(--i360-space-sm); padding: var(--i360-space-sm) var(--i360-space-md); }   /* its look: .i360-list-item */
-    .panel-item .item-text { flex: 1; min-width: 0; }
-    .panel-item .item-page { font-family: var(--i360-font); font-size: var(--i360-text-size-sm); color: var(--i360-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .panel-item.lvl-1, .panel-item.lvl-2 { font-weight: 700; }
-    .panel-item.lvl-3 { padding-inline-start: calc(2 * var(--i360-space-md)); }
-    .panel-item.lvl-4 { padding-inline-start: calc(3 * var(--i360-space-md)); }
+    .panel-item { padding: var(--i360-space-sm) var(--i360-space-md); }   /* its look: .i360-result (inline) */
     .bm-row { display: flex; align-items: center; }
     .bm-row .panel-item { flex: 1; }
     .panel-empty { padding: var(--i360-space-md); }   /* its look: .i360-empty */

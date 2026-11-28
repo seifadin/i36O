@@ -61,7 +61,7 @@ describe('the app\'s shared components write the hub builders\' structure', () =
 })
 
 describe('no app component writes a shared component\'s class itself', () => {
-  const COMPONENT_CLASS = /(?<![\w-])(toolbar|toolbar-menu|tb-(?:title|start|main|end|group)|sr-only|i360-(?:chip|field|field-input|btn|btn-ghost|list-item|card|inset|popup|banner|toast|status|empty|rows|disclosure(?:-[a-z0-9]+)?))(?![\w-])/
+  const COMPONENT_CLASS = /(?<![\w-])(toolbar|toolbar-menu|tb-(?:title|start|main|end|group)|sr-only|i360-(?:chip|field|field-input|btn|btn-ghost|list-item|card|inset|popup|banner|toast|status|empty|rows|disclosure(?:-[a-z0-9]+)?|result(?:-[a-z0-9]+)?))(?![\w-])/
   const dir = join(process.cwd(), 'src')
   const files = (readdirSync(dir, { recursive: true }) as string[])
     .filter((f) => f.endsWith('.tsx') && !f.endsWith('shared.tsx'))

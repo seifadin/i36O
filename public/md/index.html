@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-3D6hIXNf4LDnJ8FiBk72H5jhL5eVkE6zYpg22D6ry1M='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-P5qn7WS5SmxbXFWNBr83AhEDIhcpvTcsuyyZyh4KTDc='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -608,6 +608,20 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
 .i360-list-item:hover, .i360-list-item.active, .i360-list-item.current { background: var(--i360-hover, #EEF2FF); }
 .i360-list-item[aria-selected="true"], .i360-list-item.active-btn { background: var(--i360-accent, #0010CF); color: var(--i360-on-accent, #FAF7F2); }
 
+/* A result row (resultRow(), on .i360-list-item): where something is, small and muted as every page
+   number and count, and what it says. Stacked (search results): where above, the snippet in reading
+   text; inline (contents, bookmarks): the text, then where at the line's end; a heading's level: 1
+   and 2 bold, 3 and 4 further in. */
+.i360-result-where { font-size: var(--i360-text-size-sm, 0.875rem); line-height: var(--i360-line-height-ui, 1.6); color: var(--i360-muted, #5A62C9); font-weight: 400; font-variant-numeric: tabular-nums; }
+.i360-result-stacked > .i360-result-where { display: flex; gap: var(--i360-space-sm, 0.5rem); }
+.i360-result-stacked > .i360-result-text { display: block; line-height: var(--i360-line-height, 2); }
+.i360-result-inline { display: flex; align-items: baseline; gap: var(--i360-space-sm, 0.5rem); }
+.i360-result-inline > .i360-result-text { flex: 1; min-width: 0; }
+.i360-result-inline > .i360-result-where { white-space: nowrap; }
+.i360-result.i360-result-level-1, .i360-result.i360-result-level-2 { font-weight: 700; }
+.i360-result.i360-result-level-3 { padding-inline-start: calc(2 * var(--i360-space-md, 1rem)); }
+.i360-result.i360-result-level-4 { padding-inline-start: calc(3 * var(--i360-space-md, 1rem)); }
+
 /* Floating surfaces: pop-ups, menus, dialogs, tooltips (the toolbar's ⋮ menu above has the same look). */
 .i360-popup {
   background: var(--i360-surface, #FAF7F2);
@@ -846,14 +860,11 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
       margin-inline: auto;
     }
 
-    .page-sheet {
-      background-color: var(--i360-bg);
+    .page-sheet {   /* its look: .i360-card (a page is a card) */
       color: var(--i360-text);
       width: 100%;
       min-height: calc(var(--page-w) * 1.4142);
       padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 3.5vw, 3rem) clamp(1rem, 2vw, 1.5rem);
-      box-shadow: var(--i360-page-shadow);
-      border-radius: var(--i360-radius-sm);
       position: relative;
       overflow-wrap: break-word;
       display: flex;
@@ -1055,7 +1066,6 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
       padding: var(--i360-space-xs) 0;
     }
     /* Each result: .i360-list-item. */
-    .search-results .res-page { display: block; font-family: var(--i360-font); font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
     .search-results .res-more { padding: var(--i360-space-sm); font-size: var(--i360-text-size-sm); color: var(--i360-muted); }
 
     ::highlight(search) { background-color: var(--i360-highlight); color: inherit; }
@@ -1103,12 +1113,7 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     /* Its close and remove buttons: ghost buttons (.i360-btn-ghost). */
     .panel-body { flex: 1; overflow-y: auto; padding: var(--i360-space-xs) 0; }
     .panel-list { list-style: none; }
-    .panel-item { display: flex; align-items: baseline; gap: var(--i360-space-sm); padding: var(--i360-space-sm) var(--i360-space-md); }   /* its look: .i360-list-item */
-    .panel-item .item-text { flex: 1; min-width: 0; }
-    .panel-item .item-page { font-family: var(--i360-font); font-size: var(--i360-text-size-sm); color: var(--i360-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .panel-item.lvl-1, .panel-item.lvl-2 { font-weight: 700; }
-    .panel-item.lvl-3 { padding-inline-start: calc(2 * var(--i360-space-md)); }
-    .panel-item.lvl-4 { padding-inline-start: calc(3 * var(--i360-space-md)); }
+    .panel-item { padding: var(--i360-space-sm) var(--i360-space-md); }   /* its look: .i360-result (inline) */
     .bm-row { display: flex; align-items: center; }
     .bm-row .panel-item { flex: 1; }
     .panel-empty { padding: var(--i360-space-md); }   /* its look: .i360-empty */
@@ -1801,12 +1806,23 @@ ${body}`;
     search: ' type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"',
     number: ' type="text" inputmode="numeric" autocomplete="off"'
   });
-  function listItem(a = {}) {
-    const inner = escapeText(a.text ?? "");
-    return a.href !== void 0 ? `<a class="${classes("i360-list-item", a.class)}"${attributes(a)}>${inner}</a>` : `<button class="${classes("i360-list-item", a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
+  var RESULT = "i360-result";
+  var RESULT_LAYOUTS = Object.freeze(["stacked", "inline"]);
+  function resultRow(a = {}) {
+    const layout = a.layout || "stacked";
+    if (!RESULT_LAYOUTS.includes(layout)) throw new Error(`a result row's layout is stacked or inline, not "${a.layout}"`);
+    if (a.text === void 0 && !a.snippet) throw new Error("a result row needs its text or snippet");
+    if (a.level !== void 0 && (layout !== "inline" || ![1, 2, 3, 4].includes(Number(a.level)))) throw new Error("a level (1–4) is for an inline result row");
+    const s = a.snippet;
+    const text = `<span class="${RESULT}-text" dir="auto">${s ? `${escapeText(s.before)}<mark>${escapeText(s.hit)}</mark>${escapeText(s.after)}` : escapeText(a.text)}</span>`;
+    const notes = [a.where ? `<span>${escapeText(a.where)}</span>` : "", a.more ? `<span class="${RESULT}-more">${escapeText(a.more)}</span>` : ""].join("");
+    const where = notes ? `<span class="${RESULT}-where">${notes}</span>` : "";
+    const own = [`i360-list-item ${RESULT} ${RESULT}-${layout}`, a.level !== void 0 && `${RESULT}-level-${Number(a.level)}`].filter(Boolean).join(" ");
+    const inner = layout === "stacked" ? where + text : text + where;
+    return a.href !== void 0 ? `<a class="${classes(own, a.class)}"${attributes(a)}>${inner}</a>` : `<button class="${classes(own, a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
   }
   var BOXES = Object.freeze({
-    card: { cls: "i360-card", tags: ["section", "div"] },
+    card: { cls: "i360-card", tags: ["section", "article", "div"] },
     inset: { cls: "i360-inset", tags: ["div"] },
     popup: { cls: "i360-popup", tags: ["div", "span"] },
     banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
@@ -1836,6 +1852,7 @@ ${body}`;
   }
   var CLASS = Object.freeze({
     banner: BOXES.banner.cls,
+    card: BOXES.card.cls,
     chipLabel: CLASS_CHIP_LABEL,
     title: TITLE,
     ghostButton: GHOST_BUTTON,
@@ -4086,15 +4103,8 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     for (let i = 0; i < shown; i++) {
       const m = search.matches[i];
       const li = el("li");
-      const btn = fromMarkup(listItem());
-      const page = el("span", "res-page", state.format === "plain" ? "" : pageLabelText(state.pages[m.page.idx], tr));
-      const text = el("span");
-      text.dir = "auto";
-      const sn = snippet(m, SNIPPET_CHARS);
-      const mark = el("mark");
-      mark.textContent = sn.hit;
-      text.append(document.createTextNode(sn.before), mark, document.createTextNode(sn.after));
-      btn.append(page, text);
+      const where = state.format === "plain" ? "" : pageLabelText(state.pages[m.page.idx], tr);
+      const btn = fromMarkup(resultRow({ where: where || void 0, snippet: snippet(m, SNIPPET_CHARS) }));
       btn.addEventListener("click", () => showMatch(i));
       li.appendChild(btn);
       frag.appendChild(li);
@@ -4204,12 +4214,8 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     updateCounter(true);
     if (panelCoversPage()) closePanel();
   }
-  function panelItem(text, pageText, onClick, extraClass) {
-    const btn = fromMarkup(listItem({ class: "panel-item" + (extraClass ? " " + extraClass : "") }));
-    const s1 = el("span", "item-text", text);
-    s1.dir = "auto";
-    const s2 = el("span", "item-page", pageText);
-    btn.append(s1, s2);
+  function panelItem(text, pageText, onClick, level) {
+    const btn = fromMarkup(resultRow({ layout: "inline", class: "panel-item", text, where: pageText || void 0, level }));
     btn.addEventListener("click", onClick);
     return btn;
   }
@@ -4242,7 +4248,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
             text,
             state.format === "plain" ? "" : pageLabelText(state.pages[idx], tr),
             () => jumpToElement(idx, h2),
-            `lvl-${h2.tagName.slice(1)}`
+            Number(h2.tagName.slice(1))
           ));
           ul.appendChild(li);
         }
@@ -5291,7 +5297,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     }
   }
   function sheetShell(idx) {
-    const sheet = el("article", "page-sheet");
+    const sheet = el("article", `page-sheet ${CLASS.card}`);
     sheet.id = `page-${idx}`;
     sheet.dataset.idx = String(idx);
     sheet.dir = state.dir;
