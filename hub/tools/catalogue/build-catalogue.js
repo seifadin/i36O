@@ -25,6 +25,8 @@ const read = (p) => readFileSync(join(HUB, p), 'utf8');
 const THEMES = ['light', 'sepia', 'dark'];
 const escapeText = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const call = (row) => (row.startsWith('box:') ? `box('${row.slice(4)}')` : row);
+// «i360إ» as the CSE's title writes it (src/cse.src.html): an isolate keeps the إ after the name, a mark
+// before it keeps it there with Eastern digits.
 const anchor = (row) => `c-${row.replace(':', '-')}`;
 
 // The catalogue's own layout: theme columns and labels, from the theme's values.
@@ -76,7 +78,7 @@ function catalogueHtml() {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
-  <title>مكوّنات i360إ</title>
+  <title>مكوّنات &#x2066;i360إ&#x2069;</title>
   <style id="i360-fallback">${fallbackCss(read('theme/site/theme.css'))}</style>
   <link rel="stylesheet" href="${THEME_ORIGIN}/theme.css">
   <style>${chrome}${CATALOGUE_CSS}</style>
@@ -84,7 +86,7 @@ function catalogueHtml() {
 </head>
 <body class="i360-page">
   <main class="cat-page">
-    <h1>مكوّنات i360إ المشتركة</h1>
+    <h1>مكوّنات <bdi dir="ltr">i360&lrm;إ</bdi> المشتركة</h1>
     <p class="cat-note">${ROWS.length} مكوّنًا، كلٌّ منها مرسوم من بانيه في الشيفرة، بالسمات الثلاث. أماكن الاستخدام: hub/COMPONENTS.md</p>
     <nav class="cat-index">${index}</nav>
 ${sections}
