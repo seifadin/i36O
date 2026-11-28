@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # scripts/pre-commit-hook.sh — runs on every `git commit` (installed once per clone as a shim,
-# i360-instructions.md §10). When a native-relevant file is staged (NATIVE_PATTERN), it asks
+# i360-instructions.md §10). First, when a hub/ or app src/ file is staged, it builds the hub
+# (the pages, hub/COMPONENTS.md, the catalogue) and adds what the build wrote to the commit (below).
+# Then, when a native-relevant file is staged (NATIVE_PATTERN), it asks
 # for the release version: runtimeVersion derives from package.json's version, so a native
 # change released without a bump would leave OTA bundles matched to the wrong binary (§14l).
 # Here, not in pre-push: only pre-commit can still add the bumped package.json to the commit
@@ -21,6 +23,39 @@ source "$REPO_ROOT/scripts/native-pattern.sh"
 source "$REPO_ROOT/scripts/fix-ci-scripts-exec-bit.sh"
 
 STAGED_FILES=$(git diff --cached --name-only)
+
+# The hub build, so a commit never holds a source without what is built from it (i360-instructions.md
+# §1): the built pages (public/day|md|cse, the quran page), hub/COMPONENTS.md (which reads the app's
+# src/ too) and the catalogue (git-ignored). The build reads the files on disk, not the staged ones:
+# with other changes in hub/, src/ or public/ left out of the commit, what it wrote could include
+# them — so it is skipped then, with a warning (the push's tests still catch a stale COMPONENTS.md).
+# Everything it changes in those folders is its own output, added to this commit. A failing build
+# stops the commit (a broken source): fix it and commit again.
+BUILD_DIRS=(hub src public)
+if echo "$STAGED_FILES" | grep -qE '^(hub|src)/'; then
+  if [ -n "$(git diff --name-only -- "${BUILD_DIRS[@]}")" ] \
+      || [ -n "$(git ls-files --others --exclude-standard -- "${BUILD_DIRS[@]}")" ]; then
+    echo "⚠ Hub build skipped: hub/, src/ or public/ has changes not in this commit:"
+    { git diff --name-only -- "${BUILD_DIRS[@]}"; git ls-files --others --exclude-standard -- "${BUILD_DIRS[@]}"; } | sed 's/^/    /'
+    echo "  Add them too (git add -A), or build and add by hand: (cd hub && npm run build)"
+  else
+    echo "→ Hub build (pages, hub/COMPONENTS.md, catalogue)..."
+    if ! BUILD_LOG=$(cd hub && npm run build 2>&1); then
+      printf '%s\n' "$BUILD_LOG" | tail -20
+      echo "✗ Hub build failed — commit stopped. Fix it and commit again"
+      echo "  (no hub/node_modules? cd hub && npm ci)."
+      exit 1
+    fi
+    BUILT=$( { git diff --name-only -- "${BUILD_DIRS[@]}"; git ls-files --others --exclude-standard -- "${BUILD_DIRS[@]}"; } )
+    if [ -n "$BUILT" ]; then
+      git add -A -- "${BUILD_DIRS[@]}"
+      echo "✓ Added to this commit, as built:"
+      printf '%s\n' "$BUILT" | sed 's/^/    /'
+    else
+      echo "✓ Hub build: nothing changed."
+    fi
+  fi
+fi
 
 IS_NATIVE=false
 if echo "$STAGED_FILES" | grep -qE "$NATIVE_PATTERN"; then

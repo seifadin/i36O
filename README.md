@@ -35,10 +35,11 @@ npm run lucide -- <v>  # Lucide's version, for the app and the hub together
 
 cd hub && npm ci       # the hub's packages
 npm test               # ESLint, then the hub's tests
-npm run build          # writes public/md, public/cse, public/day and the quran page (hub/quran/site/i360/)
+npm run build          # writes public/md, public/cse, public/day, the quran page (hub/quran/site/i360/),
+                       # hub/COMPONENTS.md and the components' catalogue — the commit hook runs it for you
 ```
 
-Pushes to `vite` (the one permanent branch) go through `scripts/pre-push-hook.sh`, which runs the tests, publishes the hub's Workers when they change, deploys a preview and asks before releasing to the web and, over the air, to phones. Install the hooks once per clone:
+Pushes to `vite` (the one permanent branch) go through `scripts/pre-push-hook.sh`, which runs the tests, publishes the hub's Workers when they change, deploys a preview and asks before releasing to the web and, over the air, to phones. Commits go through `scripts/pre-commit-hook.sh`: when a `hub/` or `src/` file is in the commit it runs the hub build and adds what it wrote (skipped, with a warning, while those folders have changes left out of the commit; a failing build stops the commit), and it asks for a version when a native file is. Install the hooks once per clone:
 
 ```
 printf '#!/usr/bin/env bash\nexec bash "$(git rev-parse --show-toplevel)/scripts/pre-push-hook.sh" "$@"\n' > .git/hooks/pre-push && chmod +x .git/hooks/pre-push

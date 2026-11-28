@@ -89,4 +89,7 @@ function writeComponents(html, draw = svgFor) {
   });
 }
 
-export { writeComponents };
+// Every placeholder name, for the components' inventory (scripts/list-components.js).
+const PLACEHOLDER_NAMES = Object.freeze([...Object.keys(PAIRED), ...Object.keys(COMPONENTS)]);
+
+export { writeComponents, PLACEHOLDER_NAMES };

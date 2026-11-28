@@ -92,6 +92,7 @@ const FIELD_KINDS = Object.freeze({
   number: ' type="text" inputmode="numeric" autocomplete="off"',
 });
 
+// A field: a search box, a number box or a list (its kind, above).
 function field(a = {}) {
   if (a.kind === 'select') return `<select class="${classes('i360-field', a.class)}"${attributes(a)}${flags(a)}></select>`;
   const kind = FIELD_KINDS[a.kind];
@@ -127,6 +128,19 @@ function listItem(a = {}) {
 // load error) — then a button, not a status. fieldBox: a field's look round a field and its
 // buttons (the app's search bar). The app's React versions: src/components/shared.tsx, checked
 // against these by src/components/shared.test.ts.
+// Each container, as the components' inventory (scripts/list-components.js) names it:
+//   card          A box around a section
+//   inset         A box inside a section
+//   popup         A pop-up: a list, a dialog or a tooltip
+//   banner        A notice
+//   toast         A short message that comes and goes
+//   fieldBox      A field's look round a field and its buttons
+//   toolbar       A toolbar
+//   toolbarStart  A toolbar's start (its settings)
+//   toolbarMain   A toolbar's middle
+//   toolbarEnd    A toolbar's end
+//   toolbarGroup  A group of toolbar buttons
+//   toolbarMenu   A toolbar's ⋮ menu
 const BOXES = Object.freeze({
   card: { cls: 'i360-card', tags: ['section', 'details', 'div'] },
   inset: { cls: 'i360-inset', tags: ['div', 'details'] },
@@ -219,5 +233,7 @@ function cardFooter(a = {}) {
 const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON,
   toolbarEnd: BOXES.toolbarEnd.cls, toolbarMenu: BOXES.toolbarMenu.cls });
 
+// BOXES and CARD_TONES are exported for the components' inventory and catalogue
+// (scripts/list-components.js, tools/catalogue/), which list every container and card colour.
 export { toolbarButton, labelButton, menuButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box,
-  cardHeader, cardFooter, statusLine, CLASS };
+  cardHeader, cardFooter, statusLine, CLASS, BOXES, CARD_TONES };

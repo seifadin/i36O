@@ -56,6 +56,11 @@ src/icons.js          ICON_SEMANTICS: each meaning's Lucide icon, decided once �
 src/components.js     the shared components (toolbar and label buttons, fields, chips, boxes, card headers…), each
                       written once: page HTML placeholders (scripts/placeholders.js) and page scripts call the same
                       builders; the app's twins in src/components/shared.tsx are parity-tested against them
+COMPONENTS.md         every component — the shared ones (builder, placeholder, class, React twin, where used), the
+                      app's own React ones and each page's own classes — rewritten by every `npm run build`
+                      (alone: `npm run components`, scripts/list-components.js); a test fails when it is out of date
+scripts/component-samples.js  an example of each shared component, in each state (for the catalogue; a test
+                      fails when a component has none)
 library/books/        our own books     → lib.i36o.workers.dev/books/ (published by the CSE index workflow)
 indexer/wrangler.jsonc  the lib Worker (lib.i36o.workers.dev: the CSE build, our books and quran/, files only)
 indexer/quran-data.js tanzil's Quran texts and translations and the exegesis index → lib's quran/ (every CSE build)
@@ -66,6 +71,9 @@ quran/                the quran Worker (quran.i36o.workers.dev): tanzil's Naviga
 forward/404.html      fallback for the forwarding sites
 tools/compare/        dev-only old-vs-new checks (Playwright, not run by npm test); `node run.js` runs only
                       the ones a change needs — its README
+tools/catalogue/      dev-only: every shared component, drawn by its builder, in light, sepia and dark —
+                      rebuilt by every `npm run build` (alone: `npm run catalogue`) into tools/catalogue/out/index.html,
+                      one self-contained file: download it from the Codespace and open it
 ```
 Link to a book: `https://i36o.web.app/md/?file=books/NAME.md`
 Link to a page: add `#p=45` (or `#p=2:45` for volume 2, page 45).

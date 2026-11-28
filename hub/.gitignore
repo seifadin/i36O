@@ -6,3 +6,4 @@ indexer/work/
 indexer/dist/
 indexer/dist-report.json
 .wrangler/
+tools/catalogue/out/
