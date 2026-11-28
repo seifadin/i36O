@@ -7,7 +7,7 @@
 import { lstatSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { options, outDir, versionFor } from './lib/versions.js';
-import { launch, network, hubHosts, serveFile } from './lib/browser.js';
+import { launch, network, hubHosts, serveFile, SCIENCE_ROW } from './lib/browser.js';
 import { library, DISPLAY_TEST } from './lib/fixtures.js';
 import { baserow, dayServices, DAY_CLOCK } from './lib/fakes.js';
 import { compare } from './lib/report.js';
@@ -22,7 +22,7 @@ const SCREENS = {
   reader: (v) => ({ hosts: hubHosts(v), url: 'https://i36o.web.app/md/', prepare: async (p) => { await p.setInputFiles('#file-input', DISPLAY_TEST); await p.waitForTimeout(2000); } }),
   cse: (v) => ({ hosts: { ...hubHosts(v), 'lib.i36o.workers.dev': (r, u) => serveFile(r, join(LIB, decodeURIComponent(u.pathname))) }, url: `https://i36o.web.app/cse/?q=${encodeURIComponent('العلم')}`, prepare: async (p) => { await p.waitForTimeout(1500); } }),
   day: (v) => ({ hosts: { ...hubHosts(v), ...dayServices }, url: 'https://i36o.web.app/day/', clock: true }),
-  app: (v) => ({ hosts: { 'i36o.web.app': v.dist, 'theme.i36o.workers.dev': v.theme, 'api.baserow.io': baserow }, url: 'https://i36o.web.app/', prepare: async (p) => { await p.locator('main button[aria-expanded]').first().click(); await p.waitForTimeout(300); } })
+  app: (v) => ({ hosts: { 'i36o.web.app': v.dist, 'theme.i36o.workers.dev': v.theme, 'api.baserow.io': baserow }, url: 'https://i36o.web.app/', prepare: async (p) => { await p.locator(SCIENCE_ROW).first().click(); await p.waitForTimeout(300); } })
 };
 
 async function shot(browser, screen, theme, w, file) {

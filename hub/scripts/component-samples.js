@@ -13,6 +13,7 @@ import * as C from '../src/components.js';
 import { svgFor } from './icons.js';
 
 const icon = (meaning) => svgFor(meaning);
+const chevrons = { closed: icon('collapsed'), open: icon('expanded') };
 
 // A script-filled row (`data-target="x"`) given its text, as its page script would.
 const fill = (html, texts) => Object.entries(texts).reduce(
@@ -91,6 +92,16 @@ const SAMPLES = Object.freeze({
   'box:toolbarEnd': [{ name: 'نهاية الشريط', args: { html: sampleButton() }, display: (html) => C.box('toolbar', { html }) }],
   'box:toolbarGroup': [{ name: 'مجموعة أزرار', args: { html: sampleButton() + sampleButton() }, display: inBar }],
   'box:toolbarMenu': [{ name: 'قائمة ⋮', args: { html: sampleButton() } }],
+  'box:rows': [{ name: 'صفوف بينها خطوط', args: { html: '<p class="p-sm">صف</p><p class="p-sm">صف</p><p class="p-sm">صف</p>' } }],
+  disclosure: [
+    { name: 'علم، مغلق', args: { level: 1, icon: icon('verse'), text: 'العقيدة', chevrons } },
+    { name: 'علم مفتوح وفرع فيه', args: { level: 1, icon: icon('verse'), text: 'العقيدة', chevrons, open: true,
+      html: C.box('rows', { html: C.disclosure({ level: 2, icon: icon('hadith'), text: 'أصول الدين', chevrons, count: true, open: true, html: '<p class="px-md py-sm">نتائج الفرع</p>' }) }) },
+      display: (html) => C.box('rows', { html: html.replace('data-disclosure-count></span>', 'data-disclosure-count>≈ 15</span>') }) },
+    { name: 'مع العدد', args: { level: 1, text: 'الفقه', chevrons, count: true }, display: (html) => html.replace('data-disclosure-count></span>', 'data-disclosure-count>27</span>') },
+    { name: 'داخل نص', args: { inline: true, 'text-i18n': 'refsLabel', chevrons, html: '<p>صحيح البخاري (1)</p>' },
+      display: (html) => inCard(html.replace('data-i18n="refsLabel"></span>', 'data-i18n="refsLabel">المراجع</span>')) },
+  ],
   cardHeader: Object.keys(C.CARD_TONES).map((tone) => ({
     name: tone,
     args: { tone, icon: icon({ quran: 'verse', hadith: 'hadith', prayer: 'prayerTimes', converter: 'converter', event: 'events' }[tone] || 'verse'),
@@ -99,9 +110,9 @@ const SAMPLES = Object.freeze({
   cardFooter: [
     { name: 'الآية', args: { tone: 'quran', part: 'cat-quran', citation: true, reference: 'text', source: 'link', 'source-text': 'AlQuran.cloud', 'source-href': 'https://alquran.cloud/' },
       display: (html) => inCard(fill(html, { 'cat-quran-citation': 'سورة البقرة (2:186)', 'cat-quran-reference': 'تفسير الجلالين' }).replace('>Source<', '>المصدر<')) },
-    { name: 'الحديث', args: { tone: 'hadith', part: 'cat-hadith', citation: true, reference: 'details', 'reference-i18n': 'refsLabel', source: 'link', 'source-text': 'HadeethEnc.com', 'source-href': 'https://hadeethenc.com/' },
+    { name: 'الحديث', args: { tone: 'hadith', part: 'cat-hadith', citation: true, reference: 'details', 'reference-i18n': 'refsLabel', chevrons, source: 'link', 'source-text': 'HadeethEnc.com', 'source-href': 'https://hadeethenc.com/' },
       display: (html) => inCard(fill(html, { 'cat-hadith-citation': 'الدرجة: صحيح · متفق عليه', 'cat-hadith-reference': 'صحيح البخاري (1)' })
-        .replace('data-i18n="refsLabel" class="cursor-pointer text-base"></summary>', 'data-i18n="refsLabel" class="cursor-pointer text-base">المراجع</summary>').replace('>Source<', '>المصدر<')) },
+        .replace('data-i18n="refsLabel"></span>', 'data-i18n="refsLabel">المراجع</span>').replace('>Source<', '>المصدر<')) },
     { name: 'المحوّل', args: { tone: 'converter', part: 'cat-conv', source: 'text' },
       display: (html) => inCard(fill(html, { 'cat-conv-source': 'تقويم حسابي تقريبي. قد يختلف التاريخ بيوم أو اثنين عن الفعلي.' })) },
     { name: 'صفوف فارغة تختفي', args: { tone: 'quran', part: 'cat-empty', citation: true, reference: 'text', source: 'link', 'source-text': 'AlQuran.cloud', 'source-href': 'https://alquran.cloud/' },

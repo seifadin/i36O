@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-uYcd1aYaocIebYudSGtKr7wvZiCJF0vMBIHHVUXBPBE='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-bnHt4GtGOaA4dRaXuA30LS7ZRSC2KmGY8mFAW81REuI='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -433,6 +433,7 @@
    app too (text boxes show the field focus instead). */
 .i360-btn-ghost:focus-visible,
 :is(.i360-btn, .i360-chip, .i360-list-item):focus-visible,
+.i360-disclosure > summary:focus-visible,
 .i360-page :is(button, a, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: none;
   box-shadow: 0 0 0 var(--i360-line-width-strong, 2px) var(--i360-bg, #FAF7F2), 0 0 0 calc(2 * var(--i360-line-width-strong, 2px)) var(--toolbar-focus);
@@ -656,6 +657,42 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
 /* Words for screen readers only (announcer()): on no screen, still read. */
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
+/* A disclosure (disclosure()): the browser's <details>, its <summary> a row — the chevron, an
+   optional icon, the text, an optional count — that opens and closes what it holds; the science
+   accordions' look, the app's (Seif 2026-11-28). Level 1: a science, level 2: a group inside one, one
+   gap further in; inline: a collapsed list inside a text, in the text's own colour and size. Its
+   chevron changes at once, with no animation. Size and spacing are written with :where(), so a page
+   that places a row (the app's: the screen's edges, its sizes kept under the title's) wins. */
+.i360-disclosure > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  cursor: pointer;
+  user-select: none;
+  color: var(--i360-text, #0010CF);
+  font-weight: 400;
+}
+.i360-disclosure > summary::-webkit-details-marker { display: none; }
+:where(.i360-disclosure-1, .i360-disclosure-2) > summary { line-height: var(--i360-line-height-ui, 1.6); padding-inline: var(--safe-gap); }
+:where(.i360-disclosure-1) > summary { font-size: var(--i360-text-size-lg, 1.25rem); padding-block: var(--i360-space-sm, 0.5rem); }
+:where(.i360-disclosure-2) > summary { font-size: var(--i360-text-size, 1rem); padding-block: var(--i360-space-xs, 0.25rem); padding-inline-start: calc(var(--safe-gap) * 2); }
+.i360-disclosure-1 > summary:hover, .i360-disclosure-2 > summary:hover { background-color: var(--i360-hover, #EEF2FF); }
+.i360-disclosure-inline > summary { display: inline-flex; gap: var(--i360-space-xs, 0.25rem); color: inherit; font-weight: inherit; }
+.i360-disclosure-chevron, .i360-disclosure-icon { display: inline-flex; flex-shrink: 0; }
+.i360-disclosure-chevron svg, .i360-disclosure-icon svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+.i360-disclosure-inline .i360-disclosure-chevron svg { width: var(--i360-icon-size-inline, 1em); height: var(--i360-icon-size-inline, 1em); }
+.i360-disclosure-icon { color: var(--i360-link, #2E8B57); }
+.i360-disclosure:not([open]) > summary .i360-disclosure-chevron > :last-child,
+.i360-disclosure[open] > summary .i360-disclosure-chevron > :first-child { display: none; }
+/* Closed, the chevron points the way the text reads (chevron-left in Arabic and Urdu). */
+[dir="ltr"] .i360-disclosure-chevron > :first-child { transform: scaleX(-1); }
+.i360-disclosure-count { font-size: var(--i360-text-size-sm, 0.875rem); color: var(--i360-muted, #5A62C9); font-variant-numeric: tabular-nums; }
+
+/* A list of rows (box('rows')): a line between each, the theme's line colour at half strength (the
+   science accordions, at each level). */
+.i360-rows > * + * { border-top: var(--i360-line-width, 1px) solid color-mix(in srgb, var(--i360-rule, #CBD5E1) 50%, transparent); }
+
 /* A notice (an error, missing pages). */
 .i360-banner {
   background: var(--i360-banner-bg, #fef2f2);
@@ -708,29 +745,11 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     .results-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--i360-space-sm); margin-top: var(--i360-space-md); }
     .results-bar .status { margin-top: 0; }
     .bar-btns { display: flex; gap: var(--i360-space-sm); }
-    .count { font-size: var(--i360-text-size-sm); font-weight: 400; color: var(--i360-muted); font-variant-numeric: tabular-nums; }
-
-    details.major { margin-top: var(--i360-space-md); }   /* .i360-card */
-    details.inter { margin-top: var(--i360-space-sm); }   /* .i360-inset */
-    details.major > summary, details.inter > summary {
-      list-style: none;
-      display: flex;
-      align-items: center;
-      gap: var(--i360-space-sm);
-      padding: var(--i360-space-sm) var(--i360-space-md);
-      cursor: pointer;
-      font-weight: 400;   /* as the app's science list: size and place mark the levels; bold is the title's */
-      color: var(--i360-heading);
-      user-select: none;
-      border-radius: var(--i360-radius-lg);   /* the keyboard focus ring follows the box's corners */
-    }
-    details.major > summary { font-size: var(--i360-text-size-lg); }
-    details.major > summary:hover, details.inter > summary:hover { background: var(--i360-hover); border-radius: var(--i360-radius-lg); }
-    details > summary::-webkit-details-marker { display: none; }
-    details.major > summary::before, details.inter > summary::before { content: '◂'; color: var(--i360-muted); font-size: var(--i360-text-size-sm); transition: transform var(--i360-speed-quick); }
-    details.major[open] > summary::before, details.inter[open] > summary::before { transform: rotate(-90deg); }
-    .major-body { padding: 0 var(--i360-space-md) var(--i360-space-sm); }
-    .inter-body { padding: 0 var(--i360-space-md) var(--i360-space-sm); }
+    /* The science rows are the shared disclosures (.i360-disclosure, page-chrome.css), one level
+       in for a group; the results sit a level further in than their row's text, as the app's. */
+    #results { margin-top: var(--i360-space-md); }
+    .direct { padding: 0 var(--safe-gap) var(--i360-space-sm); padding-inline-start: calc(var(--safe-gap) * 2); }
+    .inter-body { padding: 0 var(--safe-gap) var(--i360-space-sm); padding-inline-start: calc(var(--safe-gap) * 3); }
 
     .source { padding-top: var(--i360-space-sm); }
     .source + .source { border-top: var(--i360-line-width) solid var(--i360-rule); margin-top: var(--i360-space-sm); }
@@ -777,7 +796,7 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
         <button class="i360-btn i360-btn-sm i360-btn-icon" type="button" id="btn-collapse" title="طي الكل" aria-label="طي الكل"><svg data-icon="collapseAll" data-lucide="list-chevrons-down-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 5 3 3 3-3"></path><path d="m15 19 3-3 3 3"></path></svg></button>
       </div>
     </div>
-    <div id="results"></div>
+    <div class="i360-rows" id="results"></div>
     <div class="about" id="about"></div>
   </main>
   </div>
@@ -1387,6 +1406,130 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
   var LIB_HOST = "lib.i36o.workers.dev";
   var LIB = `https://${LIB_HOST}/`;
 
+  // src/components.js
+  var escapeText = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  var escapeAttr = (s) => escapeText(s).replace(/"/g, "&quot;");
+  var ATTRIBUTE_ORDER = [
+    "id",
+    "name",
+    "href",
+    "target",
+    "rel",
+    "lang",
+    "dir",
+    "role",
+    "label",
+    "title",
+    "aria-label",
+    "placeholder",
+    "aria-controls",
+    "aria-labelledby",
+    "aria-haspopup",
+    "aria-expanded",
+    "aria-pressed",
+    "aria-selected",
+    "aria-live",
+    "data-i18n"
+  ];
+  function attributes(a) {
+    let out = "";
+    const write = (name, value) => {
+      if (value === void 0 || value === null || value === false) return;
+      if (name === "label") out += ` title="${escapeAttr(value)}" aria-label="${escapeAttr(value)}"`;
+      else out += value === true ? ` ${name}` : ` ${name}="${escapeAttr(value)}"`;
+    };
+    for (const name of ATTRIBUTE_ORDER) write(name, a[name]);
+    for (const name of Object.keys(a).filter((k) => k.startsWith("data-") && k !== "data-i18n").sort()) write(name, a[name]);
+    return out;
+  }
+  var GHOST_BUTTON = "i360-btn-ghost";
+  var TITLE = "tb-title";
+  var flags = (a) => `${a.disabled ? " disabled" : ""}${a.hidden ? " hidden" : ""}`;
+  var classes = (own, extra) => extra ? `${own} ${extra}` : own;
+  function buttonInside(a, what) {
+    const words = a.text !== void 0 || a["text-id"] || a["data-i18n"];
+    if (!a.icon && !words && !a.drawn) throw new Error(`${what} needs an icon, a text or both (or drawn, when its script draws it)`);
+    const span = words ? `<span${a["text-id"] ? ` id="${escapeAttr(a["text-id"])}"` : ""}>${escapeText(a.text ?? "")}</span>` : "";
+    return { icon: a.icon || "", span, iconOnly: !!a.icon && !words };
+  }
+  var CLASS_CHIP_LABEL = "i360-chip-label";
+  var FIELD_KINDS = Object.freeze({
+    search: ' type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"',
+    number: ' type="text" inputmode="numeric" autocomplete="off"'
+  });
+  function button(a = {}) {
+    const { icon, span, iconOnly } = buttonInside(a, "a button");
+    const own = ["i360-btn", a.primary && "i360-btn-primary", a.small && "i360-btn-sm", iconOnly && "i360-btn-icon"].filter(Boolean).join(" ");
+    const inner = icon ? icon + span : span.replace(/^<span>|<\/span>$/g, "");
+    return `<button class="${classes(own, a.class)}" type="${a.type === "submit" ? "submit" : "button"}"${attributes(a)}${flags(a)}>${inner}</button>`;
+  }
+  function listItem(a = {}) {
+    const inner = escapeText(a.text ?? "");
+    return a.href !== void 0 ? `<a class="${classes("i360-list-item", a.class)}"${attributes(a)}>${inner}</a>` : `<button class="${classes("i360-list-item", a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
+  }
+  var BOXES = Object.freeze({
+    card: { cls: "i360-card", tags: ["section", "div"] },
+    inset: { cls: "i360-inset", tags: ["div"] },
+    popup: { cls: "i360-popup", tags: ["div", "span"] },
+    banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
+    toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" },
+    fieldBox: { cls: "i360-field i360-field-search", tags: ["div"] },
+    // The toolbar (src/page-chrome.css): the bar, its parts, a group of its buttons and its ⋮ menu.
+    // A bar's variant (sticky: stays at the top while the page scrolls; bottom: the app's) is its own
+    // modifier class, never a page's.
+    toolbar: { cls: "toolbar", tags: ["header", "div"], variants: ["sticky", "bottom"] },
+    toolbarStart: { cls: "tb-start", tags: ["div"] },
+    toolbarMain: { cls: "tb-main", tags: ["div"] },
+    toolbarEnd: { cls: "tb-end", tags: ["div"] },
+    toolbarGroup: { cls: "tb-group", tags: ["div"] },
+    toolbarMenu: { cls: "toolbar-menu", tags: ["div"] },
+    rows: { cls: "i360-rows", tags: ["div"] }
+  });
+  function box(kind, a = {}) {
+    const k = BOXES[kind];
+    if (!k) throw new Error(`no container "${kind}"`);
+    const tag = a.tag || k.tags[0];
+    if (!k.tags.includes(tag)) throw new Error(`a ${kind} is a ${k.tags.join(" or ")}, not a ${tag}`);
+    if (a.variant && !(k.variants || []).includes(a.variant)) throw new Error(`a ${kind} has no variant "${a.variant}"`);
+    const own = a.variant ? `${k.cls} ${k.cls}-${a.variant}` : k.cls;
+    const isButton = tag === "button";
+    const all = { ...a, role: a.role ?? (isButton ? void 0 : k.role), "aria-live": a["aria-live"] ?? k.live };
+    return `<${tag} class="${classes(own, a.class)}"${isButton ? ' type="button"' : ""}${attributes(all)}${flags(a)}>${a.html ?? ""}</${tag}>`;
+  }
+  var SHAPES = /* @__PURE__ */ new Set(["path", "circle", "rect", "line", "polyline", "polygon", "ellipse"]);
+  var SHAPE_ATTRIBUTES = /* @__PURE__ */ new Set(["d", "cx", "cy", "r", "rx", "ry", "x", "y", "x1", "y1", "x2", "y2", "width", "height", "points", "fill"]);
+  function dataIcon(name, nodes) {
+    if (!/^[a-z0-9-]+$/.test(String(name)) || !Array.isArray(nodes) || !nodes.length) return "";
+    const drawing = nodes.filter((n) => Array.isArray(n) && SHAPES.has(n[0])).map(([tag, attrs]) => `<${tag}${Object.entries(attrs || {}).filter(([k]) => SHAPE_ATTRIBUTES.has(k)).map(([k, v]) => ` ${k}="${escapeAttr(v)}"`).join("")}></${tag}>`).join("");
+    return `<svg data-lucide="${name}" viewBox="0 0 24 24" aria-hidden="true">${drawing}</svg>`;
+  }
+  var DISCLOSURE = "i360-disclosure";
+  var DISCLOSURE_LEVELS = Object.freeze(["1", "2", "inline"]);
+  function disclosure(a = {}) {
+    const { closed, open } = a.chevrons || {};
+    if (!closed || !open) throw new Error("a disclosure needs its two chevrons (chevrons: { closed, open })");
+    if (a.text === void 0 && !a["text-i18n"]) throw new Error("a disclosure needs its text (text or text-i18n)");
+    const level = a.inline ? "inline" : String(a.level ?? 1);
+    if (!DISCLOSURE_LEVELS.includes(level)) throw new Error(`a disclosure's level is 1 or 2 (or inline), not "${a.level}"`);
+    const head = `<summary class="${classes(`${DISCLOSURE}-head`, a["head-class"])}"><span class="${DISCLOSURE}-chevron" aria-hidden="true">${closed}${open}</span>` + (a.icon ? `<span class="${DISCLOSURE}-icon" aria-hidden="true">${a.icon}</span>` : "") + `<span class="${DISCLOSURE}-text"${a["text-i18n"] ? ` data-i18n="${escapeAttr(a["text-i18n"])}"` : ""}>${escapeText(a.text ?? "")}</span>` + (a.count ? `<span class="${DISCLOSURE}-count" data-disclosure-count></span>` : "") + "</summary>";
+    return `<details class="${classes(`${DISCLOSURE} ${DISCLOSURE}-${level}`, a.class)}"${attributes({ id: a.id })}${a.open ? " open" : ""}${flags(a)}>${head}${a.html ?? ""}</details>`;
+  }
+  var CARD_TONES = Object.freeze({
+    quran: { tile: "bg-quran-bg text-quran", text: "text-quran" },
+    hadith: { tile: "bg-hadith-bg text-hadith", text: "text-hadith" },
+    prayer: { tile: "bg-prayer-bg text-prayer", text: "text-prayer" },
+    converter: { tile: "bg-converter-bg text-converter", text: "text-converter" },
+    event: { tile: "bg-event-bg text-event", text: "text-event" }
+  });
+  var CLASS = Object.freeze({
+    banner: BOXES.banner.cls,
+    chipLabel: CLASS_CHIP_LABEL,
+    title: TITLE,
+    ghostButton: GHOST_BUTTON,
+    toolbarEnd: BOXES.toolbarEnd.cls,
+    toolbarMenu: BOXES.toolbarMenu.cls
+  });
+
   // src/cse-view.js
   var READER = "/md/index.html";
   var RESULTS_PER_STEP = 20;
@@ -1461,7 +1604,7 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
         if (!majors.has(mk)) majors.set(mk, { majorId: u.majorId, major: u.major || "—", units: /* @__PURE__ */ new Map() });
         const M = majors.get(mk);
         if (!M.units.has(ik)) {
-          M.units.set(ik, ik ? { name: u.intermediate || M.major, order: num(ik), gps: [] } : { name: null, order: Infinity, gps: [] });
+          M.units.set(ik, ik ? { name: u.intermediate || M.major, id: ik, order: num(ik), gps: [] } : { name: null, id: null, order: Infinity, gps: [] });
         }
         const U = M.units.get(ik);
         if (!ik) U.order = Math.min(U.order, num(u.minorId));
@@ -1472,8 +1615,14 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     }
     return [...majors.values()].sort((a, b) => num(a.majorId) - num(b.majorId)).map((M) => ({
       major: M.major,
-      units: [...M.units.values()].sort((a, b) => a.order - b.order).map(({ name, gps: list }) => ({ name, gps: list }))
+      id: M.majorId || null,
+      units: [...M.units.values()].sort((a, b) => a.order - b.order).map(({ name, id, gps: list }) => ({ name, id, gps: list }))
     }));
+  }
+  function scienceIconSvg(icons, level, id, bad) {
+    if (!icons || !icons[level] || id == null || !Object.hasOwn(icons[level], id)) return "";
+    const key = icons[level][id];
+    return key && icons.drawings && dataIcon(key, icons.drawings[key]) || bad;
   }
   function readAddress(search2, hostname, protocol) {
     const p = new URLSearchParams(search2);
@@ -1499,113 +1648,11 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     return s ? `?${s}` : "";
   }
 
-  // src/components.js
-  var escapeText = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  var escapeAttr = (s) => escapeText(s).replace(/"/g, "&quot;");
-  var ATTRIBUTE_ORDER = [
-    "id",
-    "name",
-    "href",
-    "target",
-    "rel",
-    "lang",
-    "dir",
-    "role",
-    "label",
-    "title",
-    "aria-label",
-    "placeholder",
-    "aria-controls",
-    "aria-labelledby",
-    "aria-haspopup",
-    "aria-expanded",
-    "aria-pressed",
-    "aria-selected",
-    "aria-live",
-    "data-i18n"
-  ];
-  function attributes(a) {
-    let out = "";
-    const write = (name, value) => {
-      if (value === void 0 || value === null || value === false) return;
-      if (name === "label") out += ` title="${escapeAttr(value)}" aria-label="${escapeAttr(value)}"`;
-      else out += value === true ? ` ${name}` : ` ${name}="${escapeAttr(value)}"`;
-    };
-    for (const name of ATTRIBUTE_ORDER) write(name, a[name]);
-    for (const name of Object.keys(a).filter((k) => k.startsWith("data-") && k !== "data-i18n").sort()) write(name, a[name]);
-    return out;
-  }
-  var GHOST_BUTTON = "i360-btn-ghost";
-  var TITLE = "tb-title";
-  var flags = (a) => `${a.disabled ? " disabled" : ""}${a.hidden ? " hidden" : ""}`;
-  var classes = (own, extra) => extra ? `${own} ${extra}` : own;
-  function buttonInside(a, what) {
-    const words = a.text !== void 0 || a["text-id"] || a["data-i18n"];
-    if (!a.icon && !words && !a.drawn) throw new Error(`${what} needs an icon, a text or both (or drawn, when its script draws it)`);
-    const span = words ? `<span${a["text-id"] ? ` id="${escapeAttr(a["text-id"])}"` : ""}>${escapeText(a.text ?? "")}</span>` : "";
-    return { icon: a.icon || "", span, iconOnly: !!a.icon && !words };
-  }
-  var CLASS_CHIP_LABEL = "i360-chip-label";
-  var FIELD_KINDS = Object.freeze({
-    search: ' type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"',
-    number: ' type="text" inputmode="numeric" autocomplete="off"'
-  });
-  function button(a = {}) {
-    const { icon, span, iconOnly } = buttonInside(a, "a button");
-    const own = ["i360-btn", a.primary && "i360-btn-primary", a.small && "i360-btn-sm", iconOnly && "i360-btn-icon"].filter(Boolean).join(" ");
-    const inner = icon ? icon + span : span.replace(/^<span>|<\/span>$/g, "");
-    return `<button class="${classes(own, a.class)}" type="${a.type === "submit" ? "submit" : "button"}"${attributes(a)}${flags(a)}>${inner}</button>`;
-  }
-  function listItem(a = {}) {
-    const inner = escapeText(a.text ?? "");
-    return a.href !== void 0 ? `<a class="${classes("i360-list-item", a.class)}"${attributes(a)}>${inner}</a>` : `<button class="${classes("i360-list-item", a.class)}" type="button"${attributes(a)}${flags(a)}>${inner}</button>`;
-  }
-  var BOXES = Object.freeze({
-    card: { cls: "i360-card", tags: ["section", "details", "div"] },
-    inset: { cls: "i360-inset", tags: ["div", "details"] },
-    popup: { cls: "i360-popup", tags: ["div", "span"] },
-    banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
-    toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" },
-    fieldBox: { cls: "i360-field i360-field-search", tags: ["div"] },
-    // The toolbar (src/page-chrome.css): the bar, its parts, a group of its buttons and its ⋮ menu.
-    // A bar's variant (sticky: stays at the top while the page scrolls; bottom: the app's) is its own
-    // modifier class, never a page's.
-    toolbar: { cls: "toolbar", tags: ["header", "div"], variants: ["sticky", "bottom"] },
-    toolbarStart: { cls: "tb-start", tags: ["div"] },
-    toolbarMain: { cls: "tb-main", tags: ["div"] },
-    toolbarEnd: { cls: "tb-end", tags: ["div"] },
-    toolbarGroup: { cls: "tb-group", tags: ["div"] },
-    toolbarMenu: { cls: "toolbar-menu", tags: ["div"] }
-  });
-  function box(kind, a = {}) {
-    const k = BOXES[kind];
-    if (!k) throw new Error(`no container "${kind}"`);
-    const tag = a.tag || k.tags[0];
-    if (!k.tags.includes(tag)) throw new Error(`a ${kind} is a ${k.tags.join(" or ")}, not a ${tag}`);
-    if (a.variant && !(k.variants || []).includes(a.variant)) throw new Error(`a ${kind} has no variant "${a.variant}"`);
-    const own = a.variant ? `${k.cls} ${k.cls}-${a.variant}` : k.cls;
-    const isButton = tag === "button";
-    const all = { ...a, role: a.role ?? (isButton ? void 0 : k.role), "aria-live": a["aria-live"] ?? k.live };
-    return `<${tag} class="${classes(own, a.class)}"${isButton ? ' type="button"' : ""}${attributes(all)}${flags(a)}>${a.html ?? ""}</${tag}>`;
-  }
-  var CARD_TONES = Object.freeze({
-    quran: { tile: "bg-quran-bg text-quran", text: "text-quran" },
-    hadith: { tile: "bg-hadith-bg text-hadith", text: "text-hadith" },
-    prayer: { tile: "bg-prayer-bg text-prayer", text: "text-prayer" },
-    converter: { tile: "bg-converter-bg text-converter", text: "text-converter" },
-    event: { tile: "bg-event-bg text-event", text: "text-event" }
-  });
-  var CLASS = Object.freeze({
-    banner: BOXES.banner.cls,
-    chipLabel: CLASS_CHIP_LABEL,
-    title: TITLE,
-    ghostButton: GHOST_BUTTON,
-    toolbarEnd: BOXES.toolbarEnd.cls,
-    toolbarMenu: BOXES.toolbarMenu.cls
-  });
-
   // i360:icons
   var icon_theme = { "system": '<svg data-icon="theme.system" data-lucide="monitor" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>', "light": '<svg data-icon="theme.light" data-lucide="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>', "sepia": '<svg data-icon="theme.sepia" data-lucide="coffee" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2v2"></path><path d="M14 2v2"></path><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"></path><path d="M6 2v2"></path></svg>', "dark": '<svg data-icon="theme.dark" data-lucide="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg>' };
+  var icon_badIcon = '<svg data-icon="badIcon" data-lucide="circle-slash" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="9" x2="15" y1="15" y2="9"></line></svg>';
+  var icon_collapsed = '<svg data-icon="collapsed" data-lucide="chevron-left" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>';
+  var icon_expanded = '<svg data-icon="expanded" data-lucide="chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>';
 
   // src/page-chrome.js
   var $ = (id) => document.getElementById(id);
@@ -1859,17 +1906,16 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     applyNumerals2();
     if (ctx.majors.length === 1) ctx.majors[0].el.open = true;
   }
-  function summaryLine(name) {
-    const summary = el("summary");
-    const count = el("span", "count");
-    summary.append(el("span", "", name), count);
-    return { summary, count };
+  var CHEVRONS = { closed: icon_collapsed, open: icon_expanded };
+  function makeDisclosure(level, name, iconLevel, id, body) {
+    const icon = scienceIconSvg(state.catalog && state.catalog.icons, iconLevel, id, icon_badIcon);
+    const box2 = fromMarkup(disclosure({ level, text: name, icon: icon || void 0, count: true, chevrons: CHEVRONS, class: level === 1 ? "major" : "inter" }));
+    box2.append(body);
+    return { box: box2, count: box2.querySelector("[data-disclosure-count]") };
   }
   function makeMajor(ctx, M) {
-    const box2 = fromMarkup(box("card", { tag: "details", class: "major" }));
-    const { summary, count } = summaryLine(M.major);
-    const body = el("div", "major-body");
-    box2.append(summary, body);
+    const body = fromMarkup(box("rows", { class: "major-body" }));
+    const { box: box2, count } = makeDisclosure(1, M.major, "major", M.id, body);
     const m = { el: box2, count, groups: [] };
     for (const U of M.units) {
       const g = makeGroup(ctx, U, m);
@@ -1891,12 +1937,9 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     const details = U.name != null;
     let box2, count = null;
     if (details) {
-      box2 = fromMarkup(box("inset", { tag: "details", class: "inter" }));
-      const line = summaryLine(U.name);
-      count = line.count;
       const body = el("div", "inter-body");
       body.append(list, foot);
-      box2.append(line.summary, body);
+      ({ box: box2, count } = makeDisclosure(2, U.name, "intermediate", U.id, body));
     } else {
       box2 = el("div", "direct");
       box2.append(list, foot);

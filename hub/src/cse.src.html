@@ -68,29 +68,11 @@
     .results-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--i360-space-sm); margin-top: var(--i360-space-md); }
     .results-bar .status { margin-top: 0; }
     .bar-btns { display: flex; gap: var(--i360-space-sm); }
-    .count { font-size: var(--i360-text-size-sm); font-weight: 400; color: var(--i360-muted); font-variant-numeric: tabular-nums; }
-
-    details.major { margin-top: var(--i360-space-md); }   /* .i360-card */
-    details.inter { margin-top: var(--i360-space-sm); }   /* .i360-inset */
-    details.major > summary, details.inter > summary {
-      list-style: none;
-      display: flex;
-      align-items: center;
-      gap: var(--i360-space-sm);
-      padding: var(--i360-space-sm) var(--i360-space-md);
-      cursor: pointer;
-      font-weight: 400;   /* as the app's science list: size and place mark the levels; bold is the title's */
-      color: var(--i360-heading);
-      user-select: none;
-      border-radius: var(--i360-radius-lg);   /* the keyboard focus ring follows the box's corners */
-    }
-    details.major > summary { font-size: var(--i360-text-size-lg); }
-    details.major > summary:hover, details.inter > summary:hover { background: var(--i360-hover); border-radius: var(--i360-radius-lg); }
-    details > summary::-webkit-details-marker { display: none; }
-    details.major > summary::before, details.inter > summary::before { content: '◂'; color: var(--i360-muted); font-size: var(--i360-text-size-sm); transition: transform var(--i360-speed-quick); }
-    details.major[open] > summary::before, details.inter[open] > summary::before { transform: rotate(-90deg); }
-    .major-body { padding: 0 var(--i360-space-md) var(--i360-space-sm); }
-    .inter-body { padding: 0 var(--i360-space-md) var(--i360-space-sm); }
+    /* The science rows are the shared disclosures (.i360-disclosure, page-chrome.css), one level
+       in for a group; the results sit a level further in than their row's text, as the app's. */
+    #results { margin-top: var(--i360-space-md); }
+    .direct { padding: 0 var(--safe-gap) var(--i360-space-sm); padding-inline-start: calc(var(--safe-gap) * 2); }
+    .inter-body { padding: 0 var(--safe-gap) var(--i360-space-sm); padding-inline-start: calc(var(--safe-gap) * 3); }
 
     .source { padding-top: var(--i360-space-sm); }
     .source + .source { border-top: var(--i360-line-width) solid var(--i360-rule); margin-top: var(--i360-space-sm); }
@@ -137,7 +119,7 @@
         <!--@@BUTTON id="btn-collapse" icon="collapseAll" label="طي الكل" small@@-->
       </div>
     </div>
-    <div id="results"></div>
+    <!--@@ROWS id="results"@@--><!--@@/ROWS@@-->
     <div class="about" id="about"></div>
   </main>
   </div>

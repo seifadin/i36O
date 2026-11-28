@@ -7,7 +7,8 @@ import * as CseView from '../cse-view.js';
 import { fetchWithTimeout } from '../net.js';
 import { LIB } from '../sites.js';
 import { $, IN_APP, drawSettingsButtons, el, fromMarkup, setPressed, setStatus as setLineStatus, setupClose, wireSettingsButtons } from '../page-chrome.js';
-import { CLASS, box as componentBox, button, listItem } from '../components.js';
+import { CLASS, box as componentBox, button, disclosure, listItem } from '../components.js';
+import * as ICON from 'i360:icons';
 import { CSE as LOCALES } from '../locales.js';
 import { numericDate } from '../dates.js';
 
@@ -188,19 +189,20 @@ async function runSearch(run, q) {
   if (ctx.majors.length === 1) ctx.majors[0].el.open = true;
 }
 
-// A summary line: name, then its count.
-function summaryLine(name) {
-  const summary = el('summary');
-  const count = el('span', 'count');
-  summary.append(el('span', '', name), count);
-  return { summary, count };
+// A science or a group: a shared disclosure (the app's science rows) — its icon from the catalog,
+// its name, then its count. `body` holds its contents. Returns the box and its count.
+const CHEVRONS = { closed: ICON.collapsed, open: ICON.expanded };
+function makeDisclosure(level, name, iconLevel, id, body) {
+  const icon = CseView.scienceIconSvg(state.catalog && state.catalog.icons, iconLevel, id, ICON.badIcon);
+  const box = fromMarkup(disclosure({ level, text: name, icon: icon || undefined, count: true, chevrons: CHEVRONS, class: level === 1 ? 'major' : 'inter' }));
+  box.append(body);
+  return { box, count: box.querySelector('[data-disclosure-count]') };
 }
 
 function makeMajor(ctx, M) {
-  const box = fromMarkup(componentBox('card', { tag: 'details', class: 'major' }));
-  const { summary, count } = summaryLine(M.major);
-  const body = el('div', 'major-body');
-  box.append(summary, body);
+  // A science's groups, a line between each, as the app's rows.
+  const body = fromMarkup(componentBox('rows', { class: 'major-body' }));
+  const { box, count } = makeDisclosure(1, M.major, 'major', M.id, body);
   const m = { el: box, count, groups: [] };
   for (const U of M.units) {
     const g = makeGroup(ctx, U, m);
@@ -227,12 +229,9 @@ function makeGroup(ctx, U, m) {
   const details = U.name != null;
   let box, count = null;
   if (details) {
-    box = fromMarkup(componentBox('inset', { tag: 'details', class: 'inter' }));
-    const line = summaryLine(U.name);
-    count = line.count;
     const body = el('div', 'inter-body');
     body.append(list, foot);
-    box.append(line.summary, body);
+    ({ box, count } = makeDisclosure(2, U.name, 'intermediate', U.id, body));
   } else {
     box = el('div', 'direct');
     box.append(list, foot);

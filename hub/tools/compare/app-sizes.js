@@ -5,7 +5,7 @@
 // (lib/versions.js, fake Baserow tables from lib/fakes.js).
 //   node app-sizes.js [--old <ref>] [--new <ref>] [--widths 320,390,1280] [--out <folder>]
 import { app, options } from './lib/versions.js';
-import { network, errorsOf } from './lib/browser.js';
+import { network, errorsOf, SCIENCE_ROW, CLOSED_SCIENCE_ROW } from './lib/browser.js';
 import { baserow } from './lib/fakes.js';
 import { oldVsNew } from './lib/report.js';
 
@@ -13,15 +13,15 @@ const opts = options();
 const WIDTHS = typeof opts.widths === 'string' ? opts.widths.split(',').map(Number)
   : [...Array.from({ length: 69 }, (_, i) => 260 + i * 5), ...Array.from({ length: 16 }, (_, i) => 650 + i * 50)];
 
-const measure = () => {
+const measure = (row) => {
   const size = (el) => (el ? parseFloat(getComputedStyle(el).fontSize) : null);
-  const buttons = [...document.querySelectorAll('main button')];
+  const rows = [...document.querySelectorAll(row)];
   const title = document.querySelector('.shadow-toolbar') || document.querySelector('header');
   return {
     title: size(title),
-    major: size(buttons.find((b) => b.hasAttribute('aria-expanded') && !b.textContent.includes('فرع') && !b.textContent.includes('مصدر'))),
-    intermediate: size(buttons.find((b) => b.hasAttribute('aria-expanded') && b.textContent.includes('فرع'))),
-    minor: size(buttons.find((b) => !b.hasAttribute('aria-expanded') && b.textContent.includes('مصدر'))),
+    major: size(rows.find((b) => !b.textContent.includes('فرع') && !b.textContent.includes('مصدر'))),
+    intermediate: size(rows.find((b) => b.textContent.includes('فرع'))),
+    minor: size([...document.querySelectorAll('main button:not([aria-expanded])')].find((b) => b.textContent.includes('مصدر'))),
     overflow: document.documentElement.scrollWidth > window.innerWidth
   };
 };
@@ -34,9 +34,9 @@ async function one(browser, v, w) {
   await p.goto('https://i36o.web.app/'); await p.waitForTimeout(1200);
   const steps = [];
   try {
-    await p.locator('main button[aria-expanded]').first().click(); await p.waitForTimeout(200);
-    await p.locator('main button[aria-expanded="false"]').filter({ hasText: 'فرع' }).first().click(); await p.waitForTimeout(200);
-    const m = await p.evaluate(measure);
+    await p.locator(SCIENCE_ROW).first().click(); await p.waitForTimeout(200);
+    await p.locator(CLOSED_SCIENCE_ROW).filter({ hasText: 'فرع' }).first().click(); await p.waitForTimeout(200);
+    const m = await p.evaluate(measure, SCIENCE_ROW);
     m.biggerThanTitle = ['major', 'intermediate', 'minor'].filter((k) => m[k] > m.title);
     steps.push(['sizes', m]);
   } catch (e) { steps.push(['sizes', 'ERROR ' + e.message.split('\n')[0]]); }

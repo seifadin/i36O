@@ -124,7 +124,7 @@ function listItem(a = {}) {
 }
 
 // The containers: their element and class; what is inside is the page's own (`html`, or what its
-// script adds). A card or inset may be a <details> (the CSE's groups), a card a <section>; a popup
+// script adds). A card may be a <section>; a popup
 // a <span> when it is a tooltip; a banner a <button> when tapping it opens its details (the app's
 // load error) — then a button, not a status. fieldBox: a field's look round a field and its
 // buttons (the app's search bar). The app's React versions: src/components/shared.tsx, checked
@@ -142,9 +142,10 @@ function listItem(a = {}) {
 //   toolbarEnd    A toolbar's end
 //   toolbarGroup  A group of toolbar buttons
 //   toolbarMenu   A toolbar's ⋮ menu
+//   rows          A list of rows, a line between each (the science accordions)
 const BOXES = Object.freeze({
-  card: { cls: 'i360-card', tags: ['section', 'details', 'div'] },
-  inset: { cls: 'i360-inset', tags: ['div', 'details'] },
+  card: { cls: 'i360-card', tags: ['section', 'div'] },
+  inset: { cls: 'i360-inset', tags: ['div'] },
   popup: { cls: 'i360-popup', tags: ['div', 'span'] },
   banner: { cls: 'i360-banner', tags: ['div', 'button'], role: 'status' },
   toast: { cls: 'i360-toast', tags: ['div'], role: 'status', live: 'polite' },
@@ -158,6 +159,7 @@ const BOXES = Object.freeze({
   toolbarEnd: { cls: 'tb-end', tags: ['div'] },
   toolbarGroup: { cls: 'tb-group', tags: ['div'] },
   toolbarMenu: { cls: 'toolbar-menu', tags: ['div'] },
+  rows: { cls: 'i360-rows', tags: ['div'] },
 });
 
 function box(kind, a = {}) {
@@ -170,6 +172,47 @@ function box(kind, a = {}) {
   const isButton = tag === 'button';
   const all = { ...a, role: a.role ?? (isButton ? undefined : k.role), 'aria-live': a['aria-live'] ?? k.live };
   return `<${tag} class="${classes(own, a.class)}"${isButton ? ' type="button"' : ''}${attributes(all)}${flags(a)}>${a.html ?? ''}</${tag}>`;
+}
+
+// An icon named by data, not by a meaning (the sciences' icons, named in Baserow: the CSE draws them
+// from its catalog, indexer/science-icons.js): Lucide's drawing `nodes` ([[tag, attrs], …], as in
+// lucide-static's icon-nodes.json) written as the pages write every icon — only the shapes and
+// attributes Lucide uses, escaped. '' for a name or drawing that isn't one.
+const SHAPES = new Set(['path', 'circle', 'rect', 'line', 'polyline', 'polygon', 'ellipse']);
+const SHAPE_ATTRIBUTES = new Set(['d', 'cx', 'cy', 'r', 'rx', 'ry', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'width', 'height', 'points', 'fill']);
+function dataIcon(name, nodes) {
+  if (!/^[a-z0-9-]+$/.test(String(name)) || !Array.isArray(nodes) || !nodes.length) return '';
+  const drawing = nodes.filter((n) => Array.isArray(n) && SHAPES.has(n[0])).map(([tag, attrs]) =>
+    `<${tag}${Object.entries(attrs || {}).filter(([k]) => SHAPE_ATTRIBUTES.has(k)).map(([k, v]) => ` ${k}="${escapeAttr(v)}"`).join('')}></${tag}>`).join('');
+  return `<svg data-lucide="${name}" viewBox="0 0 24 24" aria-hidden="true">${drawing}</svg>`;
+}
+
+const DISCLOSURE = 'i360-disclosure';
+const DISCLOSURE_LEVELS = Object.freeze(['1', '2', 'inline']);
+
+// A disclosure: a row that opens and closes what it holds — the browser's own <details>, so it
+// works without script and screen readers announce it as expanded or collapsed. The science
+// accordions (the app's and the CSE's: `level` 1, a science; 2, a group inside one) and a collapsed
+// list inside a text (`inline`: Daily Reflection's references). Its heading: the chevron (`chevrons`
+// { closed, open }, both drawn; the right one shows by itself), then an optional `icon`, its text
+// (`text`, or `text-i18n` for words its page fills), and with `count` a place for a number
+// ([data-disclosure-count], filled by its script). What it holds is `html` (or what its script
+// adds). `open` starts it open; `head-class` places the heading (the app's rows reach the screen's
+// edges); `class` places the whole. A heading holds no other control: a button inside a <summary>
+// would also open and close it.
+function disclosure(a = {}) {
+  const { closed, open } = a.chevrons || {};
+  if (!closed || !open) throw new Error('a disclosure needs its two chevrons (chevrons: { closed, open })');
+  if (a.text === undefined && !a['text-i18n']) throw new Error('a disclosure needs its text (text or text-i18n)');
+  const level = a.inline ? 'inline' : String(a.level ?? 1);
+  if (!DISCLOSURE_LEVELS.includes(level)) throw new Error(`a disclosure's level is 1 or 2 (or inline), not "${a.level}"`);
+  const head = `<summary class="${classes(`${DISCLOSURE}-head`, a['head-class'])}">`
+    + `<span class="${DISCLOSURE}-chevron" aria-hidden="true">${closed}${open}</span>`
+    + (a.icon ? `<span class="${DISCLOSURE}-icon" aria-hidden="true">${a.icon}</span>` : '')
+    + `<span class="${DISCLOSURE}-text"${a['text-i18n'] ? ` data-i18n="${escapeAttr(a['text-i18n'])}"` : ''}>${escapeText(a.text ?? '')}</span>`
+    + (a.count ? `<span class="${DISCLOSURE}-count" data-disclosure-count></span>` : '')
+    + '</summary>';
+  return `<details class="${classes(`${DISCLOSURE} ${DISCLOSURE}-${level}`, a.class)}"${attributes({ id: a.id })}${a.open ? ' open' : ''}${flags(a)}>${head}${a.html ?? ''}</details>`;
 }
 
 // A card's header (Daily Reflection): its icon on a tile in the card's colour, then its name.
@@ -218,7 +261,8 @@ function emptyState(a = {}) {
 // row is optional and filled by the page script through `<part>-<row>` targets; a row left empty
 // is hidden, so a card that has only a source shows just that line.
 //   citation: the reference line (سورة البقرة (2:186); a hadith's grade and attribution)
-//   reference: "text" (the edition shown) or "details" (a collapsed list, `reference-i18n` its label)
+//   reference: "text" (the edition shown) or "details" (a collapsed list, `reference-i18n` its label:
+//              an inline disclosure, `chevrons` its two chevrons)
 //   source: "link" — «المصدر: <a>» with `source-text` and `source-href` — or "text"
 // `class` places it (a margin).
 function cardFooter(a = {}) {
@@ -231,8 +275,8 @@ function cardFooter(a = {}) {
   if (a.reference === 'text') rows.push(`<p data-target="${t('reference')}" class="text-sm empty:hidden"></p>`);
   else if (a.reference === 'details') {
     if (!a['reference-i18n']) throw new Error('a collapsed reference needs its label (reference-i18n)');
-    rows.push(`<details class="text-sm has-[>p:empty]:hidden"><summary data-i18n="${escapeAttr(a['reference-i18n'])}" class="cursor-pointer text-base"></summary>`
-      + `<p data-target="${t('reference')}" class="mt-sm whitespace-pre-line"></p></details>`);
+    rows.push(disclosure({ inline: true, chevrons: a.chevrons, 'text-i18n': a['reference-i18n'], class: 'text-sm has-[>p:empty]:hidden', 'head-class': 'text-base',
+      html: `<p data-target="${t('reference')}" class="mt-sm whitespace-pre-line"></p>` }));
   } else if (a.reference) throw new Error('a card footer\'s reference is "text" or "details"');
   if (a.source === 'link') {
     if (!a['source-text'] || !a['source-href']) throw new Error('a source link needs source-text and source-href');
@@ -250,5 +294,5 @@ const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LA
 
 // BOXES and CARD_TONES are exported for the components' inventory and catalogue
 // (scripts/list-components.js, tools/catalogue/), which list every container and card colour.
-export { ghostButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box,
+export { ghostButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box, disclosure, dataIcon,
   cardHeader, cardFooter, statusLine, announcer, emptyState, CLASS, BOXES, CARD_TONES };

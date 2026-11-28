@@ -191,3 +191,24 @@ test('once a quarter, the science icons in the same rows are reported (old and u
     for (const r of ROWS) delete r.ScienceMinorIcon;
   }
 });
+
+test('the CSE\'s catalog carries each science\'s and group\'s icon, and a changed icon alone makes a new build', async () => {
+  const dir = setup();
+  const state = { calls: [], md5: 'a1', archiveDownloads: 0 };
+  ROWS[0].ScienceMajorIcon = 'ScrollText';
+  ROWS[0].ScienceIntermediateIcon = 'NoSuchIcon';
+  try {
+    const one = await idx.run({ fetchFn: services(state), key: 'K', rootDir: dir, archivePages: fakeArchive(state), passes: 1, buildId: 'one', log: () => {} });
+    const written = JSON.parse(readFileSync(join(dir, 'dist', 'b', 'one', 'catalog.json'), 'utf8'));
+    assert.deepEqual([written.icons.major, written.icons.intermediate, Object.keys(written.icons.drawings)], [{ 2: 'scroll-text' }, { 20: null }, ['scroll-text']]);
+    assert.deepEqual(one.catalog.icons, written.icons);
+    const same = await idx.run({ fetchFn: services(state), key: 'K', rootDir: dir, archivePages: fakeArchive(state), passes: 1, buildId: 'two', log: () => {}, previous: 'dist' });
+    assert.equal(same.changed, false, 'the same icons: nothing to publish');
+    ROWS[0].ScienceMajorIcon = 'BookOpen';
+    const changed = await idx.run({ fetchFn: services(state), key: 'K', rootDir: dir, archivePages: fakeArchive(state), passes: 1, buildId: 'three', log: () => {}, previous: 'dist' });
+    assert.equal(changed.changed, true, 'only an icon changed: a new build');
+    assert.equal(changed.catalog.icons.major[2], 'book-open');
+  } finally {
+    for (const r of ROWS) { delete r.ScienceMajorIcon; delete r.ScienceIntermediateIcon; }
+  }
+});

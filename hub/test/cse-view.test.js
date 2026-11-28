@@ -78,9 +78,20 @@ test('candidate groups follow the app: majors and units in ID order (as numbers)
   const searcher = CseIndex.createSearcher(cat, () => { throw new Error('no loading here'); });
   const g = CseView.candidateGroups(searcher, [0, 2, 3, 4, 5, 7]);
   assert.deepEqual(g.map((M) => M.major), ['القرآن', 'الفقه', 'ثقافة']);
-  assert.deepEqual(g[0].units, [{ name: null, gps: [7] }], 'no intermediate: directly under the major');
+  assert.deepEqual(g[0].units, [{ name: null, id: null, gps: [7] }], 'no intermediate: directly under the major');
+  assert.deepEqual(g.map((M) => [M.id, M.units.map((U) => U.id)]), [['1', [null]], ['2', ['2.10', null, '2.2']], ['10', ['10.3']]], 'each science and group keeps its ID (its icon)');
   assert.deepEqual(g[1].units.map((U) => [U.name, U.gps]), [['ب', [3, 4]], [null, [5]], ['أ', [3, 4]]]);
   assert.deepEqual(g[1].units.map((U) => U.name), ['ب', null, 'أ'], '2.10 (=2.1) < 2.15 < 2.2, as numbers');
   assert.deepEqual(g[1].units[2].gps, [3, 4], 'a page used twice in one unit is listed once');
   assert.deepEqual(g[2].units[0].gps, [0, 2]);
+});
+
+test('a science\'s icon comes from the catalog: none when it has none (or an older catalog), the badIcon for a name Lucide lacks', () => {
+  const icons = { major: { 1: 'search', 2: null, 3: 'gone' }, intermediate: {}, drawings: { search: [['circle', { cx: '1', cy: '1', r: '1' }]] } };
+  assert.equal(CseView.scienceIconSvg(icons, 'major', '1', 'BAD'), '<svg data-lucide="search" viewBox="0 0 24 24" aria-hidden="true"><circle cx="1" cy="1" r="1"></circle></svg>');
+  assert.equal(CseView.scienceIconSvg(icons, 'major', '2', 'BAD'), 'BAD', 'Baserow names an icon Lucide doesn\'t have');
+  assert.equal(CseView.scienceIconSvg(icons, 'major', '3', 'BAD'), 'BAD', 'no drawing for it');
+  assert.equal(CseView.scienceIconSvg(icons, 'major', '9', 'BAD'), '', 'no icon');
+  assert.equal(CseView.scienceIconSvg(icons, 'intermediate', null, 'BAD'), '');
+  assert.equal(CseView.scienceIconSvg(undefined, 'major', '1', 'BAD'), '', 'a catalog from before icons');
 });

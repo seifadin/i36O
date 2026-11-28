@@ -4,6 +4,7 @@
    the CSE page). */
 import { LIB_HOST } from './sites.js';
 import { num } from './cse-index.js';
+import { dataIcon } from './components.js';
 // The Reader on the same site as this page (i36o.web.app or the app's own copy).
 // Always /md/index.html: inside the app, Capacitor's server answers /md/ with the app's
 // home page (i360-hub.md §10).
@@ -116,8 +117,8 @@ function candidateGroups(searcher, gps) {
       const M = majors.get(mk);
       if (!M.units.has(ik)) {
         M.units.set(ik, ik
-          ? { name: u.intermediate || M.major, order: num(ik), gps: [] }
-          : { name: null, order: Infinity, gps: [] });
+          ? { name: u.intermediate || M.major, id: ik, order: num(ik), gps: [] }
+          : { name: null, id: null, order: Infinity, gps: [] });
       }
       const U = M.units.get(ik);
       if (!ik) U.order = Math.min(U.order, num(u.minorId));
@@ -128,8 +129,20 @@ function candidateGroups(searcher, gps) {
   }
   return [...majors.values()].sort((a, b) => num(a.majorId) - num(b.majorId)).map((M) => ({
     major: M.major,
-    units: [...M.units.values()].sort((a, b) => a.order - b.order).map(({ name, gps: list }) => ({ name, gps: list }))
+    id: M.majorId || null,
+    units: [...M.units.values()].sort((a, b) => a.order - b.order).map(({ name, id, gps: list }) => ({ name, id, gps: list }))
   }));
+}
+
+/* ---------------- Science icons ----------------
+   A science's or group's icon, drawn from the catalog (its `icons`, written by the indexer:
+   indexer/science-icons.js forCatalog) as the pages draw every Lucide icon. '' when it has none (or
+   the catalog predates icons); `bad` (the badIcon, drawn) when Baserow names an icon Lucide doesn't
+   have, as the app shows. Drawn by dataIcon() (src/components.js). */
+function scienceIconSvg(icons, level, id, bad) {
+  if (!icons || !icons[level] || id == null || !Object.hasOwn(icons[level], id)) return '';
+  const key = icons[level][id];
+  return (key && icons.drawings && dataIcon(key, icons.drawings[key])) || bad;
 }
 
 /* ---------------- Address ----------------
@@ -160,4 +173,4 @@ function writeAddress({ q, exact, word, data }) {
   return s ? `?${s}` : '';
 }
 
-export { LIB_HOST, READER, RESULTS_PER_STEP, itemFileCounts, sourceName, pageLabel, resultLink, candidateGroups, readAddress, writeAddress };
+export { LIB_HOST, READER, RESULTS_PER_STEP, itemFileCounts, sourceName, pageLabel, resultLink, candidateGroups, scienceIconSvg, readAddress, writeAddress };

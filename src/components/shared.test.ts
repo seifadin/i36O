@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import * as Hub from '@i360/components'
-import { Announcer, Banner, Button, FieldBox, GhostButton, Popup, SearchField, Toast, Toolbar, ToolbarStart } from './shared'
+import { Announcer, Banner, Button, Disclosure, FieldBox, GhostButton, Popup, Rows, SearchField, Toast, Toolbar, ToolbarStart } from './shared'
 
 // The app's shared components (shared.tsx) against the hub builders (hub/src/components.js): the
 // same element, classes and attributes for the same inputs. An icon's drawing is left out (each
@@ -13,6 +13,7 @@ import { Announcer, Banner, Button, FieldBox, GhostButton, Popup, SearchField, T
 
 const ICON = '<svg data-icon="x"></svg>'
 const icon = h('svg', { 'data-icon': 'x' })
+const CHEVRONS = { closed: ICON, open: ICON }
 
 function normal(html: string): string {
   return html
@@ -44,6 +45,11 @@ describe('the app\'s shared components write the hub builders\' structure', () =
     ['field box', h(FieldBox, { className: 'flex' }), Hub.box('fieldBox', { class: 'flex' })],
     ['hidden announcer', h(Announcer), Hub.announcer()],
     ['search field in a field box', h(SearchField, { id: 'q', placeholder: 'ابحث…' }), Hub.field({ kind: 'search', 'in-box': true, id: 'q', placeholder: 'ابحث…' })],
+    ['rows', h(Rows), Hub.box('rows')],
+    ['a science, closed', h(Disclosure, { text: 'العقيدة', open: false, onToggle: () => {} }, 'x'), Hub.disclosure({ text: 'العقيدة', chevrons: CHEVRONS })],
+    ['a group, open, with its icon, placed', h(Disclosure, { level: 2, icon, text: 'أصول الدين', open: true, onToggle: () => {}, headClassName: 'safe-sides', className: 'inter' }, h('p', null, 'x')),
+      Hub.disclosure({ level: 2, icon: ICON, text: 'أصول الدين', open: true, 'head-class': 'safe-sides', class: 'inter', chevrons: CHEVRONS, html: '<p>x</p>' })],
+    ['inline, with a count', h(Disclosure, { inline: true, text: 'المراجع', count: '', open: false, onToggle: () => {} }), Hub.disclosure({ inline: true, text: 'المراجع', count: true, chevrons: CHEVRONS })],
   ]
   it.each(cases)('%s', (_, el, hub) => {
     expect(app(el)).toBe(normal(hub))
@@ -55,7 +61,7 @@ describe('the app\'s shared components write the hub builders\' structure', () =
 })
 
 describe('no app component writes a shared component\'s class itself', () => {
-  const COMPONENT_CLASS = /(?<![\w-])(toolbar|toolbar-menu|tb-(?:title|start|main|end|group)|sr-only|i360-(?:chip|field|field-input|btn|btn-ghost|list-item|card|inset|popup|banner|toast|status|empty))(?![\w-])/
+  const COMPONENT_CLASS = /(?<![\w-])(toolbar|toolbar-menu|tb-(?:title|start|main|end|group)|sr-only|i360-(?:chip|field|field-input|btn|btn-ghost|list-item|card|inset|popup|banner|toast|status|empty|rows|disclosure(?:-[a-z0-9]+)?))(?![\w-])/
   const dir = join(process.cwd(), 'src')
   const files = (readdirSync(dir, { recursive: true }) as string[])
     .filter((f) => f.endsWith('.tsx') && !f.endsWith('shared.tsx'))

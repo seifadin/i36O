@@ -1,4 +1,5 @@
-import { forwardRef, type ButtonHTMLAttributes, type HTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, type ButtonHTMLAttributes, type HTMLAttributes, type InputHTMLAttributes, type MouseEvent, type ReactNode } from 'react'
+import { ICON } from '@/lib/icons'
 
 // The app's shared components (their look: hub/src/page-chrome.css). Each writes exactly the
 // structure of its hub builder in hub/src/components.js — the same element, own classes and fixed
@@ -83,4 +84,34 @@ export function ToolbarStart({ className, children, ...rest }: BoxProps) {
 // A field's look round a field and its buttons (hub: box('fieldBox')) — the search bar.
 export function FieldBox({ className, children, ...rest }: BoxProps) {
   return <div className={cx('i360-field i360-field-search', className)} {...rest}>{children}</div>
+}
+
+// A list of rows, a line between each (hub: box('rows')) — the science list, at each level.
+export function Rows({ className, children, ...rest }: BoxProps) {
+  return <div className={cx('i360-rows', className)} {...rest}>{children}</div>
+}
+
+// A row that opens and closes what it holds (hub: disclosure): the browser's <details>, so screen
+// readers announce it as expanded or collapsed. React decides which is open (`open`; a tap asks
+// `onToggle`), so the science list keeps one open at a time, and draws what it holds only while
+// open. Level 1: a science, 2: a group inside one; `inline`: a collapsed list inside a text. Its
+// heading: the chevron (the right one shows by itself), an optional `icon`, its `text`, an optional
+// `count`. `headClassName` places the heading (the screen's edges, the list's sizes); `className`
+// the whole. Nothing else goes in the heading: a button there would also open and close it.
+export function Disclosure({ level = 1, inline, icon, text, count, open, onToggle, id, className, headClassName, children }: {
+  level?: 1 | 2; inline?: boolean; icon?: ReactNode; text: string; count?: string; open: boolean; onToggle: () => void
+  id?: string; className?: string; headClassName?: string; children?: ReactNode
+}) {
+  const toggle = (e: MouseEvent) => { e.preventDefault(); onToggle() }
+  return (
+    <details className={cx(`i360-disclosure i360-disclosure-${inline ? 'inline' : level}`, className)} id={id} open={open}>
+      <summary className={cx('i360-disclosure-head', headClassName)} onClick={toggle}>
+        <span className="i360-disclosure-chevron" aria-hidden="true"><ICON.collapsed /><ICON.expanded /></span>
+        {icon && <span className="i360-disclosure-icon" aria-hidden="true">{icon}</span>}
+        <span className="i360-disclosure-text">{text}</span>
+        {count !== undefined && <span className="i360-disclosure-count" data-disclosure-count="">{count}</span>}
+      </summary>
+      {open && children}
+    </details>
+  )
 }

@@ -53,6 +53,11 @@ export const hubHosts = (v) => ({ 'i36o.web.app': v.public, 'theme.i36o.workers.
 // One browser for a whole run; contexts are opened per case.
 export const launch = () => chromium.launch();
 
+// The app's science rows that open and close: a <summary> since the shared disclosure (2026-11-28),
+// a button with aria-expanded before — both, so either version can be compared.
+export const SCIENCE_ROW = 'main summary, main button[aria-expanded]';
+export const CLOSED_SCIENCE_ROW = 'main details:not([open]) > summary, main button[aria-expanded="false"]';
+
 // Collects uncaught page errors (part of every result: a new error is a difference).
 export function errorsOf(page) {
   const errors = [];

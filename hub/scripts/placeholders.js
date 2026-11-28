@@ -15,6 +15,8 @@
 //   <!--@@BUTTON id="btn-exegesis" icon="exegesis" text="تفسير" text-id="exegesis-label" disabled@@-->
 //   <!--@@LIST_ITEM id="lang-ar" lang="ar" data-lang="ar" text="العربية"@@-->
 //   <!--@@CARD id="quran-card" class="…"@@--> …the page's own contents… <!--@@/CARD@@-->
+//   <!--@@DISCLOSURE level="2" text="…" count@@--> …what it holds… <!--@@/DISCLOSURE@@-->  (icon; text-i18n; inline; open; head-class)
+//   <!--@@ROWS id="results"@@--><!--@@/ROWS@@-->                   (a line between each row)
 //   (likewise INSET, POPUP, BANNER, TOAST, FIELD_BOX and the toolbar's: TOOLBAR variant="sticky", TOOLBAR_START,
 //   TOOLBAR_MAIN, TOOLBAR_END, TOOLBAR_GROUP, TOOLBAR_MENU; tag="…" where the container allows another element)
 //   <!--@@CARD_HEADER tone="quran" icon="verse" data-i18n="quranLabel" text="Quranic Verse" class="mb-md"@@-->
@@ -46,7 +48,11 @@ const PAIRED = Object.freeze({
   TOOLBAR_END: (a, inner) => C.box('toolbarEnd', { ...a, html: inner }),
   TOOLBAR_GROUP: (a, inner) => C.box('toolbarGroup', { ...a, html: inner }),
   TOOLBAR_MENU: (a, inner) => C.box('toolbarMenu', { ...a, html: inner }),
+  ROWS: (a, inner) => C.box('rows', { ...a, html: inner }),
+  DISCLOSURE: (a, inner, draw) => C.disclosure({ ...a, icon: a.icon ? draw(a.icon) : undefined, chevrons: CHEVRONS(draw), html: inner }),
 });
+// A disclosure's two chevrons, by their meanings (src/icons.js).
+const CHEVRONS = (draw) => ({ closed: draw('collapsed'), open: draw('expanded') });
 // Its contents hold no opening of the same container, so the innermost pair is written first.
 const pairedPattern = (name) => new RegExp(`<!--@@${name}((?:\\s+[a-z0-9-]+(?:="[^"]*")?)*)\\s*@@-->((?:(?!<!--@@${name}[\\s@])[\\s\\S])*?)<!--@@\\/${name}@@-->`, 'g');
 
@@ -65,7 +71,7 @@ const COMPONENTS = Object.freeze({
   BUTTON: (a, draw) => C.button({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
   LIST_ITEM: (a) => C.listItem(a),
   CARD_HEADER: (a, draw) => C.cardHeader({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
-  CARD_FOOTER: (a) => C.cardFooter(a),
+  CARD_FOOTER: (a, draw) => C.cardFooter({ ...a, chevrons: a.reference === 'details' ? CHEVRONS(draw) : undefined }),
   STATUS_LINE: (a) => C.statusLine(a),
   ANNOUNCER: (a) => C.announcer(a),
   EMPTY_STATE: (a) => C.emptyState(a),
@@ -78,7 +84,7 @@ function writeComponents(html, draw = svgFor) {
   do {
     before = out;
     for (const [name, make] of Object.entries(PAIRED)) {
-      out = out.replace(pairedPattern(name), (_, attrs, inner) => make(parse(attrs), inner));
+      out = out.replace(pairedPattern(name), (_, attrs, inner) => make(parse(attrs), inner, draw));
     }
   } while (out !== before);
   return out.replace(PLACEHOLDER, (all, name, attrs) => {

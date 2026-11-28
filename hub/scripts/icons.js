@@ -58,6 +58,9 @@ const nameFor = (meaning, semantics) =>
 function check(html, icons = lucide(), semantics = ICON_SEMANTICS) {
   const problems = [];
   for (const m of html.matchAll(SVG)) {
+    // A template, not an icon: src/components.js's dataIcon() draws an icon named by data (the
+    // sciences', from the CSE's catalog) — its drawing is checked there, shape by shape.
+    if (m[0].includes('${')) continue;
     const line = lineOf(html, m.index);
     const meaning = (m[1].match(MEANING) || [])[1];
     const name = (m[1].match(NAME) || [])[1];

@@ -110,11 +110,12 @@ async function readPrevious({ fetchFn, previous, log }) {
 /* What a build would contain, minus its id, time and file layout: when
    the planned build's matches the previous one, there's nothing to publish
    (and no build is written). */
-function signature({ versions, sources, unindexed, books }) {
+function signature({ versions, sources, unindexed, books, icons }) {
   const byId = (a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
   return JSON.stringify({
     versions,
     books: books || [],
+    icons: icons || null,   // the sciences' icons (science-icons.js forCatalog): a changed icon is a new build
     sources: [...sources].sort(byId).map((s) => ({
       id: s.id, url: s.url, links: s.links, type: s.type, title: s.title || null, fingerprint: s.fingerprint || null,
       how: s.how || null, pageCount: s.pageCount, usedBy: s.usedBy
@@ -124,12 +125,13 @@ function signature({ versions, sources, unindexed, books }) {
 }
 const versionsOf = (c) => ({ format: c.format, searchCore: c.searchCore, bookFormat: c.bookFormat, extractor: c.extractor });
 const currentVersions = () => ({ format: CseIndex.FORMAT, searchCore: SearchCore.VERSION, bookFormat: BookFormat.VERSION, extractor: EXTRACTOR_VERSION });
-const catalogSignature = (c) => signature({ versions: versionsOf(c), sources: c.sources, unindexed: c.unindexed || [], books: c.books });
-const plannedSignature = (entries, books) => signature({
+const catalogSignature = (c) => signature({ versions: versionsOf(c), sources: c.sources, unindexed: c.unindexed || [], books: c.books, icons: c.icons || null });
+const plannedSignature = (entries, books, icons) => signature({
   versions: currentVersions(),
   sources: entries.filter((e) => e.pageCount > 0),
   unindexed: entries.filter((e) => !(e.pageCount > 0)),
-  books
+  books,
+  icons
 });
 
 // Our own books (library/books/), published as they are: [{ name, hash }].
@@ -225,6 +227,8 @@ async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, 
   const refreshAll = refresh.includes('all');
   const wantRefresh = (s) => refreshAll || refresh.some((r) => s.links.includes(r) || s.id === r || s.fetchUrl === r);
   log(`${sources.length} sources (${all.length - sources.length} website links skipped).`);
+  // The sciences' and groups' icons, for the CSE's catalog (science-icons.js forCatalog).
+  const icons = ScienceIcons.forCatalog(rows, inventory.fieldText);
 
   // Once a quarter (the full check in a quarter's first week, as tanzil's re-check): the science
   // icons in those same rows against the pinned Lucide (science-icons.js). Report only.
@@ -308,7 +312,7 @@ async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, 
   // For the GitHub workflow: publish only when something changed.
   const output = (changed) => { if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `changed=${changed}\n`); };
   const ownBooks = libraryBooks(libraryDir);
-  if (prev && prev.usable && !quran.changed && catalogSignature(prev.catalog) === plannedSignature(entries, ownBooks)) {
+  if (prev && prev.usable && !quran.changed && catalogSignature(prev.catalog) === plannedSignature(entries, ownBooks, icons)) {
     log(`Nothing changed since build ${prev.catalog.buildId}: no build written, nothing to publish.`);
     output(false);
     return { catalog: prev.catalog, report: { buildId: prev.catalog.buildId, status, quran: quran.report, scienceIcons, changed: false }, changed: false };
@@ -323,7 +327,7 @@ async function runIn({ fetchFn, key, table, refresh, archivePages, passes, log, 
   log(`Writing build ${id}…`);
   // Text from a local previous build is in the work folder by now, so the
   // dist folder can be replaced.
-  const { catalog, stats } = await writeBuild({ sources: entries, outDir: distDir, buildId: id, passes, log, extractor: EXTRACTOR_VERSION, books: ownBooks });
+  const { catalog, stats } = await writeBuild({ sources: entries, outDir: distDir, buildId: id, passes, log, extractor: EXTRACTOR_VERSION, books: ownBooks, icons });
   writeFileSync(join(distDir, '_headers'), LIB_HEADERS);
   writeFileSync(join(distDir, 'robots.txt'), LIB_ROBOTS);
   cpSync(join(quranDir, 'quran'), join(distDir, 'quran'), { recursive: true });

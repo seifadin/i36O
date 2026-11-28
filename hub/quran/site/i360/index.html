@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-HkeAQ9o83xzviNaJ8roftNLdhb/rwNtsGKkLGMVcIXc='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-3t+9psnFLDvtnMuxQj5GL9rWeqgHkFFhhJZ4NhmVl90='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev 'self'; img-src 'self'; frame-src 'self' https://tanzil.net; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>القرآن الكريم — مشروع تنزيل</title>
   <meta name="description" content="القرآن الكريم من مشروع تنزيل (tanzil.net)، مع زر لتفسير الآية الظاهرة من فهرس الموسوعة الإسلامية i360إ.">
@@ -425,6 +425,7 @@
    app too (text boxes show the field focus instead). */
 .i360-btn-ghost:focus-visible,
 :is(.i360-btn, .i360-chip, .i360-list-item):focus-visible,
+.i360-disclosure > summary:focus-visible,
 .i360-page :is(button, a, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: none;
   box-shadow: 0 0 0 var(--i360-line-width-strong, 2px) var(--i360-bg, #FAF7F2), 0 0 0 calc(2 * var(--i360-line-width-strong, 2px)) var(--toolbar-focus);
@@ -647,6 +648,42 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
 
 /* Words for screen readers only (announcer()): on no screen, still read. */
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* A disclosure (disclosure()): the browser's <details>, its <summary> a row — the chevron, an
+   optional icon, the text, an optional count — that opens and closes what it holds; the science
+   accordions' look, the app's (Seif 2026-11-28). Level 1: a science, level 2: a group inside one, one
+   gap further in; inline: a collapsed list inside a text, in the text's own colour and size. Its
+   chevron changes at once, with no animation. Size and spacing are written with :where(), so a page
+   that places a row (the app's: the screen's edges, its sizes kept under the title's) wins. */
+.i360-disclosure > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--i360-space-sm, 0.5rem);
+  cursor: pointer;
+  user-select: none;
+  color: var(--i360-text, #0010CF);
+  font-weight: 400;
+}
+.i360-disclosure > summary::-webkit-details-marker { display: none; }
+:where(.i360-disclosure-1, .i360-disclosure-2) > summary { line-height: var(--i360-line-height-ui, 1.6); padding-inline: var(--safe-gap); }
+:where(.i360-disclosure-1) > summary { font-size: var(--i360-text-size-lg, 1.25rem); padding-block: var(--i360-space-sm, 0.5rem); }
+:where(.i360-disclosure-2) > summary { font-size: var(--i360-text-size, 1rem); padding-block: var(--i360-space-xs, 0.25rem); padding-inline-start: calc(var(--safe-gap) * 2); }
+.i360-disclosure-1 > summary:hover, .i360-disclosure-2 > summary:hover { background-color: var(--i360-hover, #EEF2FF); }
+.i360-disclosure-inline > summary { display: inline-flex; gap: var(--i360-space-xs, 0.25rem); color: inherit; font-weight: inherit; }
+.i360-disclosure-chevron, .i360-disclosure-icon { display: inline-flex; flex-shrink: 0; }
+.i360-disclosure-chevron svg, .i360-disclosure-icon svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+.i360-disclosure-inline .i360-disclosure-chevron svg { width: var(--i360-icon-size-inline, 1em); height: var(--i360-icon-size-inline, 1em); }
+.i360-disclosure-icon { color: var(--i360-link, #2E8B57); }
+.i360-disclosure:not([open]) > summary .i360-disclosure-chevron > :last-child,
+.i360-disclosure[open] > summary .i360-disclosure-chevron > :first-child { display: none; }
+/* Closed, the chevron points the way the text reads (chevron-left in Arabic and Urdu). */
+[dir="ltr"] .i360-disclosure-chevron > :first-child { transform: scaleX(-1); }
+.i360-disclosure-count { font-size: var(--i360-text-size-sm, 0.875rem); color: var(--i360-muted, #5A62C9); font-variant-numeric: tabular-nums; }
+
+/* A list of rows (box('rows')): a line between each, the theme's line colour at half strength (the
+   science accordions, at each level). */
+.i360-rows > * + * { border-top: var(--i360-line-width, 1px) solid color-mix(in srgb, var(--i360-rule, #CBD5E1) 50%, transparent); }
 
 /* A notice (an error, missing pages). */
 .i360-banner {
@@ -961,8 +998,8 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     number: ' type="text" inputmode="numeric" autocomplete="off"'
   });
   var BOXES = Object.freeze({
-    card: { cls: "i360-card", tags: ["section", "details", "div"] },
-    inset: { cls: "i360-inset", tags: ["div", "details"] },
+    card: { cls: "i360-card", tags: ["section", "div"] },
+    inset: { cls: "i360-inset", tags: ["div"] },
     popup: { cls: "i360-popup", tags: ["div", "span"] },
     banner: { cls: "i360-banner", tags: ["div", "button"], role: "status" },
     toast: { cls: "i360-toast", tags: ["div"], role: "status", live: "polite" },
@@ -975,8 +1012,10 @@ div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i3
     toolbarMain: { cls: "tb-main", tags: ["div"] },
     toolbarEnd: { cls: "tb-end", tags: ["div"] },
     toolbarGroup: { cls: "tb-group", tags: ["div"] },
-    toolbarMenu: { cls: "toolbar-menu", tags: ["div"] }
+    toolbarMenu: { cls: "toolbar-menu", tags: ["div"] },
+    rows: { cls: "i360-rows", tags: ["div"] }
   });
+  var DISCLOSURE_LEVELS = Object.freeze(["1", "2", "inline"]);
   var CARD_TONES = Object.freeze({
     quran: { tile: "bg-quran-bg text-quran", text: "text-quran" },
     hadith: { tile: "bg-hadith-bg text-hadith", text: "text-hadith" },

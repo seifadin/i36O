@@ -35,7 +35,9 @@ function walk(dir, keep) {
 }
 
 // The builders, in the order components.js exports them; box() becomes one row per container.
-const BUILDERS = Object.keys(C).filter((k) => typeof C[k] === 'function');
+// dataIcon draws an icon from data for a component (a disclosure's icon), it places nothing itself.
+const HELPERS = new Set(['dataIcon']);
+const BUILDERS = Object.keys(C).filter((k) => typeof C[k] === 'function' && !HELPERS.has(k));
 const ROWS = BUILDERS.flatMap((b) => (b === 'box' ? Object.keys(C.BOXES).map((k) => `box:${k}`) : [b]));
 const toSnake = (name) => name.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase();
 const placeholderOf = (row) => {

@@ -37,7 +37,7 @@ function walkFiles(dir) {
   return out;
 }
 
-async function writeBuild({ sources, outDir, buildId, passes = 8, chunkBytes = CHUNK_BYTES, log = () => {}, extractor = null, books = [] }) {
+async function writeBuild({ sources, outDir, buildId, passes = 8, chunkBytes = CHUNK_BYTES, log = () => {}, extractor = null, books = [], icons = null }) {
   const base = join(outDir, 'b', buildId);
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(join(base, 'index'), { recursive: true });
@@ -116,7 +116,9 @@ async function writeBuild({ sources, outDir, buildId, passes = 8, chunkBytes = C
     format: CseIndex.FORMAT, buildId, builtAt: new Date().toISOString(),
     searchCore: SearchCore.VERSION, bookFormat: BookFormat.VERSION, extractor,
     shards: CseIndex.SHARDS, minQuery: CseIndex.MIN_QUERY,
-    pageCount, sources: catalogSources, unindexed, books
+    pageCount, sources: catalogSources, unindexed, books,
+    // The sciences' and groups' icons (indexer/science-icons.js forCatalog); none in a build made without them.
+    ...(icons ? { icons } : {})
   };
   writeFileSync(join(base, 'catalog.json'), JSON.stringify(catalog));
   writeFileSync(join(outDir, 'latest.json'), JSON.stringify({ buildId }));

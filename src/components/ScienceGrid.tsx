@@ -13,7 +13,7 @@ import { fetchIcon, iconLoaded, loadedIcon } from '@/lib/iconsLoader'
 import { APP } from '@i360/locales'
 import Dialog from '@/components/Dialog'
 import ReportNotice from '@/components/ReportNotice'
-import { Banner, GhostButton, Toast } from '@/components/shared'
+import { Banner, Disclosure, GhostButton, Rows, Toast } from '@/components/shared'
 
 const T = APP.ar
 
@@ -44,42 +44,25 @@ function DynamicIcon({ name }: { name: string }) {
 // which React treats as a brand-new component type and remounts instead
 // of reconciling.
 
-// Every row reaches the screen's edges (its highlight and dividers); its content keeps the
-// shared gap from them, clear of any safe-area inset (safe-sides, page-chrome.css), one gap
-// more per level down.
-const BUTTON = {
-  major: 'flex w-full items-center justify-between safe-sides py-sm text-right text-list-lg font-normal text-brand-blue hover:bg-brand-highlight focus:outline-none',
-  intermediate: 'flex w-full items-center justify-between safe-sides [--safe-level:2] py-xs text-right text-list font-normal text-brand-blue hover:bg-brand-highlight focus:outline-none',
-}
-const PANEL = { major: 'divide-y divide-brand-divider bg-brand-ivory', intermediate: 'divide-y divide-brand-divider bg-brand-ivory' }
+// A science or group row is the shared disclosure (shared.tsx; look: page-chrome.css), as in the
+// CSE. Placed here: every row reaches the screen's edges (its highlight and dividers), its content
+// keeping the shared gap from them, clear of any safe-area inset (safe-sides), one gap more per
+// level down; its text never bigger than the app's title (text-list-lg, text-list).
+const HEAD = { 1: 'safe-sides text-list-lg', 2: 'safe-sides [--safe-level:2] text-list' } as const
 
-// One expandable row of the science accordion (major or intermediate level).
-// aria-expanded / aria-controls let screen readers announce what the chevron
-// shows, and tie the button to the panel it reveals (WAI-ARIA disclosure).
-function DisclosureRow({ level, label, icon, expanded, panelId, onToggle, children }: {
-  level: 'major' | 'intermediate'
+// One expandable row of the science list: what it holds, a line between each.
+function ScienceRow({ level, label, icon, open, onToggle, children }: {
+  level: 1 | 2
   label: string
   icon?: string | null
-  expanded: boolean
-  panelId: string
+  open: boolean
   onToggle: () => void
   children: ReactNode
 }) {
   return (
-    <div>
-      <button type="button" onClick={onToggle} aria-expanded={expanded} aria-controls={panelId} className={BUTTON[level]}>
-        <div className="flex items-center gap-sm">
-          {expanded ? <ICON.expanded /> : <ICON.collapsed />}
-          {icon && (
-            <span className="text-brand-green">
-              <DynamicIcon name={icon} />
-            </span>
-          )}
-          <span>{label}</span>
-        </div>
-      </button>
-      {expanded && <div id={panelId} className={PANEL[level]}>{children}</div>}
-    </div>
+    <Disclosure level={level} text={label} icon={icon ? <DynamicIcon name={icon} /> : undefined} open={open} onToggle={onToggle} headClassName={HEAD[level]}>
+      <Rows>{children}</Rows>
+    </Disclosure>
   )
 }
 
@@ -297,15 +280,14 @@ export default function ScienceGrid() {
           },
         }}
       />
-      <div className="divide-y divide-brand-divider">
+      <Rows>
       {groups.map(group => (
-        <DisclosureRow
+        <ScienceRow
           key={group.majorId}
-          level="major"
+          level={1}
           label={group.major}
           icon={group.majorIcon}
-          expanded={openMajorId === group.majorId}
-          panelId={`sci-major-${group.majorId}`}
+          open={openMajorId === group.majorId}
           onToggle={() => {
             setOpenMajorId(openMajorId === group.majorId ? null : group.majorId)
             setOpenIntermediateId(null)
@@ -313,13 +295,12 @@ export default function ScienceGrid() {
         >
           {group.children.map(child =>
             child.kind === 'intermediate' ? (
-              <DisclosureRow
+              <ScienceRow
                 key={`int-${child.intermediateId}`}
-                level="intermediate"
+                level={2}
                 label={child.intermediate}
                 icon={child.intermediateIcon}
-                expanded={openIntermediateId === child.intermediateId}
-                panelId={`sci-int-${group.majorId}-${child.intermediateId}`}
+                open={openIntermediateId === child.intermediateId}
                 onToggle={() => setOpenIntermediateId(openIntermediateId === child.intermediateId ? null : child.intermediateId)}
               >
                 {child.items.map(({ science }) => (
@@ -331,7 +312,7 @@ export default function ScienceGrid() {
                     onAppendixTap={handleAppendixTap}
                   />
                 ))}
-              </DisclosureRow>
+              </ScienceRow>
             ) : (
               <MinorButton
                 key={`minor-${child.science.ScienceMinorId}`}
@@ -342,9 +323,9 @@ export default function ScienceGrid() {
               />
             )
           )}
-        </DisclosureRow>
+        </ScienceRow>
       ))}
-      </div>
+      </Rows>
     </Fragment>
   )
 }

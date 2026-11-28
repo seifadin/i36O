@@ -13,12 +13,13 @@ const SRC = path.join(ROOT, 'src');
 const PAGES = fs.readdirSync(SRC).filter((f) => f.endsWith('.src.html'));
 const BUILT = ['../public/md/index.html', '../public/cse/index.html', '../public/day/index.html', 'quran/site/i360/index.html'];
 const SVG = (m) => `<svg data-icon="${m}" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path></path></svg>`;
+const CHEVRONS = { closed: SVG('l'), open: SVG('d') };
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 // Markup outside the page's <style> and <script> (their text may name classes).
 const markup = (html) => html.replace(/<(style|script)\b[^>]*>[\s\S]*?<\/\1>/g, '');
 
 // Every shared component's own class: only its builder writes it.
-const COMPONENT_CLASS = /(?<![\w-])(toolbar-menu|tb-(?:title|start|main|end|group)|divider|sr-only|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast|status|empty))(?![\w-])/;
+const COMPONENT_CLASS = /(?<![\w-])(toolbar-menu|tb-(?:title|start|main|end|group)|divider|sr-only|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast|status|empty|rows|disclosure(?:-[a-z0-9]+)?))(?![\w-])/;
 // The bar itself, in a page's HTML (in a script, "toolbar" is also the Reader's id for it).
 const BAR_CLASS = /(?<![\w-])toolbar(?![\w-])/;
 
@@ -107,7 +108,7 @@ test('components: each builder writes one fixed structure, attributes in one ord
   assert.equal(C.button({ small: true, text: '', 'data-retry': true }), '<button class="i360-btn i360-btn-sm" type="button" data-retry></button>');
   assert.equal(C.listItem({ id: 'l', lang: 'ur', 'data-lang': 'ur', text: 'اردو' }), '<button class="i360-list-item" type="button" id="l" lang="ur" data-lang="ur">اردو</button>');
   assert.equal(C.listItem({ href: '/md/?file=x&p=1', class: 'hit' }), '<a class="i360-list-item hit" href="/md/?file=x&amp;p=1"></a>');
-  assert.equal(C.box('card', { tag: 'details', class: 'major' }), '<details class="i360-card major"></details>');
+  assert.equal(C.box('card', { tag: 'section', class: 'major' }), '<section class="i360-card major"></section>');
   assert.equal(C.box('toast', { id: 't' }), '<div class="i360-toast" id="t" role="status" aria-live="polite"></div>');
   assert.equal(C.box('banner', { html: '<p>x</p>' }), '<div class="i360-banner" role="status"><p>x</p></div>');
   assert.equal(C.cardHeader({ tone: 'quran', icon: SVG('verse'), 'data-i18n': 'quranLabel', text: 'Quranic Verse', class: 'mb-md' }),
@@ -121,8 +122,11 @@ test('components: each builder writes one fixed structure, attributes in one ord
   assert.equal(C.cardFooter({ tone: 'quran', part: 'quran', citation: true, reference: 'text', source: 'link', 'source-text': 'AlQuran.cloud', 'source-href': 'https://alquran.cloud/', class: 'mt-md' }),
     '<div class="border-t border-rule pt-md space-y-xs font-bold text-quran mt-md"><p data-target="quran-citation" class="text-base empty:hidden"></p><p data-target="quran-reference" class="text-sm empty:hidden"></p>'
     + '<p class="text-sm"><span data-i18n="sourceLabel">Source</span>: <a data-target="quran-link" href="https://alquran.cloud/" target="_blank" rel="noopener noreferrer" class="underline">AlQuran.cloud</a></p></div>');
-  assert.equal(C.cardFooter({ tone: 'hadith', part: 'hadith', reference: 'details', 'reference-i18n': 'refsLabel' }),
-    '<div class="border-t border-rule pt-md space-y-xs font-bold text-hadith"><details class="text-sm has-[>p:empty]:hidden"><summary data-i18n="refsLabel" class="cursor-pointer text-base"></summary><p data-target="hadith-reference" class="mt-sm whitespace-pre-line"></p></details></div>');
+  assert.equal(C.cardFooter({ tone: 'hadith', part: 'hadith', reference: 'details', 'reference-i18n': 'refsLabel', chevrons: CHEVRONS }),
+    '<div class="border-t border-rule pt-md space-y-xs font-bold text-hadith"><details class="i360-disclosure i360-disclosure-inline text-sm has-[>p:empty]:hidden">'
+    + '<summary class="i360-disclosure-head text-base"><span class="i360-disclosure-chevron" aria-hidden="true">' + SVG('l') + SVG('d') + '</span><span class="i360-disclosure-text" data-i18n="refsLabel"></span></summary>'
+    + '<p data-target="hadith-reference" class="mt-sm whitespace-pre-line"></p></details></div>');
+  assert.throws(() => C.cardFooter({ tone: 'hadith', part: 'hadith', reference: 'details', 'reference-i18n': 'refsLabel' }), /two chevrons/);
   assert.equal(C.cardFooter({ tone: 'converter', part: 'conv', source: 'text' }),
     '<div class="border-t border-rule pt-md space-y-xs font-bold text-converter"><p data-target="conv-source" class="text-sm empty:hidden"></p></div>');
   assert.throws(() => C.cardFooter({ tone: 'quran', part: 'q' }), /at least one row/);
@@ -184,4 +188,39 @@ test('components: Daily Reflection\'s verse, hadith and converter cards end with
   for (const part of ['quran', 'hadith', 'conv']) assert.match(html, new RegExp(`<!--@@CARD_FOOTER [^@]*part="${part}"`), part);
   assert.doesNotMatch(html, /border-t border-rule pt-md space-y-xs/, 'a footer written by hand');
   assert.doesNotMatch(html, /data-i18n="sourceLabel"/, 'a source line written by hand');
+});
+
+test('components: a disclosure — the browser\'s <details>, its heading a row (chevrons, icon, text, count), two levels or inline', () => {
+  const head = (inner, cls = '') => `<summary class="i360-disclosure-head${cls}"><span class="i360-disclosure-chevron" aria-hidden="true">${SVG('l')}${SVG('d')}</span>${inner}</summary>`;
+  assert.equal(C.disclosure({ text: 'العقيدة', chevrons: CHEVRONS }),
+    `<details class="i360-disclosure i360-disclosure-1">${head('<span class="i360-disclosure-text">العقيدة</span>')}</details>`);
+  assert.equal(C.disclosure({ level: 2, icon: SVG('i'), text: 'أصول <الدين>', count: true, open: true, id: 'g', class: 'inter', 'head-class': 'safe-sides', chevrons: CHEVRONS, html: '<p>x</p>' }),
+    `<details class="i360-disclosure i360-disclosure-2 inter" id="g" open>${head(`<span class="i360-disclosure-icon" aria-hidden="true">${SVG('i')}</span><span class="i360-disclosure-text">أصول &lt;الدين></span><span class="i360-disclosure-count" data-disclosure-count></span>`, ' safe-sides')}<p>x</p></details>`);
+  assert.equal(C.disclosure({ inline: true, 'text-i18n': 'refsLabel', chevrons: CHEVRONS }),
+    `<details class="i360-disclosure i360-disclosure-inline">${head('<span class="i360-disclosure-text" data-i18n="refsLabel"></span>')}</details>`);
+  assert.ok(C.disclosure({ level: '2', text: 'x', chevrons: CHEVRONS }).startsWith('<details class="i360-disclosure i360-disclosure-2"><summary'), 'a placeholder\'s level (text) works too');
+  assert.throws(() => C.disclosure({ text: 'x' }), /two chevrons/);
+  assert.throws(() => C.disclosure({ chevrons: CHEVRONS }), /needs its text/);
+  assert.throws(() => C.disclosure({ level: 3, text: 'x', chevrons: CHEVRONS }), /level is 1 or 2/);
+  assert.equal(C.box('rows', { id: 'results' }), '<div class="i360-rows" id="results"></div>');
+});
+
+test('components: an icon named by data (the sciences\') is drawn from Lucide\'s nodes, only its shapes, escaped', () => {
+  assert.equal(C.dataIcon('book-open', [['path', { d: 'M12 7v14' }], ['circle', { cx: '12', cy: '12', r: '3' }]]),
+    '<svg data-lucide="book-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v14"></path><circle cx="12" cy="12" r="3"></circle></svg>');
+  assert.equal(C.dataIcon('x', [['script', { src: 'a' }], ['path', { d: '"><b>', onload: 'x', 'on-x': 'y' }]]),
+    '<svg data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path d="&quot;>&lt;b>"></path></svg>');
+  assert.equal(C.dataIcon('Bad Name', [['path', { d: 'M0 0' }]]), '');
+  assert.equal(C.dataIcon('x', []), '');
+  assert.equal(C.dataIcon('x', null), '');
+});
+
+test('components: every row that opens and closes is a disclosure — no page or page script writes <details> or <summary> itself', () => {
+  const OWN = /<(details|summary)\b|\b(?:el|createElement)\(\s*['"](details|summary)['"]|\btag:\s*['"]details['"]/;
+  const files = fs.readdirSync(SRC, { recursive: true }).filter((f) => /\.(html|js)$/.test(f) && f !== 'components.js');
+  for (const f of files) {
+    const text = fs.readFileSync(path.join(SRC, f), 'utf8');
+    assert.doesNotMatch(f.endsWith('.html') ? markup(text) : text, OWN, `${f}: use disclosure() / <!--@@DISCLOSURE@@-->`);
+  }
+  assert.throws(() => C.box('card', { tag: 'details' }), /not a details/);
 });

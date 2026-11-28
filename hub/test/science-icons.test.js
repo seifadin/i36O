@@ -37,3 +37,21 @@ test('science icons: the installed Lucide is read (old names included)', () => {
   assert.equal(names.get('History'), 'RotateCcwClock');
   assert.equal(names.get('ScrollText'), 'ScrollText');
 });
+
+test('science icons for the CSE\'s catalog: each science\'s and group\'s icon by ID, old names drawn as their icon, unknown ones null, one drawing each', () => {
+  const nodes = { 'book-bookmark': [['path', { d: 'M1 1' }]], search: [['circle', { cx: '1', cy: '1', r: '1' }]] };
+  const text = (v) => (v == null ? '' : String(v));
+  const rows = [
+    { ScienceMajorId: 1, ScienceMajorIcon: 'Search', ScienceIntermediateId: '1.1', ScienceIntermediateIcon: 'BookMarked' },
+    { ScienceMajorId: 1, ScienceMajorIcon: 'BookMarked', ScienceIntermediateId: '1.2', ScienceIntermediateIcon: ' Typo ' },
+    { ScienceMajorId: 2, ScienceMajorIcon: '', ScienceIntermediateId: '', ScienceIntermediateIcon: 'Search' },
+  ];
+  assert.deepEqual(ScienceIcons.forCatalog(rows, text, ScienceIcons.lucideFiles(INDEX), nodes), {
+    major: { 1: 'search' },
+    intermediate: { '1.1': 'book-bookmark', '1.2': null },
+    drawings: { search: nodes.search, 'book-bookmark': nodes['book-bookmark'] },
+  });
+  const real = ScienceIcons.forCatalog([{ ScienceMajorId: 5, ScienceMajorIcon: 'ScrollText' }], text);
+  assert.equal(real.major[5], 'scroll-text');
+  assert.ok(Array.isArray(real.drawings['scroll-text']) && real.drawings['scroll-text'].length, 'the installed Lucide\'s drawing');
+});

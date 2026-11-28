@@ -5,7 +5,7 @@
 // Besides old vs new, any sideways scrolling in the new version is listed on its own.
 //   node sweep.js [--old <ref>] [--new <ref>] [--pages reader,cse,day,app] [--out <folder>]
 import { options, versionFor } from './lib/versions.js';
-import { network, hubHosts, serveFile } from './lib/browser.js';
+import { network, hubHosts, serveFile, SCIENCE_ROW } from './lib/browser.js';
 import { books, library } from './lib/fixtures.js';
 import { baserow, dayServices, DAY_CLOCK } from './lib/fakes.js';
 import { oldVsNew } from './lib/report.js';
@@ -42,7 +42,7 @@ const CASES = {
     `https://i36o.web.app/cse/?q=${encodeURIComponent('العلم')}`, async (p) => { await p.waitForTimeout(1500); }),
   day: async (b, v) => sweepOne(b, { ...hubHosts(v), ...dayServices }, 'https://i36o.web.app/day/', null, false, true),
   app: async (b, v) => sweepOne(b, { 'i36o.web.app': v.dist, 'theme.i36o.workers.dev': v.theme, 'api.baserow.io': baserow }, 'https://i36o.web.app/',
-    async (p) => { await p.locator('main button[aria-expanded]').first().click(); await p.waitForTimeout(300); })
+    async (p) => { await p.locator(SCIENCE_ROW).first().click(); await p.waitForTimeout(300); })
 };
 
 async function sweepOne(browser, hosts, url, prepare, inApp = false, clock = false) {
