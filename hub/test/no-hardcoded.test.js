@@ -19,7 +19,8 @@ const ALLOWED = {
     '1.6rem': 'a button\'s narrowest width at the densest step',
     '0.9rem': 'the option tick box',
     '0.7rem': 'the tick inside it',
-    '0px': 'no status-bar inset for the bottom bar'
+    '0px': 'no status-bar inset for the bottom bar',
+    '1px': 'the screen-reader-only box (.sr-only)'
   },
   'theme/site/botpress.css': {},
   'src/reader.src.html': {
@@ -32,7 +33,7 @@ const ALLOWED = {
     '26rem': 'search pop-up width', '20rem': 'side panel width', '2.5rem': 'floating button size'
   },
   'src/cse.src.html': { '2.75rem': 'search box and button height', '1.5rem': 'status line height (one line)' },
-  'src/quran.src.html': { '48rem': 'tanzil\'s banner at most its own width (768 px)', '1px': 'the hidden status line for screen readers' },
+  'src/quran.src.html': { '48rem': 'tanzil\'s banner at most its own width (768 px)' },
   'src/day.src.html': { '11rem': 'language list narrowest' }
 };
 

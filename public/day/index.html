@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-lmwAhzP2x5Ixkk6I2VS2VkLDN6LtJJY4BlVBYsZRq3k='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-oboQZXm65tWbGgVbEuT5dxsV/8zIO9nXkAKOxZvXnqM='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://api.alquran.cloud https://hadeethenc.com https://geocoding-api.open-meteo.com https://dar-hijri.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>التأمل اليومي</title>
   <!-- Shared i360 theme (theme/ in this repo; https://theme.i36o.workers.dev), filled in by
@@ -25,6 +25,7 @@
   --i360-active: #EEF2FF;
   --i360-link: #2E8B57;
   --i360-quran: #2E8B57;
+  --i360-quran-bg: rgba(46, 139, 87, 0.14);
   --i360-note: #2A35C4;
   --i360-code: #F1ECE2;
   --i360-quote: #F4F0E8;
@@ -104,6 +105,7 @@
   --i360-active: #eadbb8;
   --i360-link: #8a4b0f;
   --i360-quran: #2f5a1e;
+  --i360-quran-bg: rgba(47, 90, 30, 0.14);
   --i360-note: #4a3c27;
   --i360-code: #efe5cf;
   --i360-quote: #f1e7d1;
@@ -147,6 +149,7 @@
   --i360-active: #1e3a5f;
   --i360-link: #7dd3fc;
   --i360-quran: #86efac;
+  --i360-quran-bg: rgba(134, 239, 172, 0.14);
   --i360-note: #cbd5e1;
   --i360-code: #0f172a;
   --i360-quote: #111827;
@@ -260,28 +263,21 @@
        pages); the cards: --i360-bg. */
     /* Fonts from the shared theme: Amiri for every language, Amiri Quran for the verse. */
     body { font-family: var(--i360-font); background-color: var(--i360-frame); color: var(--i360-text); transition: all var(--i360-speed) ease; margin: 0; padding: 0; overflow-x: hidden; }
-    .arabic-script, .hadith-text-style { font-family: var(--i360-font); line-height: var(--i360-line-height) !important; }
-    .arabic-script.quran-verse { font-family: var(--i360-font-quran); }
-    .text-quran { color: var(--i360-quran); }
-    .bg-quran-soft { background-color: var(--i360-hover); }
-    @supports (color: color-mix(in oklab, red, red)) { .bg-quran-soft { background-color: color-mix(in oklab, var(--i360-quran) 14%, transparent); } }
-    .text-accent { color: var(--i360-accent); }
+    /* The verse: Amiri Quran, right to left in every language (its text is always Arabic). */
+    .quran-verse { font-family: var(--i360-font-quran); }
+    [dir="ltr"] .quran-verse { direction: rtl; }
     /* Sizes, spacing, corners, lines and shadows: the shared theme's only (src/day.tailwind.js).
        Amiri has only regular (400) and bold (700), so only those are used. No extra letter
        spacing in Arabic script: it pulls joined letters apart. */
     [dir="rtl"] .tracking-widest { letter-spacing: normal !important; }
     /* Icons: Lucide (lucide.dev, ISC licence), drawn inline; checked by scripts/icons.js. Their
-       sizes here; their drawing style for every page: src/page-chrome.css. */
-    svg.icon { width: var(--i360-icon-size); height: var(--i360-icon-size); display: block; }
-    svg.icon-inline { width: var(--i360-icon-size-inline); height: var(--i360-icon-size-inline); display: inline-block; vertical-align: -0.125em; }
+       drawing style and sizes (.icon, .icon-inline): src/page-chrome.css. */
     /* The cards (their look: .i360-card, the inner boxes .i360-inset, src/page-chrome.css): their padding
        grows with the screen (twice the shared gap), no width breakpoints. They enter one after another
        (App.reveal in day/main.js adds .is-shown): from a step below, faded in at the theme's slow speed. */
     .day-card { padding: calc(2 * var(--i360-gap)); opacity: 0; transform: translateY(var(--i360-space-md)); transition: all var(--i360-speed-slow) ease; }
     .day-card.is-shown { opacity: 1; transform: none; }
     .next-prayer-highlight { border: var(--i360-line-width-strong) solid var(--i360-accent) !important; background-color: var(--i360-hover); transform: scale(1.05); box-shadow: var(--i360-popup-shadow); border-radius: var(--i360-radius-lg); }
-    [dir="ltr"] .arabic-script { direction: rtl; }
-    .text-custom-secondary { color: var(--i360-muted); }
     /* The top bar (i360-hub.md §10 "Toolbars"): fixed at the top, as on every i360 page; in Arabic from
        the right: theme · numerals · language … title · ✕ (the ✕ in the installed app only); it mirrors in
        left-to-right languages. The bar and everything in it: src/page-chrome.css (toolbar-sticky: it stays
@@ -449,6 +445,10 @@ svg[data-lucide] {
   flex-shrink: 0;
 }
 .toolbar-btn svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+/* An icon's size anywhere else: .icon (a card's, a status, a floating button), .icon-inline (beside
+   text, as tall as it). */
+.icon { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); display: block; }
+.icon-inline { width: var(--i360-icon-size-inline, 1em); height: var(--i360-icon-size-inline, 1em); display: inline-block; vertical-align: -0.125em; }
 
 /* The numerals button shows digits (٣ / 3). */
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -626,6 +626,29 @@ svg[data-lucide] {
   z-index: var(--i360-layer-toast, 60);
 }
 
+/* A status line (statusLine(), setStatus() in page-chrome.js): small muted words and a retry button;
+   on a failure it is also .i360-banner (below), which gives it the notice's colours. */
+.i360-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;   /* words and button on one line of text, as in running text */
+  gap: var(--i360-space-sm, 0.5rem);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  color: var(--i360-muted, #5A62C9);
+}
+
+/* Where there is nothing to show (emptyState()): muted words, centred; each page places it. */
+.i360-empty {
+  color: var(--i360-muted, #5A62C9);
+  font-size: var(--i360-text-size, 1rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-align: center;
+}
+
+/* Words for screen readers only (announcer()): on no screen, still read. */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
 /* A notice (an error, missing pages). */
 .i360-banner {
   background: var(--i360-banner-bg, #fef2f2);
@@ -693,7 +716,7 @@ svg[data-lucide] {
     .conv-native { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; border: 0; padding: 0; }
     .conv-error { color: var(--i360-danger); }
   </style>
-  <style id="tailwind">*,::backdrop,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:#3b82f680;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:initial}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:initial;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:initial}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.mx-auto{margin-left:auto;margin-right:auto}.mb-lg{margin-bottom:var(--i360-space-lg)}.mb-md{margin-bottom:var(--i360-space-md)}.me-xs{margin-inline-end:var(--i360-space-xs)}.ms-sm{margin-inline-start:var(--i360-space-sm)}.mt-lg{margin-top:var(--i360-space-lg)}.mt-md{margin-top:var(--i360-space-md)}.mt-sm{margin-top:var(--i360-space-sm)}.mt-xs{margin-top:var(--i360-space-xs)}.block{display:block}.inline{display:inline}.flex{display:flex}.table{display:table}.grid{display:grid}.contents{display:contents}.hidden{display:none}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-\[var\(--col-min\)\]{max-width:var(--col-min)}.flex-1{flex:1 1 0%}.flex-auto{flex:1 1 auto}.flex-shrink{flex-shrink:1}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}.cursor-pointer{cursor:pointer}.resize{resize:both}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-md{gap:var(--i360-space-md)}.gap-sm{gap:var(--i360-space-sm)}.gap-xs{gap:var(--i360-space-xs)}.space-y-md>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-md)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-md)*var(--tw-space-y-reverse))}.space-y-sm>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-sm)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-sm)*var(--tw-space-y-reverse))}.space-y-xs>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-xs)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-xs)*var(--tw-space-y-reverse))}.whitespace-pre-line{white-space:pre-line}.rounded-full{border-radius:var(--i360-radius-full)}.rounded-lg{border-radius:var(--i360-radius-lg)}.border{border-width:var(--i360-line-width)}.border-2{border-width:var(--i360-line-width-strong)}.border-t{border-top-width:var(--i360-line-width)}.border-event{border-color:var(--i360-event)}.border-rule{border-color:var(--i360-rule)}.bg-converter-bg{background-color:var(--i360-converter-bg)}.bg-event{background-color:var(--i360-event)}.bg-event-bg{background-color:var(--i360-event-bg)}.bg-hadith-bg{background-color:var(--i360-hadith-bg)}.bg-prayer-bg{background-color:var(--i360-prayer-bg)}.p-md{padding:var(--i360-space-md)}.p-sm{padding:var(--i360-space-sm)}.px-md{padding-left:var(--i360-space-md);padding-right:var(--i360-space-md)}.px-sm{padding-left:var(--i360-space-sm);padding-right:var(--i360-space-sm)}.py-sm{padding-top:var(--i360-space-sm);padding-bottom:var(--i360-space-sm)}.pb-lg{padding-bottom:var(--i360-space-lg)}.pt-md{padding-top:var(--i360-space-md)}.text-center{text-align:center}.text-justify{text-align:justify}.text-end{text-align:end}.text-base{font-size:var(--i360-text-size)}.text-base,.text-lg{line-height:var(--i360-line-height-ui)}.text-lg{font-size:var(--i360-text-size-lg)}.text-sm{font-size:var(--i360-text-size-sm);line-height:var(--i360-line-height-ui)}.font-bold{font-weight:700}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-reading{line-height:var(--i360-line-height)}.tracking-widest{letter-spacing:.1em}.text-converter{color:var(--i360-converter)}.text-event{color:var(--i360-event)}.text-hadith{color:var(--i360-hadith)}.text-page{color:var(--i360-bg)}.text-prayer{color:var(--i360-prayer)}.underline{text-decoration-line:underline}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:var(--i360-speed-quick)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:var(--i360-speed-quick)}.empty\:hidden:empty{display:none}.has-\[\>p\:empty\]\:hidden:has(>p:empty){display:none}</style>   <!-- built from src/day.tailwind.js (scripts/build.js) -->
+  <style id="tailwind">*,::backdrop,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:#3b82f680;--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:initial}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:initial;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:initial}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.mx-auto{margin-left:auto;margin-right:auto}.mb-lg{margin-bottom:var(--i360-space-lg)}.mb-md{margin-bottom:var(--i360-space-md)}.me-xs{margin-inline-end:var(--i360-space-xs)}.ms-sm{margin-inline-start:var(--i360-space-sm)}.mt-lg{margin-top:var(--i360-space-lg)}.mt-md{margin-top:var(--i360-space-md)}.mt-sm{margin-top:var(--i360-space-sm)}.mt-xs{margin-top:var(--i360-space-xs)}.block{display:block}.inline{display:inline}.flex{display:flex}.table{display:table}.grid{display:grid}.contents{display:contents}.hidden{display:none}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-\[var\(--col-min\)\]{max-width:var(--col-min)}.flex-1{flex:1 1 0%}.flex-auto{flex:1 1 auto}.flex-shrink{flex-shrink:1}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}.cursor-pointer{cursor:pointer}.resize{resize:both}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-md{gap:var(--i360-space-md)}.gap-sm{gap:var(--i360-space-sm)}.gap-xs{gap:var(--i360-space-xs)}.space-y-md>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-md)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-md)*var(--tw-space-y-reverse))}.space-y-sm>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-sm)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-sm)*var(--tw-space-y-reverse))}.space-y-xs>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(var(--i360-space-xs)*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(var(--i360-space-xs)*var(--tw-space-y-reverse))}.whitespace-pre-line{white-space:pre-line}.rounded-full{border-radius:var(--i360-radius-full)}.rounded-lg{border-radius:var(--i360-radius-lg)}.border{border-width:var(--i360-line-width)}.border-2{border-width:var(--i360-line-width-strong)}.border-t{border-top-width:var(--i360-line-width)}.border-event{border-color:var(--i360-event)}.border-rule{border-color:var(--i360-rule)}.bg-converter-bg{background-color:var(--i360-converter-bg)}.bg-event{background-color:var(--i360-event)}.bg-event-bg{background-color:var(--i360-event-bg)}.bg-hadith-bg{background-color:var(--i360-hadith-bg)}.bg-prayer-bg{background-color:var(--i360-prayer-bg)}.bg-quran-bg{background-color:var(--i360-quran-bg)}.p-md{padding:var(--i360-space-md)}.p-sm{padding:var(--i360-space-sm)}.px-md{padding-left:var(--i360-space-md);padding-right:var(--i360-space-md)}.px-sm{padding-left:var(--i360-space-sm);padding-right:var(--i360-space-sm)}.py-sm{padding-top:var(--i360-space-sm);padding-bottom:var(--i360-space-sm)}.pb-lg{padding-bottom:var(--i360-space-lg)}.pt-md{padding-top:var(--i360-space-md)}.text-center{text-align:center}.text-justify{text-align:justify}.text-end{text-align:end}.text-base{font-size:var(--i360-text-size)}.text-base,.text-lg{line-height:var(--i360-line-height-ui)}.text-lg{font-size:var(--i360-text-size-lg)}.text-sm{font-size:var(--i360-text-size-sm);line-height:var(--i360-line-height-ui)}.font-bold{font-weight:700}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-reading{line-height:var(--i360-line-height)}.tracking-widest{letter-spacing:.1em}.text-accent{color:var(--i360-accent)}.text-converter{color:var(--i360-converter)}.text-event{color:var(--i360-event)}.text-hadith{color:var(--i360-hadith)}.text-muted{color:var(--i360-muted)}.text-page{color:var(--i360-bg)}.text-prayer{color:var(--i360-prayer)}.text-quran{color:var(--i360-quran)}.underline{text-decoration-line:underline}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:var(--i360-speed-quick)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:var(--i360-speed-quick)}.empty\:hidden:empty{display:none}.has-\[\>p\:empty\]\:hidden:has(>p:empty){display:none}</style>   <!-- built from src/day.tailwind.js (scripts/build.js) -->
 </head>
 <body class="i360-page min-h-screen flex flex-col items-center">
   <header class="toolbar toolbar-sticky">
@@ -719,34 +742,34 @@ svg[data-lucide] {
 
   <div class="page safe-area safe-area-top-bar">
   <div class="layout-stable flex flex-col gap-xs mb-lg text-center">
-    <p class="text-custom-secondary text-base font-bold" data-target="current-date"></p>
+    <p class="text-muted text-base font-bold" data-target="current-date"></p>
     <p class="text-accent text-sm font-bold" data-target="hijri-date"></p>
-    <p class="text-custom-secondary text-sm" data-target="hijri-source"></p>
+    <p class="text-muted text-sm" data-target="hijri-source"></p>
   </div>
 
   <main id="cards" class="cards">
     <div class="cards-col" id="col-a">
     <section class="i360-card day-card" id="quran-card">
-      <div class="flex items-center gap-sm mb-md"><span class="bg-quran-soft text-quran p-sm rounded-lg"><svg class="icon" data-icon="verse" data-lucide="moon-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5h4"></path><path d="M20 3v4"></path><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></span><h2 data-i18n="quranLabel" class="text-base font-bold uppercase tracking-widest text-quran">Quranic Verse</h2></div>
+      <div class="flex items-center gap-sm mb-md"><span class="bg-quran-bg text-quran p-sm rounded-lg"><svg class="icon" data-icon="verse" data-lucide="moon-star" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5h4"></path><path d="M20 3v4"></path><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></span><h2 data-i18n="quranLabel" class="text-base font-bold uppercase tracking-widest text-quran">Quranic Verse</h2></div>
       <div class="space-y-md">
-        <p data-target="quran-arabic" class="arabic-script quran-verse text-lg font-bold text-justify mb-md"></p>
-        <p data-target="quran-translation" class="text-base leading-reading italic text-custom-secondary text-justify"></p>
+        <p data-target="quran-arabic" class="quran-verse text-lg leading-reading font-bold text-justify mb-md"></p>
+        <p data-target="quran-translation" class="text-base leading-reading italic text-muted text-justify"></p>
       </div>
       <div class="border-t border-rule pt-md space-y-xs font-bold text-quran mt-md"><p data-target="quran-citation" class="text-base empty:hidden"></p><p data-target="quran-reference" class="text-sm empty:hidden"></p><p class="text-sm"><span data-i18n="sourceLabel">Source</span>: <a data-target="quran-link" href="https://alquran.cloud/" target="_blank" rel="noopener noreferrer" class="underline">AlQuran.cloud</a></p></div>
-      <div data-status="quran" class="hidden items-center gap-sm text-sm text-custom-secondary mt-md"><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry></button></div>
+      <div class="i360-status mt-md" role="status" aria-live="polite" data-status="quran" hidden><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry hidden></button></div>
     </section>
 
     <section class="i360-card day-card" id="hadith-card">
       <div class="flex items-center gap-sm mb-md"><span class="bg-hadith-bg text-hadith p-sm rounded-lg"><svg class="icon" data-icon="hadith" data-lucide="book-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v16"></path><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"></path></svg></span><h2 data-i18n="hadithLabel" class="text-base font-bold uppercase tracking-widest text-hadith">Hadith</h2></div>
       <div class="space-y-md">
-        <p data-target="hadith-title" class="text-base font-bold text-custom-secondary"></p>
+        <p data-target="hadith-title" class="text-base font-bold text-muted"></p>
         <div class="space-y-sm">
-          <p data-target="hadith-narrator" class="hidden hadith-text-style text-base text-hadith font-bold"></p>
-          <p data-target="hadith-text" class="hadith-text-style text-base text-custom-secondary font-bold text-justify"></p>
+          <p data-target="hadith-narrator" class="hidden leading-reading text-base text-hadith font-bold"></p>
+          <p data-target="hadith-text" class="leading-reading text-base text-muted font-bold text-justify"></p>
         </div>
       </div>
       <div class="border-t border-rule pt-md space-y-xs font-bold text-hadith mt-md"><p data-target="hadith-citation" class="text-base empty:hidden"></p><details class="text-sm has-[>p:empty]:hidden"><summary data-i18n="refsLabel" class="cursor-pointer text-base"></summary><p data-target="hadith-reference" class="mt-sm whitespace-pre-line"></p></details><p class="text-sm"><span data-i18n="sourceLabel">Source</span>: <a data-target="hadith-link" href="https://hadeethenc.com/" target="_blank" rel="noopener noreferrer" class="underline">HadeethEnc.com</a></p></div>
-      <div data-status="hadith" class="hidden items-center gap-sm text-sm text-custom-secondary mt-md"><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry></button></div>
+      <div class="i360-status mt-md" role="status" aria-live="polite" data-status="hadith" hidden><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry hidden></button></div>
     </section>
 
     </div>
@@ -754,7 +777,7 @@ svg[data-lucide] {
     <section class="i360-card day-card" id="prayer-card">
       <div class="flex items-center gap-sm mb-md"><span class="bg-prayer-bg text-prayer p-sm rounded-lg"><svg class="icon" data-icon="prayerTimes" data-lucide="clock" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></span><h2 data-i18n="prayerLabel" class="text-base font-bold uppercase tracking-widest text-prayer">Prayer Times</h2></div>
       <div data-target="prayer-grid" class="grid grid-cols-3 gap-sm mb-md"></div>
-      <div class="i360-inset flex flex-wrap gap-md text-sm text-custom-secondary p-md">
+      <div class="i360-inset flex flex-wrap gap-md text-sm text-muted p-md">
         <div class="flex flex-col gap-xs flex-auto">
           <p><span class="font-bold" data-i18n="methodLabel">Method:</span> <span data-target="meta-method">…</span></p>
           <p class="flex flex-wrap items-center gap-xs"><span class="font-bold" data-i18n="madhabLabel">Madhab:</span>
@@ -771,10 +794,10 @@ svg[data-lucide] {
       <!-- The city picker: Open-Meteo's place search (GeoNames data), asked only from here. -->
       <div class="i360-inset hidden mt-md p-md flex-col gap-sm" id="city-picker">
         <input class="i360-field i360-field-search w-full px-md py-sm" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" id="city-search">
-        <p data-target="city-status" class="text-sm text-custom-secondary" role="status" aria-live="polite"></p>
+        <p data-target="city-status" class="text-sm text-muted" role="status" aria-live="polite"></p>
         <div data-target="city-results" class="flex flex-col gap-xs" role="listbox"></div>
       </div>
-      <div data-status="prayer" class="hidden items-center gap-sm text-sm text-custom-secondary mt-md"><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry></button></div>
+      <div class="i360-status mt-md" role="status" aria-live="polite" data-status="prayer" hidden><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry hidden></button></div>
     </section>
 
     <section class="i360-card day-card" id="converter-card">
@@ -786,15 +809,15 @@ svg[data-lucide] {
       <div class="i360-inset p-md flex flex-col gap-md">
         <div class="conv-fields" role="group" id="conv-fields">
           <div class="conv-field">
-            <label for="conv-d" data-i18n="convDay" class="text-sm text-custom-secondary"></label>
+            <label for="conv-d" data-i18n="convDay" class="text-sm text-muted"></label>
             <select class="i360-field" id="conv-d"></select>
           </div>
           <div class="conv-field conv-field-month">
-            <label for="conv-m" data-i18n="convMonth" class="text-sm text-custom-secondary"></label>
+            <label for="conv-m" data-i18n="convMonth" class="text-sm text-muted"></label>
             <select class="i360-field" id="conv-m"></select>
           </div>
           <div class="conv-field conv-field-year">
-            <label for="conv-y" data-i18n="convYear" class="text-sm text-custom-secondary"></label>
+            <label for="conv-y" data-i18n="convYear" class="text-sm text-muted"></label>
             <input class="i360-field" type="text" inputmode="numeric" autocomplete="off" id="conv-y">
           </div>
           <span class="conv-pick" id="conv-pick" hidden>
@@ -803,8 +826,8 @@ svg[data-lucide] {
           </span>
         </div>
         <div class="border-t border-rule pt-md flex flex-col gap-xs" aria-live="polite">
-          <p data-target="conv-alpha" class="text-base font-bold text-custom-secondary"></p>
-          <p data-target="conv-iso" class="text-base font-bold text-custom-secondary"></p>
+          <p data-target="conv-alpha" class="text-base font-bold text-muted"></p>
+          <p data-target="conv-iso" class="text-base font-bold text-muted"></p>
           <p data-target="conv-error" class="conv-error text-sm font-bold" hidden></p>
         </div>
       </div>
@@ -813,12 +836,12 @@ svg[data-lucide] {
     </div>
     <section class="i360-card cards-wide day-card" id="events-card">
       <div class="flex items-center gap-sm mb-md"><span class="bg-event-bg text-event p-sm rounded-lg"><svg class="icon" data-icon="events" data-lucide="calendar-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path><path d="m9 15 2 2 4-4"></path></svg></span><h2 data-i18n="eventsLabel" class="text-base font-bold uppercase tracking-widest text-event">Upcoming Events</h2></div>
-      <p data-target="events-note" class="text-sm text-custom-secondary mb-md"></p>
+      <p data-target="events-note" class="text-sm text-muted mb-md"></p>
       <div data-target="events-list" class="events-grid"></div>
     </section>
   </main>
   </div>
-  <footer class="mt-lg text-center text-custom-secondary text-sm pb-lg">
+  <footer class="mt-lg text-center text-muted text-sm pb-lg">
     <p data-i18n="footer">Updated daily.</p>
     <p data-i18n="privacy" class="mt-sm max-w-[var(--col-min)] mx-auto whitespace-pre-line"></p>
     <p data-target="credits" class="mt-sm max-w-[var(--col-min)] mx-auto"></p>
@@ -2337,7 +2360,7 @@ svg[data-lucide] {
     return `<${tag} class="${classes(own, a.class)}"${isButton ? ' type="button"' : ""}${attributes(all)}${flags(a)}>${a.html ?? ""}</${tag}>`;
   }
   var CARD_TONES = Object.freeze({
-    quran: { tile: "bg-quran-soft text-quran", text: "text-quran" },
+    quran: { tile: "bg-quran-bg text-quran", text: "text-quran" },
     hadith: { tile: "bg-hadith-bg text-hadith", text: "text-hadith" },
     prayer: { tile: "bg-prayer-bg text-prayer", text: "text-prayer" },
     converter: { tile: "bg-converter-bg text-converter", text: "text-converter" },
@@ -2404,6 +2427,15 @@ svg[data-lucide] {
   }
   function setPressed(control, on) {
     control.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+  function setStatus(line, { text = "", retry = null, error = false } = {}) {
+    const words = line.querySelector("[data-status-text]"), button = line.querySelector("[data-retry]");
+    words.replaceChildren(text);
+    line.classList.toggle(CLASS.banner, error);
+    button.hidden = !retry;
+    button.textContent = retry ? retry.label : "";
+    button.onclick = retry ? retry.onClick : null;
+    if (!line.hasAttribute("data-status-keep")) line.hidden = !text && !retry;
   }
 
   // src/frame.js
@@ -3512,9 +3544,6 @@ svg[data-lucide] {
     },
     init() {
       document.querySelectorAll("[data-target]").forEach((node) => this.targets[node.dataset.target] = node);
-      document.querySelectorAll("[data-status]").forEach((node) => {
-        node.querySelector("[data-retry]").addEventListener("click", () => App.retry(node.dataset.status));
-      });
       document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => {
         LangMenu.close(true);
         App.setLang(b.dataset.lang);
@@ -3547,20 +3576,16 @@ svg[data-lucide] {
     set(t, v) {
       if (this.targets[t]) this.targets[t].textContent = v;
     },
+    // A part's status line (shared: setStatus() in page-chrome.js): loading, a failure with retry, or none.
     status(name, kind) {
-      const box2 = document.querySelector(`[data-status="${name}"]`);
-      if (!box2) return;
-      const L = this.L, btn = box2.querySelector("[data-retry]"), txt = box2.querySelector("[data-status-text]");
-      if (!kind) {
-        box2.classList.add("hidden");
-        box2.classList.remove("flex");
-        return;
-      }
-      box2.classList.remove("hidden");
-      box2.classList.add("flex");
-      txt.textContent = kind === "loading" ? L.loading : L.loadError;
-      btn.textContent = L.retry;
-      btn.classList.toggle("hidden", kind === "loading");
+      const line = document.querySelector(`[data-status="${name}"]`);
+      if (!line) return;
+      const L = this.L, failed = kind === "error";
+      setStatus(line, {
+        text: kind ? failed ? L.loadError : L.loading : "",
+        error: failed,
+        retry: failed ? { label: L.retry, onClick: () => App.retry(name) } : null
+      });
     },
     reveal() {
       if (this.shown) return;
@@ -3704,8 +3729,8 @@ svg[data-lucide] {
         const isNext = k === next, m = /(\d{1,2}):(\d{2})/.exec(t[k] || "");
         const box2 = isNext ? el("div", "flex flex-col items-center p-sm transition-all next-prayer-highlight") : fromMarkup(box("inset", { class: "flex flex-col items-center p-sm transition-all" }));
         box2.append(
-          el("span", `text-sm font-bold ${isNext ? "text-accent" : "text-custom-secondary"}`, L.prayers[i]),
-          el("span", `text-base font-bold mt-xs ${isNext ? "text-accent" : "text-custom-secondary"}`, m ? m[0] : "—")
+          el("span", `text-sm font-bold ${isNext ? "text-accent" : "text-muted"}`, L.prayers[i]),
+          el("span", `text-base font-bold mt-xs ${isNext ? "text-accent" : "text-muted"}`, m ? m[0] : "—")
         );
         if (isNext) box2.append(el("span", "text-sm mt-xs font-bold text-accent animate-pulse", L.next));
         return box2;
@@ -3735,13 +3760,13 @@ svg[data-lucide] {
       list.replaceChildren(...Hijri.events(h).map((e) => {
         const row = e.isT ? el("div", "flex justify-between items-center gap-md p-md transition-all border-2 border-event bg-event-bg rounded-lg") : fromMarkup(box("inset", { class: "flex justify-between items-center gap-md p-md transition-all" }));
         const left = el("div", "flex-1"), title = el("div", "flex items-center gap-sm");
-        title.append(el("span", "text-base font-bold text-custom-secondary", L.events[e.id]));
+        title.append(el("span", "text-base font-bold text-muted", L.events[e.id]));
         if (e.isT) title.append(el("span", "bg-event text-page text-sm font-bold px-sm rounded-full", L.todayLabel));
-        left.append(title, el("span", "text-sm text-custom-secondary font-bold", hijriLong({ y: e.year, m: e.m + 1, d: e.d }, L.months)));
+        left.append(title, el("span", "text-sm text-muted font-bold", hijriLong({ y: e.year, m: e.m + 1, d: e.d }, L.months)));
         const right = el("div", "text-end");
         right.append(
           el("span", "text-sm uppercase font-bold text-event block", L.expected),
-          el("span", "text-sm font-bold text-custom-secondary", gregorianLong(e.date, lang))
+          el("span", "text-sm font-bold text-muted", gregorianLong(e.date, lang))
         );
         row.append(left, right);
         return row;

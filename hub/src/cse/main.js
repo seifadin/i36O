@@ -6,7 +6,7 @@ import * as CseIndex from '../cse-index.js';
 import * as CseView from '../cse-view.js';
 import { fetchWithTimeout } from '../net.js';
 import { LIB } from '../sites.js';
-import { $, IN_APP, drawSettingsButtons, el, fromMarkup, setPressed, setupClose, wireSettingsButtons } from '../page-chrome.js';
+import { $, IN_APP, drawSettingsButtons, el, fromMarkup, setPressed, setStatus as setLineStatus, setupClose, wireSettingsButtons } from '../page-chrome.js';
 import { CLASS, box as componentBox, button, listItem } from '../components.js';
 import { CSE as LOCALES } from '../locales.js';
 import { numericDate } from '../dates.js';
@@ -69,14 +69,9 @@ function smallButton(cls, text, onClick) {
 }
 
 /* ---------------- Status line ---------------- */
+// Its look and behaviour: the shared status line (statusLine(), setStatus() in page-chrome.js).
 function setStatus(text, { error = false, retry = null } = {}) {
-  statusEl.textContent = '';
-  statusEl.classList.toggle('error', error);
-  statusEl.classList.toggle(CLASS.banner, error);
-  if (text) statusEl.append(fmt(text));
-  if (retry) {
-    statusEl.append(smallButton('retry', T.retry, retry));
-  }
+  setLineStatus(statusEl, { text: text ? fmt(text) : '', error, retry: retry && { label: T.retry, onClick: retry } });
 }
 
 /* ---------------- Data ---------------- */

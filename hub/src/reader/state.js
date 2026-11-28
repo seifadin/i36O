@@ -126,6 +126,7 @@ function checkConnection() {
 function updateConnection() {
   const label = online ? t().online : t().offline;
   statusIcon.innerHTML = `${online ? ICON.online : ICON.offline}<span class="status-text"></span>`;
+  statusIcon.firstElementChild.classList.add('icon');   // its size (page-chrome.css)
   statusIcon.lastChild.textContent = label;
   statusIcon.classList.toggle('offline', !online);
   setLabel(statusIcon, label);

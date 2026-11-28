@@ -43,8 +43,6 @@
     .banner { flex-shrink: 0; display: block; border-bottom: var(--i360-line-width) solid var(--i360-border); }
     .banner img { display: block; width: 100%; max-width: 48rem; height: auto; margin-inline: auto; }
     .tanzil { flex: 1; min-height: 0; width: 100%; border: 0; display: block; background-color: var(--i360-bg); }
-
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   </style>
 </head>
 <body class="i360-page">
@@ -60,7 +58,7 @@
   <!--@@/TOOLBAR@@-->
   <a class="banner" id="banner" href="https://tanzil.net/" target="_blank" rel="noopener"><img src="/img/header.png" width="768" height="72" alt="/*@@TANZIL@@*/"></a>
   <iframe class="tanzil" id="tanzil" title="مشروع تنزيل — القرآن الكريم"></iframe>
-  <div class="sr-only" id="announce" role="status" aria-live="polite"></div>
+  <!--@@ANNOUNCER id="announce"@@-->
 
   <script>/*@@MAIN@@*/</script>
 </body>

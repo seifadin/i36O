@@ -5,6 +5,8 @@ export default {
     './index.html',
     './src/**/*.{ts,tsx}',
   ],
+  // sr-only: the shared one (hub/src/page-chrome.css, the Announcer component), so it reads the same everywhere.
+  blocklist: ['sr-only'],
   theme: {
     // The shared i360 theme's sizes (theme.css, set once for every theme; §15al), each with its value
     // built in for when theme.css can't be reached. Replacing Tailwind's own scales, not extending

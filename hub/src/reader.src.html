@@ -53,8 +53,7 @@
     .tb-end > .tb-title { max-width: 14rem; flex-shrink: 0; }
 
     /* Icons: Lucide (lucide.dev, ISC licence), drawn inline; checked by scripts/icons.js. Their
-       sizes here; their drawing style for every page: src/page-chrome.css. */
-    .status-icon svg, .floating-btn svg { width: var(--i360-icon-size); height: var(--i360-icon-size); }
+       drawing style and sizes (.icon): src/page-chrome.css. The bookmark's when on: */
     #btn-bookmark[aria-pressed="true"] svg { fill: var(--i360-ribbon); stroke: var(--i360-ribbon); }
     #btn-bookmark[aria-pressed="true"] { background-color: transparent; }
 
@@ -142,18 +141,13 @@
       gap: var(--i360-space-md);
     }
     .missing-pages-banner.visible { display: flex; }
-    .missing-pages-banner svg { width: var(--i360-icon-size); height: var(--i360-icon-size); stroke: currentColor; flex-shrink: 0; }
     .missing-pages-text { flex: 1; }
     .missing-pages-text div + div { margin-top: var(--i360-space-xs); }
 
-    .empty-state {
+    .empty-state {   /* its look: .i360-empty */
       display: none;
       margin: 18vh auto 0;
       max-width: 22rem;
-      text-align: center;
-      color: var(--i360-muted);
-      font-size: var(--i360-text-size);
-      line-height: var(--i360-line-height-ui);
     }
     .empty-state.visible { display: block; }
 
@@ -440,7 +434,7 @@
     .panel-item.lvl-4 { padding-inline-start: calc(3 * var(--i360-space-md)); }
     .bm-row { display: flex; align-items: center; }
     .bm-row .panel-item { flex: 1; }
-    .panel-empty { padding: var(--i360-space-md); color: var(--i360-muted); font-size: var(--i360-text-size-sm); line-height: var(--i360-line-height-ui); text-align: center; }
+    .panel-empty { padding: var(--i360-space-md); }   /* its look: .i360-empty */
 
     /* ---------- Reading mode ---------- */
     .floating-btn {
@@ -596,7 +590,7 @@
   </aside>
 
   <button class="floating-btn" id="btn-exit-reading" type="button">
-    <svg data-icon="exitReadingMode" data-lucide="minimize" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
+    <svg class="icon" data-icon="exitReadingMode" data-lucide="minimize" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
   </button>
 
   <!--@@TOAST id="toast" class="toast"@@--><!--@@/TOAST@@-->
@@ -605,11 +599,11 @@
 
   <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
     <!--@@BANNER id="missing-pages-banner" class="missing-pages-banner"@@-->
-      <svg data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+      <svg class="icon" data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>
     <!--@@/BANNER@@-->
 
-    <div class="empty-state" id="empty-state"></div>
+    <!--@@EMPTY_STATE id="empty-state" class="empty-state"@@-->
 
     <div class="pages-wrapper" id="pages-wrapper"></div>
   </main>

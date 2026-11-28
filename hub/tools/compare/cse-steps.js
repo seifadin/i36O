@@ -16,7 +16,7 @@ const state = () => {
   const $ = (id) => document.getElementById(id);
   const status = $('status');
   return {
-    status: status.textContent.trim(), error: status.classList.contains('error'),
+    status: status.textContent.trim(), error: status.classList.contains('error') || status.classList.contains('i360-banner'),
     majors: document.querySelectorAll('details.major').length, inters: document.querySelectorAll('details.inter').length,
     open: document.querySelectorAll('details[open]').length, hits: document.querySelectorAll('.hit').length,
     visibleHits: [...document.querySelectorAll('.hit')].filter((h) => h.offsetParent).length,
@@ -57,7 +57,8 @@ async function run(browser, v) {
     await p.evaluate(async () => { try { for (const k of await caches.keys()) await caches.delete(k); } catch { /* no caches */ } });
     await step('failed search', () => search('مسألة العلم', 1500));
     libDown = false;
-    if (await p.locator('.status .retry').count()) await step('retry', async () => { await p.locator('.status .retry').click(T); await p.waitForTimeout(1500); });
+    const retry = p.locator('.status .retry, .status [data-retry]:not([hidden])');   // .retry: before the shared status line
+    if (await retry.count()) await step('retry', async () => { await retry.click(T); await p.waitForTimeout(1500); });
     await step('theme button 1', () => p.click('#btn-theme', T));
     await step('theme button 2', () => p.click('#btn-theme', T));
     log.push(['page errors', errors]);

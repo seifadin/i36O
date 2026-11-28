@@ -18,7 +18,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const markup = (html) => html.replace(/<(style|script)\b[^>]*>[\s\S]*?<\/\1>/g, '');
 
 // Every shared component's own class: only its builder writes it.
-const COMPONENT_CLASS = /(?<![\w-])(toolbar-btn|toolbar-menu|tb-(?:title|start|main|end|group)|divider|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast))(?![\w-])/;
+const COMPONENT_CLASS = /(?<![\w-])(toolbar-btn|toolbar-menu|tb-(?:title|start|main|end|group)|divider|sr-only|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast|status|empty))(?![\w-])/;
 // The bar itself, in a page's HTML (in a script, "toolbar" is also the Reader's id for it).
 const BAR_CLASS = /(?<![\w-])toolbar(?![\w-])/;
 
@@ -36,11 +36,18 @@ test('components: Daily Reflection writes no card header or status line itself �
   assert.doesNotMatch(html, /data-status="/, 'a hand-written status line (<!--@@STATUS_LINE …@@-->)');
   const built = markup(read('../public/day/index.html'));
   assert.equal((built.match(/<h2 data-i18n="[a-zA-Z]+" class="text-base font-bold uppercase tracking-widest text-[a-z]+">/g) || []).length, 5, 'five card headers, all one size');
-  assert.equal((built.match(/<div data-status="[a-z]+" class="hidden items-center gap-sm text-sm text-custom-secondary m[tb]-md"><span data-status-text><\/span><button class="i360-btn i360-btn-sm" type="button" data-retry><\/button><\/div>/g) || []).length, 3, 'three status lines');
+  assert.equal((built.match(/<div class="i360-status m[tb]-md" role="status" aria-live="polite" data-status="[a-z]+" hidden><span data-status-text><\/span><button class="i360-btn i360-btn-sm" type="button" data-retry hidden><\/button><\/div>/g) || []).length, 3, 'three status lines');
+});
+
+test('components: the CSE writes no status line itself, the quran page no announcer, the Reader no empty state', () => {
+  for (const [page, re, what] of [['cse', /id="status"/, 'STATUS_LINE'], ['quran', /class="sr-only"/, 'ANNOUNCER'], ['reader', /id="empty-state"/, 'EMPTY_STATE']]) {
+    assert.doesNotMatch(markup(fs.readFileSync(path.join(SRC, `${page}.src.html`), 'utf8')).replace(/<!--[\s\S]*?-->/g, ''), re, `${page}: write it as <!--@@${what} …@@-->`);
+  }
 });
 
 test('components: no page script writes a shared component\'s class itself — it calls the builder (src/components.js)', () => {
-  const scripts = fs.readdirSync(SRC, { recursive: true }).filter((f) => f.endsWith('.js') && f !== 'components.js');
+  // day.tailwind.js names sr-only only to block Tailwind's own copy of it.
+  const scripts = fs.readdirSync(SRC, { recursive: true }).filter((f) => f.endsWith('.js') && f !== 'components.js' && f !== 'day.tailwind.js');
   for (const rel of scripts) {
     const code = fs.readFileSync(path.join(SRC, rel), 'utf8').replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
     const literals = [...code.matchAll(/(['"`])((?:\\.|(?!\1)[^\\])*)\1/g)].map((m) => m[2]).filter((s) => COMPONENT_CLASS.test(s));
@@ -103,8 +110,12 @@ test('components: each builder writes one fixed structure, attributes in one ord
   assert.equal(C.box('toast', { id: 't' }), '<div class="i360-toast" id="t" role="status" aria-live="polite"></div>');
   assert.equal(C.box('banner', { html: '<p>x</p>' }), '<div class="i360-banner" role="status"><p>x</p></div>');
   assert.equal(C.cardHeader({ tone: 'quran', icon: SVG('verse'), 'data-i18n': 'quranLabel', text: 'Quranic Verse', class: 'mb-md' }),
-    '<div class="flex items-center gap-sm mb-md"><span class="bg-quran-soft text-quran p-sm rounded-lg"><svg class="icon" data-icon="verse" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path></path></svg></span><h2 data-i18n="quranLabel" class="text-base font-bold uppercase tracking-widest text-quran">Quranic Verse</h2></div>');
-  assert.equal(C.statusLine({ part: 'prayer', class: 'mb-md' }), '<div data-status="prayer" class="hidden items-center gap-sm text-sm text-custom-secondary mb-md"><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry></button></div>');
+    '<div class="flex items-center gap-sm mb-md"><span class="bg-quran-bg text-quran p-sm rounded-lg"><svg class="icon" data-icon="verse" data-lucide="x" viewBox="0 0 24 24" aria-hidden="true"><path></path></svg></span><h2 data-i18n="quranLabel" class="text-base font-bold uppercase tracking-widest text-quran">Quranic Verse</h2></div>');
+  assert.equal(C.statusLine({ part: 'prayer', class: 'mb-md' }), '<div class="i360-status mb-md" role="status" aria-live="polite" data-status="prayer" hidden><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry hidden></button></div>');
+  assert.equal(C.statusLine({ id: 'status', keep: true }), '<div class="i360-status" id="status" role="status" aria-live="polite" data-status-keep><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry hidden></button></div>');
+  assert.equal(C.announcer({ id: 'announce' }), '<span class="sr-only" id="announce" role="status" aria-live="polite"></span>');
+  assert.equal(C.emptyState({ id: 'e', class: 'empty-state' }), '<div class="i360-empty empty-state" id="e"></div>');
+  assert.equal(C.emptyState({ text: 'لا علامات <بعد>' }), '<div class="i360-empty">لا علامات &lt;بعد></div>');
   assert.throws(() => C.cardHeader({ tone: 'pink', icon: SVG('x'), text: 't' }), /needs a tone/);
   assert.equal(C.cardFooter({ tone: 'quran', part: 'quran', citation: true, reference: 'text', source: 'link', 'source-text': 'AlQuran.cloud', 'source-href': 'https://alquran.cloud/', class: 'mt-md' }),
     '<div class="border-t border-rule pt-md space-y-xs font-bold text-quran mt-md"><p data-target="quran-citation" class="text-base empty:hidden"></p><p data-target="quran-reference" class="text-sm empty:hidden"></p>'
@@ -118,7 +129,7 @@ test('components: each builder writes one fixed structure, attributes in one ord
   assert.throws(() => C.cardFooter({ tone: 'quran', part: 'q', reference: 'details' }), /reference-i18n/);
   assert.throws(() => C.cardFooter({ tone: 'quran', part: 'q', source: 'link' }), /source-text and source-href/);
   assert.throws(() => C.cardFooter({ tone: 'quran', part: 'q', source: 'image' }), /"link" or "text"/);
-  assert.throws(() => C.statusLine({}), /needs its part/);
+  assert.throws(() => C.statusLine({}), /needs its part or id/);
   assert.throws(() => C.field({ kind: 'date' }), /search, number or select/);
   assert.throws(() => C.box('popup', { tag: 'section' }), /a popup is a div/);
   assert.throws(() => C.box('sidebar'), /no container/);

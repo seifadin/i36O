@@ -2,7 +2,7 @@
 // measurement, and keyboard shortcuts.
 import { oncePerFrame } from '../frame.js';
 import { el, fittingToolbar, fromMarkup, setLabel, setPressed } from '../page-chrome.js';
-import { listItem, toolbarButton } from '../components.js';
+import { emptyState, listItem, toolbarButton } from '../components.js';
 import { READER_FOLD } from './fold.js';
 import { PANEL_COVERS, ZOOM_STEP } from './constants.js';
 import * as ICON from 'i360:icons';
@@ -60,8 +60,7 @@ function panelItem(text, pageText, onClick, extraClass) {
 }
 
 function emptyNote(text) {
-  const div = el('div', 'panel-empty', text);
-  return div;
+  return fromMarkup(emptyState({ class: 'panel-empty', text }));
 }
 
 function pageSummary(idx) {

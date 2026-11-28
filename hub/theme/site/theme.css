@@ -42,6 +42,7 @@
   --i360-active: #EEF2FF;
   --i360-link: #2E8B57;
   --i360-quran: #2E8B57;
+  --i360-quran-bg: rgba(46, 139, 87, 0.14);   /* the Quran's soft background (its colour at 14%) */
   --i360-note: #2A35C4;          /* footnotes */
   --i360-code: #F1ECE2;
   --i360-quote: #F4F0E8;
@@ -131,6 +132,7 @@
   --i360-active: #eadbb8;
   --i360-link: #8a4b0f;
   --i360-quran: #2f5a1e;
+  --i360-quran-bg: rgba(47, 90, 30, 0.14);
   --i360-note: #4a3c27;
   --i360-code: #efe5cf;
   --i360-quote: #f1e7d1;
@@ -175,6 +177,7 @@
   --i360-active: #1e3a5f;
   --i360-link: #7dd3fc;
   --i360-quran: #86efac;
+  --i360-quran-bg: rgba(134, 239, 172, 0.14);
   --i360-note: #cbd5e1;
   --i360-code: #0f172a;
   --i360-quote: #111827;

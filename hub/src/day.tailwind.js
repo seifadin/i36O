@@ -7,7 +7,8 @@ const v = (name) => `var(--i360-${name})`;
 export default {
   content: ['./src/day.src.html', './src/day/**/*.js', './src/components.js'],
   // components.js names the toolbar's variant "sticky" (its own .toolbar-sticky class): not a utility here.
-  blocklist: ['sticky'],
+  // sr-only: the shared one (page-chrome.css), so a hidden announcer reads the same everywhere.
+  blocklist: ['sticky', 'sr-only'],
   theme: {
     // Three sizes: the fourth (xl) is the app title's alone.
     fontSize: {
@@ -25,10 +26,13 @@ export default {
       spacing: { xs: v('space-xs'), sm: v('space-sm'), md: v('space-md'), lg: v('space-lg') },
       lineHeight: { reading: v('line-height') },
       colors: {
+        quran: { DEFAULT: v('quran'), bg: v('quran-bg') },
         hadith: { DEFAULT: v('hadith'), bg: v('hadith-bg') },
         prayer: { DEFAULT: v('prayer'), bg: v('prayer-bg') },
         event: { DEFAULT: v('event'), bg: v('event-bg') },
         converter: { DEFAULT: v('converter'), bg: v('converter-bg') },
+        accent: v('accent'),
+        muted: v('muted'),
         rule: v('rule'),
         page: v('bg')
       }

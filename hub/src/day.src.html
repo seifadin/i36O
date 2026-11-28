@@ -17,28 +17,21 @@
        pages); the cards: --i360-bg. */
     /* Fonts from the shared theme: Amiri for every language, Amiri Quran for the verse. */
     body { font-family: var(--i360-font); background-color: var(--i360-frame); color: var(--i360-text); transition: all var(--i360-speed) ease; margin: 0; padding: 0; overflow-x: hidden; }
-    .arabic-script, .hadith-text-style { font-family: var(--i360-font); line-height: var(--i360-line-height) !important; }
-    .arabic-script.quran-verse { font-family: var(--i360-font-quran); }
-    .text-quran { color: var(--i360-quran); }
-    .bg-quran-soft { background-color: var(--i360-hover); }
-    @supports (color: color-mix(in oklab, red, red)) { .bg-quran-soft { background-color: color-mix(in oklab, var(--i360-quran) 14%, transparent); } }
-    .text-accent { color: var(--i360-accent); }
+    /* The verse: Amiri Quran, right to left in every language (its text is always Arabic). */
+    .quran-verse { font-family: var(--i360-font-quran); }
+    [dir="ltr"] .quran-verse { direction: rtl; }
     /* Sizes, spacing, corners, lines and shadows: the shared theme's only (src/day.tailwind.js).
        Amiri has only regular (400) and bold (700), so only those are used. No extra letter
        spacing in Arabic script: it pulls joined letters apart. */
     [dir="rtl"] .tracking-widest { letter-spacing: normal !important; }
     /* Icons: Lucide (lucide.dev, ISC licence), drawn inline; checked by scripts/icons.js. Their
-       sizes here; their drawing style for every page: src/page-chrome.css. */
-    svg.icon { width: var(--i360-icon-size); height: var(--i360-icon-size); display: block; }
-    svg.icon-inline { width: var(--i360-icon-size-inline); height: var(--i360-icon-size-inline); display: inline-block; vertical-align: -0.125em; }
+       drawing style and sizes (.icon, .icon-inline): src/page-chrome.css. */
     /* The cards (their look: .i360-card, the inner boxes .i360-inset, src/page-chrome.css): their padding
        grows with the screen (twice the shared gap), no width breakpoints. They enter one after another
        (App.reveal in day/main.js adds .is-shown): from a step below, faded in at the theme's slow speed. */
     .day-card { padding: calc(2 * var(--i360-gap)); opacity: 0; transform: translateY(var(--i360-space-md)); transition: all var(--i360-speed-slow) ease; }
     .day-card.is-shown { opacity: 1; transform: none; }
     .next-prayer-highlight { border: var(--i360-line-width-strong) solid var(--i360-accent) !important; background-color: var(--i360-hover); transform: scale(1.05); box-shadow: var(--i360-popup-shadow); border-radius: var(--i360-radius-lg); }
-    [dir="ltr"] .arabic-script { direction: rtl; }
-    .text-custom-secondary { color: var(--i360-muted); }
     /* The top bar (i360-hub.md §10 "Toolbars"): fixed at the top, as on every i360 page; in Arabic from
        the right: theme · numerals · language … title · ✕ (the ✕ in the installed app only); it mirrors in
        left-to-right languages. The bar and everything in it: src/page-chrome.css (toolbar-sticky: it stays
@@ -111,9 +104,9 @@
 
   <div class="page safe-area safe-area-top-bar">
   <div class="layout-stable flex flex-col gap-xs mb-lg text-center">
-    <p class="text-custom-secondary text-base font-bold" data-target="current-date"></p>
+    <p class="text-muted text-base font-bold" data-target="current-date"></p>
     <p class="text-accent text-sm font-bold" data-target="hijri-date"></p>
-    <p class="text-custom-secondary text-sm" data-target="hijri-source"></p>
+    <p class="text-muted text-sm" data-target="hijri-source"></p>
   </div>
 
   <main id="cards" class="cards">
@@ -121,8 +114,8 @@
     <!--@@CARD id="quran-card" class="day-card"@@-->
       <!--@@CARD_HEADER tone="quran" icon="verse" data-i18n="quranLabel" text="Quranic Verse" class="mb-md"@@-->
       <div class="space-y-md">
-        <p data-target="quran-arabic" class="arabic-script quran-verse text-lg font-bold text-justify mb-md"></p>
-        <p data-target="quran-translation" class="text-base leading-reading italic text-custom-secondary text-justify"></p>
+        <p data-target="quran-arabic" class="quran-verse text-lg leading-reading font-bold text-justify mb-md"></p>
+        <p data-target="quran-translation" class="text-base leading-reading italic text-muted text-justify"></p>
       </div>
       <!--@@CARD_FOOTER tone="quran" part="quran" citation reference="text" source="link" source-text="AlQuran.cloud" source-href="https://alquran.cloud/" class="mt-md"@@-->
       <!--@@STATUS_LINE part="quran" class="mt-md"@@-->
@@ -131,10 +124,10 @@
     <!--@@CARD id="hadith-card" class="day-card"@@-->
       <!--@@CARD_HEADER tone="hadith" icon="hadith" data-i18n="hadithLabel" text="Hadith" class="mb-md"@@-->
       <div class="space-y-md">
-        <p data-target="hadith-title" class="text-base font-bold text-custom-secondary"></p>
+        <p data-target="hadith-title" class="text-base font-bold text-muted"></p>
         <div class="space-y-sm">
-          <p data-target="hadith-narrator" class="hidden hadith-text-style text-base text-hadith font-bold"></p>
-          <p data-target="hadith-text" class="hadith-text-style text-base text-custom-secondary font-bold text-justify"></p>
+          <p data-target="hadith-narrator" class="hidden leading-reading text-base text-hadith font-bold"></p>
+          <p data-target="hadith-text" class="leading-reading text-base text-muted font-bold text-justify"></p>
         </div>
       </div>
       <!--@@CARD_FOOTER tone="hadith" part="hadith" citation reference="details" reference-i18n="refsLabel" source="link" source-text="HadeethEnc.com" source-href="https://hadeethenc.com/" class="mt-md"@@-->
@@ -146,7 +139,7 @@
     <!--@@CARD id="prayer-card" class="day-card"@@-->
       <!--@@CARD_HEADER tone="prayer" icon="prayerTimes" data-i18n="prayerLabel" text="Prayer Times" class="mb-md"@@-->
       <div data-target="prayer-grid" class="grid grid-cols-3 gap-sm mb-md"></div>
-      <!--@@INSET class="flex flex-wrap gap-md text-sm text-custom-secondary p-md"@@-->
+      <!--@@INSET class="flex flex-wrap gap-md text-sm text-muted p-md"@@-->
         <div class="flex flex-col gap-xs flex-auto">
           <p><span class="font-bold" data-i18n="methodLabel">Method:</span> <span data-target="meta-method">…</span></p>
           <p class="flex flex-wrap items-center gap-xs"><span class="font-bold" data-i18n="madhabLabel">Madhab:</span>
@@ -163,7 +156,7 @@
       <!-- The city picker: Open-Meteo's place search (GeoNames data), asked only from here. -->
       <!--@@INSET id="city-picker" class="hidden mt-md p-md flex-col gap-sm"@@-->
         <!--@@FIELD kind="search" id="city-search" class="w-full px-md py-sm"@@-->
-        <p data-target="city-status" class="text-sm text-custom-secondary" role="status" aria-live="polite"></p>
+        <p data-target="city-status" class="text-sm text-muted" role="status" aria-live="polite"></p>
         <div data-target="city-results" class="flex flex-col gap-xs" role="listbox"></div>
       <!--@@/INSET@@-->
       <!--@@STATUS_LINE part="prayer" class="mt-md"@@-->
@@ -178,15 +171,15 @@
       <!--@@INSET class="p-md flex flex-col gap-md"@@-->
         <div class="conv-fields" role="group" id="conv-fields">
           <div class="conv-field">
-            <label for="conv-d" data-i18n="convDay" class="text-sm text-custom-secondary"></label>
+            <label for="conv-d" data-i18n="convDay" class="text-sm text-muted"></label>
             <!--@@FIELD kind="select" id="conv-d"@@-->
           </div>
           <div class="conv-field conv-field-month">
-            <label for="conv-m" data-i18n="convMonth" class="text-sm text-custom-secondary"></label>
+            <label for="conv-m" data-i18n="convMonth" class="text-sm text-muted"></label>
             <!--@@FIELD kind="select" id="conv-m"@@-->
           </div>
           <div class="conv-field conv-field-year">
-            <label for="conv-y" data-i18n="convYear" class="text-sm text-custom-secondary"></label>
+            <label for="conv-y" data-i18n="convYear" class="text-sm text-muted"></label>
             <!--@@FIELD kind="number" id="conv-y"@@-->
           </div>
           <span class="conv-pick" id="conv-pick" hidden>
@@ -195,8 +188,8 @@
           </span>
         </div>
         <div class="border-t border-rule pt-md flex flex-col gap-xs" aria-live="polite">
-          <p data-target="conv-alpha" class="text-base font-bold text-custom-secondary"></p>
-          <p data-target="conv-iso" class="text-base font-bold text-custom-secondary"></p>
+          <p data-target="conv-alpha" class="text-base font-bold text-muted"></p>
+          <p data-target="conv-iso" class="text-base font-bold text-muted"></p>
           <p data-target="conv-error" class="conv-error text-sm font-bold" hidden></p>
         </div>
       <!--@@/INSET@@-->
@@ -205,12 +198,12 @@
     </div>
     <!--@@CARD id="events-card" class="cards-wide day-card"@@-->
       <!--@@CARD_HEADER tone="event" icon="events" data-i18n="eventsLabel" text="Upcoming Events" class="mb-md"@@-->
-      <p data-target="events-note" class="text-sm text-custom-secondary mb-md"></p>
+      <p data-target="events-note" class="text-sm text-muted mb-md"></p>
       <div data-target="events-list" class="events-grid"></div>
     <!--@@/CARD@@-->
   </main>
   </div>
-  <footer class="mt-lg text-center text-custom-secondary text-sm pb-lg">
+  <footer class="mt-lg text-center text-muted text-sm pb-lg">
     <p data-i18n="footer">Updated daily.</p>
     <p data-i18n="privacy" class="mt-sm max-w-[var(--col-min)] mx-auto whitespace-pre-line"></p>
     <p data-target="credits" class="mt-sm max-w-[var(--col-min)] mx-auto"></p>

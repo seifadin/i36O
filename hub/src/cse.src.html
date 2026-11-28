@@ -57,9 +57,7 @@
 
     .options { display: flex; flex-wrap: wrap; gap: var(--i360-space-sm); margin-top: var(--i360-space-sm); }
 
-    .status { margin-top: var(--i360-space-md); font-size: var(--i360-text-size-sm); min-height: 1.5rem; }
-    .status:not(.i360-banner) { color: var(--i360-muted); }   /* as an error: the notice's colours */
-    .status .retry { margin-inline-start: var(--i360-space-sm); }
+    .status { margin-top: var(--i360-space-md); min-height: 1.5rem; }   /* its look: .i360-status (a notice on failure) */
 
     .about { margin-top: var(--i360-space-lg); color: var(--i360-text); font-size: var(--i360-text-size-sm); line-height: var(--i360-line-height); }
 
@@ -133,7 +131,7 @@
     </div>
 
     <div class="results-bar">
-      <div class="status" id="status" role="status" aria-live="polite"></div>
+      <!--@@STATUS_LINE id="status" keep class="status"@@-->
       <div class="bar-btns" id="bar-btns" hidden>
         <!--@@BUTTON id="btn-expand" icon="expandAll" label="توسيع الكل" small@@-->
         <!--@@BUTTON id="btn-collapse" icon="collapseAll" label="طي الكل" small@@-->

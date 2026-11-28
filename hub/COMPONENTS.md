@@ -12,6 +12,7 @@ a file = calls in that script or React uses in that app file.
 
 | Builder | What | Placeholder | Class | React twin | Used by |
 |---|---|---|---|---|---|
+| `announcer` | A hidden announcer | `ANNOUNCER` | `.sr-only` | `Announcer` | quran page ×1; src/components/SearchBar.tsx ×1 |
 | `box('card')` | A box around a section | `CARD` | `.i360-card` | — | day page ×5; hub/src/cse/main.js ×1 |
 | `box('inset')` | A box inside a section | `INSET` | `.i360-inset` | — | day page ×3; hub/src/cse/main.js ×1; hub/src/day/main.js ×2 |
 | `box('popup')` | A pop-up: a list, a dialog or a tooltip | `POPUP` | `.i360-popup` | `Popup` | day page ×1; reader page ×1; src/components/Dialog.tsx ×1; src/components/OSRow.tsx ×1 |
@@ -29,12 +30,13 @@ a file = calls in that script or React uses in that app file.
 | `cardHeader` | A card's header | `CARD_HEADER` | — (Tailwind) | — | day page ×5 |
 | `chip` | An option that is on or off | `CHIP` | `.i360-chip` | — | cse page ×2; day page ×2; reader page ×2 |
 | `divider` | A thin line between groups of toolbar buttons | `DIVIDER` | `.divider` | — | quran page ×1; reader page ×2 |
+| `emptyState` | A message where there is nothing to show | `EMPTY_STATE` | `.i360-empty` | — | reader page ×1; hub/src/reader/panel.js ×1 |
 | `field` | A field | `FIELD` | `.i360-field` `.i360-field-search` | — | cse page ×1; day page ×4; reader page ×3 |
 | `labelButton` | A toolbar button with a word beside its icon | `LABEL_BUTTON` | `.toolbar-btn` `.toolbar-btn-label` | — | quran page ×1; reader page ×1 |
 | `listItem` | One row of a list | `LIST_ITEM` | `.i360-list-item` | — | day page ×5; hub/src/cse/main.js ×1; hub/src/day/main.js ×1; hub/src/reader/panel.js ×1; hub/src/reader/search.js ×1 |
 | `menuButton` | A toolbar button that opens a list | `MENU_BUTTON` | `.toolbar-btn` `.toolbar-btn-menu` | — | day page ×1 |
 | `settingsButtons` | The theme and numerals buttons | `SETTINGS_BUTTONS` | `.toolbar-btn` | — | cse page ×1; day page ×1; quran page ×1; reader page ×1 |
-| `statusLine` | A part's status | `STATUS_LINE` | — (Tailwind) | — | day page ×3 |
+| `statusLine` | A status line | `STATUS_LINE` | `.i360-status` | — | cse page ×1; day page ×3 |
 | `toolbarButton` | A toolbar button | `TOOLBAR_BUTTON` | `.toolbar-btn` | `ToolbarButton` | cse page ×1; day page ×1; reader page ×22; hub/src/reader/panel.js ×1; src/components/OSRow.tsx ×3 |
 | `toolbarTitle` | The page's name on its toolbar | `TOOLBAR_TITLE` | `.tb-title` | — | cse page ×1; day page ×1; quran page ×1; reader page ×1 |
 | — | app-only | — | — | `IconButton` | src/components/ScienceGrid.tsx ×1; src/components/SearchBar.tsx ×4 |
@@ -72,7 +74,7 @@ builds by itself. (Daily Reflection's Tailwind utilities and classes added only 
 
 | Page | Own classes |
 |---|---|
-| cse | `.about` `.bar-btns` `.count` `.file` `.group-foot` `.hit` `.hit-meta` `.hit-text` `.inter` `.inter-body` `.major` `.major-body` `.more-spots` `.options` `.results-bar` `.retry` `.scroller` `.search-btn` `.search-form` `.search-input` `.sep` `.source` `.source-name` `.status` |
-| day | `.arabic-script` `.bg-quran-soft` `.cards` `.cards-col` `.cards-wide` `.conv-error` `.conv-field` `.conv-field-month` `.conv-field-year` `.conv-fields` `.conv-native` `.conv-pick` `.day-card` `.events-grid` `.hadith-text-style` `.icon` `.icon-inline` `.is-shown` `.lang-list` `.lang-wrap` `.layout-stable` `.next-prayer-highlight` `.page` `.quran-verse` `.text-accent` `.text-custom-secondary` `.text-quran` `.tracking-widest` `.two-cols` |
-| quran | `.banner` `.sr-only` `.tanzil` |
+| cse | `.about` `.bar-btns` `.count` `.file` `.group-foot` `.hit` `.hit-meta` `.hit-text` `.inter` `.inter-body` `.major` `.major-body` `.more-spots` `.options` `.results-bar` `.scroller` `.search-btn` `.search-form` `.search-input` `.sep` `.source` `.source-name` `.status` |
+| day | `.cards` `.cards-col` `.cards-wide` `.conv-error` `.conv-field` `.conv-field-month` `.conv-field-year` `.conv-fields` `.conv-native` `.conv-pick` `.day-card` `.events-grid` `.is-shown` `.lang-list` `.lang-wrap` `.layout-stable` `.next-prayer-highlight` `.page` `.quran-verse` `.tracking-widest` `.two-cols` |
+| quran | `.banner` `.tanzil` |
 | reader | `.acts-folded` `.bm-row` `.bookmarked` `.empty-state` `.figure-label` `.flash` `.floating-btn` `.fn-back` `.fn-note` `.fn-ref` `.folded` `.footnotes` `.footnotes-list` `.indeterminate` `.item-page` `.item-text` `.lvl-1` `.lvl-2` `.lvl-3` `.lvl-4` `.markdown-body` `.missing-pages-banner` `.missing-pages-text` `.near` `.no-head` `.no-total` `.nopos` `.notitle` `.offline` `.open` `.page-content` `.page-counter` `.page-input` `.page-number-footer` `.page-placeholder` `.page-pos` `.page-sheet` `.pages-wrapper` `.panel-body` `.panel-empty` `.panel-head` `.panel-item` `.panel-list` `.panel-tab` `.progress` `.progress-fill` `.progress-text` `.progress-track` `.quran` `.reading` `.res-more` `.res-page` `.search-count` `.search-input` `.search-popup` `.search-results` `.search-row` `.show` `.side-panel` `.status-icon` `.status-text` `.sublist` `.table-wrap` `.text-size-btn` `.toast` `.viewer-container` `.visible` `.vol-select` |

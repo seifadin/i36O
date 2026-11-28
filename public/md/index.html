@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-4VgiokxVDscoqcaj7ukjEqjNWqSY+49Nj9EV+8EXyaU='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-k22CGch7ASYnaRb+QiyM8ei1TGuW2YV9ttTib5+mR70='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>قارئ الماركداون</title>
 
@@ -28,6 +28,7 @@
   --i360-active: #EEF2FF;
   --i360-link: #2E8B57;
   --i360-quran: #2E8B57;
+  --i360-quran-bg: rgba(46, 139, 87, 0.14);
   --i360-note: #2A35C4;
   --i360-code: #F1ECE2;
   --i360-quote: #F4F0E8;
@@ -107,6 +108,7 @@
   --i360-active: #eadbb8;
   --i360-link: #8a4b0f;
   --i360-quran: #2f5a1e;
+  --i360-quran-bg: rgba(47, 90, 30, 0.14);
   --i360-note: #4a3c27;
   --i360-code: #efe5cf;
   --i360-quote: #f1e7d1;
@@ -150,6 +152,7 @@
   --i360-active: #1e3a5f;
   --i360-link: #7dd3fc;
   --i360-quran: #86efac;
+  --i360-quran-bg: rgba(134, 239, 172, 0.14);
   --i360-note: #cbd5e1;
   --i360-code: #0f172a;
   --i360-quote: #111827;
@@ -445,6 +448,10 @@ svg[data-lucide] {
   flex-shrink: 0;
 }
 .toolbar-btn svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+/* An icon's size anywhere else: .icon (a card's, a status, a floating button), .icon-inline (beside
+   text, as tall as it). */
+.icon { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); display: block; }
+.icon-inline { width: var(--i360-icon-size-inline, 1em); height: var(--i360-icon-size-inline, 1em); display: inline-block; vertical-align: -0.125em; }
 
 /* The numerals button shows digits (٣ / 3). */
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -622,6 +629,29 @@ svg[data-lucide] {
   z-index: var(--i360-layer-toast, 60);
 }
 
+/* A status line (statusLine(), setStatus() in page-chrome.js): small muted words and a retry button;
+   on a failure it is also .i360-banner (below), which gives it the notice's colours. */
+.i360-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;   /* words and button on one line of text, as in running text */
+  gap: var(--i360-space-sm, 0.5rem);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  color: var(--i360-muted, #5A62C9);
+}
+
+/* Where there is nothing to show (emptyState()): muted words, centred; each page places it. */
+.i360-empty {
+  color: var(--i360-muted, #5A62C9);
+  font-size: var(--i360-text-size, 1rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-align: center;
+}
+
+/* Words for screen readers only (announcer()): on no screen, still read. */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
 /* A notice (an error, missing pages). */
 .i360-banner {
   background: var(--i360-banner-bg, #fef2f2);
@@ -661,8 +691,7 @@ svg[data-lucide] {
     .tb-end > .tb-title { max-width: 14rem; flex-shrink: 0; }
 
     /* Icons: Lucide (lucide.dev, ISC licence), drawn inline; checked by scripts/icons.js. Their
-       sizes here; their drawing style for every page: src/page-chrome.css. */
-    .status-icon svg, .floating-btn svg { width: var(--i360-icon-size); height: var(--i360-icon-size); }
+       drawing style and sizes (.icon): src/page-chrome.css. The bookmark's when on: */
     #btn-bookmark[aria-pressed="true"] svg { fill: var(--i360-ribbon); stroke: var(--i360-ribbon); }
     #btn-bookmark[aria-pressed="true"] { background-color: transparent; }
 
@@ -750,18 +779,13 @@ svg[data-lucide] {
       gap: var(--i360-space-md);
     }
     .missing-pages-banner.visible { display: flex; }
-    .missing-pages-banner svg { width: var(--i360-icon-size); height: var(--i360-icon-size); stroke: currentColor; flex-shrink: 0; }
     .missing-pages-text { flex: 1; }
     .missing-pages-text div + div { margin-top: var(--i360-space-xs); }
 
-    .empty-state {
+    .empty-state {   /* its look: .i360-empty */
       display: none;
       margin: 18vh auto 0;
       max-width: 22rem;
-      text-align: center;
-      color: var(--i360-muted);
-      font-size: var(--i360-text-size);
-      line-height: var(--i360-line-height-ui);
     }
     .empty-state.visible { display: block; }
 
@@ -1048,7 +1072,7 @@ svg[data-lucide] {
     .panel-item.lvl-4 { padding-inline-start: calc(3 * var(--i360-space-md)); }
     .bm-row { display: flex; align-items: center; }
     .bm-row .panel-item { flex: 1; }
-    .panel-empty { padding: var(--i360-space-md); color: var(--i360-muted); font-size: var(--i360-text-size-sm); line-height: var(--i360-line-height-ui); text-align: center; }
+    .panel-empty { padding: var(--i360-space-md); }   /* its look: .i360-empty */
 
     /* ---------- Reading mode ---------- */
     .floating-btn {
@@ -1204,7 +1228,7 @@ svg[data-lucide] {
   </aside>
 
   <button class="floating-btn" id="btn-exit-reading" type="button">
-    <svg data-icon="exitReadingMode" data-lucide="minimize" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
+    <svg class="icon" data-icon="exitReadingMode" data-lucide="minimize" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"></path><path d="M21 8h-3a2 2 0 0 1-2-2V3"></path><path d="M3 16h3a2 2 0 0 1 2 2v3"></path><path d="M16 21v-3a2 2 0 0 1 2-2h3"></path></svg>
   </button>
 
   <div class="i360-toast toast" id="toast" role="status" aria-live="polite"></div>
@@ -1213,11 +1237,11 @@ svg[data-lucide] {
 
   <main class="viewer-container safe-area safe-area-top-bar" id="viewer-container" tabindex="-1">
     <div class="i360-banner missing-pages-banner" id="missing-pages-banner" role="status">
-      <svg data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+      <svg class="icon" data-icon="warning" data-lucide="triangle-exclamation-point" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
       <div class="missing-pages-text" id="missing-pages-text"></div>
     </div>
 
-    <div class="empty-state" id="empty-state"></div>
+    <div class="i360-empty empty-state" id="empty-state"></div>
 
     <div class="pages-wrapper" id="pages-wrapper"></div>
   </main>
@@ -1749,12 +1773,15 @@ ${body}`;
     toolbarMenu: { cls: "toolbar-menu", tags: ["div"] }
   });
   var CARD_TONES = Object.freeze({
-    quran: { tile: "bg-quran-soft text-quran", text: "text-quran" },
+    quran: { tile: "bg-quran-bg text-quran", text: "text-quran" },
     hadith: { tile: "bg-hadith-bg text-hadith", text: "text-hadith" },
     prayer: { tile: "bg-prayer-bg text-prayer", text: "text-prayer" },
     converter: { tile: "bg-converter-bg text-converter", text: "text-converter" },
     event: { tile: "bg-event-bg text-event", text: "text-event" }
   });
+  function emptyState(a = {}) {
+    return `<div class="${classes("i360-empty", a.class)}"${attributes(a)}${flags(a)}>${escapeText(a.text ?? "")}</div>`;
+  }
   var CLASS = Object.freeze({
     banner: BOXES.banner.cls,
     chipLabel: CLASS_CHIP_LABEL,
@@ -2292,7 +2319,7 @@ ${body}`;
   var fileInput = $("file-input");
   var missingPagesBanner = $("missing-pages-banner");
   var missingPagesText = $("missing-pages-text");
-  var emptyState = $("empty-state");
+  var emptyState2 = $("empty-state");
   var lang = () => state.dir === "rtl" ? "ar" : "en";
   var t = () => READER[lang()];
   var CONNECTION_CHECK_MS = 3e4;
@@ -2312,6 +2339,7 @@ ${body}`;
   function updateConnection() {
     const label = online ? t().online : t().offline;
     statusIcon.innerHTML = `${online ? icon_online : icon_offline}<span class="status-text"></span>`;
+    statusIcon.firstElementChild.classList.add("icon");
     statusIcon.lastChild.textContent = label;
     statusIcon.classList.toggle("offline", !online);
     setLabel(statusIcon, label);
@@ -4134,8 +4162,7 @@ Please report this to https://github.com/markedjs/marked.`, e) {
     return btn;
   }
   function emptyNote(text) {
-    const div = el("div", "panel-empty", text);
-    return div;
+    return fromMarkup(emptyState({ class: "panel-empty", text }));
   }
   function pageSummary(idx) {
     const sheet = state.sheets[idx];
@@ -4625,8 +4652,8 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     tbTitle.textContent = tr.barTitle;
     setLabel(btnClose, tr.close);
     updateConnection();
-    emptyState.textContent = fmtNum(tr.emptyHint);
-    emptyState.classList.toggle("visible", state.sheets.length === 0);
+    emptyState2.textContent = fmtNum(tr.emptyHint);
+    emptyState2.classList.toggle("visible", state.sheets.length === 0);
     renderNotices();
     updateSearchCountDisplay();
     updateBookmarkButton();
@@ -5463,7 +5490,7 @@ ${fmtNum(t().position(idx + 1, state.pages.length))}`);
     nearFrom = 0;
     nearTo = -1;
     updateNear();
-    emptyState.classList.toggle("visible", state.sheets.length === 0);
+    emptyState2.classList.toggle("visible", state.sheets.length === 0);
     buildVolumeSelect();
     viewerContainer.scrollTop = 0;
     viewerContainer.scrollLeft = 0;

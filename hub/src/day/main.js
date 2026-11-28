@@ -8,7 +8,7 @@ import * as i360Theme from '../../theme/site/theme-loader.js';
 import * as HijriCalc from '../../hijri/calc.js';
 import * as HijriClient from '../../hijri/client.js';
 import DAY_CITIES from '../day-cities.json';
-import { $, drawSettingsButtons, el, fromMarkup, setLabel, setPressed, setupClose, wireSettingsButtons } from '../page-chrome.js';
+import { $, drawSettingsButtons, el, fromMarkup, setLabel, setPressed, setStatus, setupClose, wireSettingsButtons } from '../page-chrome.js';
 import { box as componentBox, listItem } from '../components.js';
 import { oncePerFrame } from '../frame.js';
 import { createStore } from '../storage.js';
@@ -533,9 +533,6 @@ const UI = {
   get L() { return LOCALES[App.lang] || LOCALES.ar; },
   init() {
     document.querySelectorAll('[data-target]').forEach(node => this.targets[node.dataset.target] = node);
-    document.querySelectorAll('[data-status]').forEach(node => {
-      node.querySelector('[data-retry]').addEventListener('click', () => App.retry(node.dataset.status));
-    });
     document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => { LangMenu.close(true); App.setLang(b.dataset.lang); }));
     LangMenu.init();
     document.querySelectorAll('[data-school]').forEach(b => b.addEventListener('click', () => App.setSchool(+b.dataset.school)));
@@ -555,13 +552,12 @@ const UI = {
   },
   settingsButtons() { drawSettingsButtons($('btn-theme'), $('btn-numerals'), App.lang); },   // in the page's language
   set(t, v) { if (this.targets[t]) this.targets[t].textContent = v; },
+  // A part's status line (shared: setStatus() in page-chrome.js): loading, a failure with retry, or none.
   status(name, kind) {
-    const box = document.querySelector(`[data-status="${name}"]`); if (!box) return;
-    const L = this.L, btn = box.querySelector('[data-retry]'), txt = box.querySelector('[data-status-text]');
-    if (!kind) { box.classList.add('hidden'); box.classList.remove('flex'); return; }
-    box.classList.remove('hidden'); box.classList.add('flex');
-    txt.textContent = kind === 'loading' ? L.loading : L.loadError;
-    btn.textContent = L.retry; btn.classList.toggle('hidden', kind === 'loading');
+    const line = document.querySelector(`[data-status="${name}"]`); if (!line) return;
+    const L = this.L, failed = kind === 'error';
+    setStatus(line, { text: kind ? (failed ? L.loadError : L.loading) : '', error: failed,
+      retry: failed ? { label: L.retry, onClick: () => App.retry(name) } : null });
   },
   reveal() {
     if (this.shown) return; this.shown = true;
@@ -666,8 +662,8 @@ const UI = {
       const box = isNext ? el('div', 'flex flex-col items-center p-sm transition-all next-prayer-highlight')
         : fromMarkup(componentBox('inset', { class: 'flex flex-col items-center p-sm transition-all' }));
       box.append(
-        el('span', `text-sm font-bold ${isNext ? 'text-accent' : 'text-custom-secondary'}`, L.prayers[i]),
-        el('span', `text-base font-bold mt-xs ${isNext ? 'text-accent' : 'text-custom-secondary'}`, m ? m[0] : '—'));
+        el('span', `text-sm font-bold ${isNext ? 'text-accent' : 'text-muted'}`, L.prayers[i]),
+        el('span', `text-base font-bold mt-xs ${isNext ? 'text-accent' : 'text-muted'}`, m ? m[0] : '—'));
       if (isNext) box.append(el('span', 'text-sm mt-xs font-bold text-accent animate-pulse', L.next));
       return box;
     }));
@@ -691,13 +687,13 @@ const UI = {
       const row = e.isT ? el('div', 'flex justify-between items-center gap-md p-md transition-all border-2 border-event bg-event-bg rounded-lg')
         : fromMarkup(componentBox('inset', { class: 'flex justify-between items-center gap-md p-md transition-all' }));
       const left = el('div', 'flex-1'), title = el('div', 'flex items-center gap-sm');
-      title.append(el('span', 'text-base font-bold text-custom-secondary', L.events[e.id]));
+      title.append(el('span', 'text-base font-bold text-muted', L.events[e.id]));
       if (e.isT) title.append(el('span', 'bg-event text-page text-sm font-bold px-sm rounded-full', L.todayLabel));
-      left.append(title, el('span', 'text-sm text-custom-secondary font-bold', hijriLong({ y: e.year, m: e.m + 1, d: e.d }, L.months)));
+      left.append(title, el('span', 'text-sm text-muted font-bold', hijriLong({ y: e.year, m: e.m + 1, d: e.d }, L.months)));
       const right = el('div', 'text-end');
       right.append(
         el('span', 'text-sm uppercase font-bold text-event block', L.expected),
-        el('span', 'text-sm font-bold text-custom-secondary', gregorianLong(e.date, lang)));
+        el('span', 'text-sm font-bold text-muted', gregorianLong(e.date, lang)));
       row.append(left, right);
       return row;
     }));

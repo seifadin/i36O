@@ -22,6 +22,9 @@ const inBar = (html) => C.box('toolbar', { html: C.box('toolbarStart', { html })
 const sampleButton = () => C.toolbarButton({ icon: icon('search'), label: 'بحث' });
 // Placed in a card, as on Daily Reflection.
 const inCard = (html) => C.box('card', { tag: 'div', class: 'p-md', html });
+const status = (html, text, retry) => html.replace(/ hidden>/, '>').replace('<span data-status-text></span>', `<span data-status-text>${text}</span>`)
+  .replace('data-retry hidden></button>', retry ? `data-retry>${retry}</button>` : 'data-retry hidden></button>')
+  .replace('class="i360-status', retry ? 'class="i360-status i360-banner' : 'class="i360-status');
 
 const SAMPLES = Object.freeze({
   toolbarButton: [
@@ -77,7 +80,7 @@ const SAMPLES = Object.freeze({
   'box:popup': [{ name: 'قائمة منبثقة', args: { class: 'p-sm', html: C.listItem({ text: 'العربية' }) + C.listItem({ text: 'English' }) } }],
   'box:banner': [{ name: 'تنبيه', args: { class: 'p-sm', html: 'تعذّر تحميل البيانات' } }],
   'box:toast': [{ name: 'رسالة عابرة', args: { class: 'px-md py-sm', html: 'تم النسخ' } }],
-  'box:fieldBox': [{ name: 'شريط البحث', args: { class: 'flex items-center gap-sm px-md py-sm', html: `<span>ابحث…</span>${icon('search')}` } }],
+  'box:fieldBox': [{ name: 'شريط البحث', args: { class: 'flex items-center gap-sm px-md py-sm', html: `<span>ابحث…</span>${icon('search').replace('<svg ', '<svg class="icon" ')}` } }],
   'box:toolbar': [
     { name: 'عادي', args: { html: C.box('toolbarStart', { html: sampleButton() }) } },
     { name: 'أعلى الصفحة', args: { variant: 'sticky', html: C.box('toolbarStart', { html: sampleButton() }) + C.toolbarTitle({ html: 'العنوان' }) } },
@@ -104,12 +107,13 @@ const SAMPLES = Object.freeze({
     { name: 'صفوف فارغة تختفي', args: { tone: 'quran', part: 'cat-empty', citation: true, reference: 'text', source: 'link', 'source-text': 'AlQuran.cloud', 'source-href': 'https://alquran.cloud/' },
       display: (html) => inCard(html.replace('>Source<', '>المصدر<')) },
   ],
+  // As setStatus() (page-chrome.js) shows it: its words, a retry button on a failure, the notice's look.
   statusLine: [
-    { name: 'بعد فشل', args: { part: 'cat-status' },
-      display: (html) => inCard(html.replace('class="hidden items-center', 'class="flex items-center')
-        .replace('<span data-status-text></span>', '<span data-status-text>تعذّر التحميل</span>')
-        .replace('data-retry></button>', 'data-retry>إعادة المحاولة</button>')) },
+    { name: 'أثناء التحميل', args: { part: 'cat-status' }, display: (html) => inCard(status(html, 'جارٍ التحميل…')) },
+    { name: 'بعد فشل', args: { part: 'cat-status' }, display: (html) => inCard(status(html, 'تعذّر التحميل', 'إعادة المحاولة')) },
   ],
+  announcer: [{ name: 'مخفي — للقارئ الصوتي وحده', args: { id: 'cat-announce' }, display: (html) => inCard(`${html}<span class="text-sm">(لا يظهر على الشاشة)</span>`) }],
+  emptyState: [{ name: 'لا شيء بعد', args: { text: 'لا علامات بعد' }, display: inCard }],
 });
 
 // The builder's own markup for one example (the inventory reads this).

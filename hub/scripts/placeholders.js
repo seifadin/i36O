@@ -19,7 +19,9 @@
 //   TOOLBAR_MAIN, TOOLBAR_END, TOOLBAR_GROUP, TOOLBAR_MENU; tag="…" where the container allows another element)
 //   <!--@@CARD_HEADER tone="quran" icon="verse" data-i18n="quranLabel" text="Quranic Verse" class="mb-md"@@-->
 //   <!--@@CARD_FOOTER tone="hadith" part="hadith" citation reference="details" reference-i18n="refsLabel" source="link" source-text="HadeethEnc.com" source-href="https://hadeethenc.com/" class="mt-md"@@-->
-//   <!--@@STATUS_LINE part="quran" class="mt-md"@@-->
+//   <!--@@STATUS_LINE part="quran" class="mt-md"@@-->            (or id="status" keep: shown while empty)
+//   <!--@@ANNOUNCER id="announce"@@-->
+//   <!--@@EMPTY_STATE id="empty-state" class="empty-state"@@-->
 //
 // A misspelled component, a missing field or an unknown meaning stops the build. A placeholder
 // with no attributes that isn't a component (<!--@@CSP@@-->) is build.js's own and is left for it;
@@ -69,6 +71,8 @@ const COMPONENTS = Object.freeze({
   CARD_HEADER: (a, draw) => C.cardHeader({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
   CARD_FOOTER: (a) => C.cardFooter(a),
   STATUS_LINE: (a) => C.statusLine(a),
+  ANNOUNCER: (a) => C.announcer(a),
+  EMPTY_STATE: (a) => C.emptyState(a),
 });
 
 // The page's HTML with every component written out.

@@ -91,6 +91,19 @@ export function setPressed(control, on) {
   control.setAttribute('aria-pressed', on ? 'true' : 'false');
 }
 
+// A status line (statusLine() in components.js): its words — text or nodes; none hides the line
+// unless it keeps its place — a retry button when `retry` gives its label and what a tap does, and
+// the notice's look on a failure (`error`). Every page's status goes through here.
+export function setStatus(line, { text = '', retry = null, error = false } = {}) {
+  const words = line.querySelector('[data-status-text]'), button = line.querySelector('[data-retry]');
+  words.replaceChildren(text);
+  line.classList.toggle(CLASS.banner, error);
+  button.hidden = !retry;
+  button.textContent = retry ? retry.label : '';
+  button.onclick = retry ? retry.onClick : null;
+  if (!line.hasAttribute('data-status-keep')) line.hidden = !text && !retry;
+}
+
 export function fittingToolbar({ bar, fold = [] }) {
   const DENSE = ['toolbar-dense', 'toolbar-densest'];
   // Each entry's changes, made once here: (folded) => void.

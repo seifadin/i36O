@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-q9vDxX8GE3gK09tTLyPDqp4NkdpGjM1PWLc8xZeg6N8='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-qUkVwjUphCUijN+9vjIKGTd36Dm5NuzUwOi51AEjPfo=' 'sha256-QyyZ0lx4kOhxzoW9QvFRkLGeYSa/axgxO2SOGuxq20E='; style-src 'unsafe-inline'; font-src https://theme.i36o.workers.dev; connect-src https://theme.i36o.workers.dev https://lib.i36o.workers.dev http://localhost:* http://127.0.0.1:*; img-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>البحث في &#x2066;i360إ&#x2069;</title>
   <meta name="description" content="ابحث في نصوص الكتب والمقالات المرتبطة بالموسوعة الإسلامية i360إ، مرتبةً حسب العلوم الشرعية.">
@@ -29,6 +29,7 @@
   --i360-active: #EEF2FF;
   --i360-link: #2E8B57;
   --i360-quran: #2E8B57;
+  --i360-quran-bg: rgba(46, 139, 87, 0.14);
   --i360-note: #2A35C4;
   --i360-code: #F1ECE2;
   --i360-quote: #F4F0E8;
@@ -108,6 +109,7 @@
   --i360-active: #eadbb8;
   --i360-link: #8a4b0f;
   --i360-quran: #2f5a1e;
+  --i360-quran-bg: rgba(47, 90, 30, 0.14);
   --i360-note: #4a3c27;
   --i360-code: #efe5cf;
   --i360-quote: #f1e7d1;
@@ -151,6 +153,7 @@
   --i360-active: #1e3a5f;
   --i360-link: #7dd3fc;
   --i360-quran: #86efac;
+  --i360-quran-bg: rgba(134, 239, 172, 0.14);
   --i360-note: #cbd5e1;
   --i360-code: #0f172a;
   --i360-quote: #111827;
@@ -447,6 +450,10 @@ svg[data-lucide] {
   flex-shrink: 0;
 }
 .toolbar-btn svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+/* An icon's size anywhere else: .icon (a card's, a status, a floating button), .icon-inline (beside
+   text, as tall as it). */
+.icon { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); display: block; }
+.icon-inline { width: var(--i360-icon-size-inline, 1em); height: var(--i360-icon-size-inline, 1em); display: inline-block; vertical-align: -0.125em; }
 
 /* The numerals button shows digits (٣ / 3). */
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -624,6 +631,29 @@ svg[data-lucide] {
   z-index: var(--i360-layer-toast, 60);
 }
 
+/* A status line (statusLine(), setStatus() in page-chrome.js): small muted words and a retry button;
+   on a failure it is also .i360-banner (below), which gives it the notice's colours. */
+.i360-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;   /* words and button on one line of text, as in running text */
+  gap: var(--i360-space-sm, 0.5rem);
+  font-size: var(--i360-text-size-sm, 0.875rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  color: var(--i360-muted, #5A62C9);
+}
+
+/* Where there is nothing to show (emptyState()): muted words, centred; each page places it. */
+.i360-empty {
+  color: var(--i360-muted, #5A62C9);
+  font-size: var(--i360-text-size, 1rem);
+  line-height: var(--i360-line-height-ui, 1.6);
+  text-align: center;
+}
+
+/* Words for screen readers only (announcer()): on no screen, still read. */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
 /* A notice (an error, missing pages). */
 .i360-banner {
   background: var(--i360-banner-bg, #fef2f2);
@@ -665,9 +695,7 @@ svg[data-lucide] {
 
     .options { display: flex; flex-wrap: wrap; gap: var(--i360-space-sm); margin-top: var(--i360-space-sm); }
 
-    .status { margin-top: var(--i360-space-md); font-size: var(--i360-text-size-sm); min-height: 1.5rem; }
-    .status:not(.i360-banner) { color: var(--i360-muted); }   /* as an error: the notice's colours */
-    .status .retry { margin-inline-start: var(--i360-space-sm); }
+    .status { margin-top: var(--i360-space-md); min-height: 1.5rem; }   /* its look: .i360-status (a notice on failure) */
 
     .about { margin-top: var(--i360-space-lg); color: var(--i360-text); font-size: var(--i360-text-size-sm); line-height: var(--i360-line-height); }
 
@@ -741,7 +769,7 @@ svg[data-lucide] {
     </div>
 
     <div class="results-bar">
-      <div class="status" id="status" role="status" aria-live="polite"></div>
+      <div class="i360-status status" id="status" role="status" aria-live="polite" data-status-keep><span data-status-text></span><button class="i360-btn i360-btn-sm" type="button" data-retry hidden></button></div>
       <div class="bar-btns" id="bar-btns" hidden>
         <button class="i360-btn i360-btn-sm i360-btn-icon" type="button" id="btn-expand" title="توسيع الكل" aria-label="توسيع الكل"><svg data-icon="expandAll" data-lucide="list-chevrons-up-down" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 8 3-3 3 3"></path><path d="m15 16 3 3 3-3"></path></svg></button>
         <button class="i360-btn i360-btn-sm i360-btn-icon" type="button" id="btn-collapse" title="طي الكل" aria-label="طي الكل"><svg data-icon="collapseAll" data-lucide="list-chevrons-down-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h8"></path><path d="M3 12h8"></path><path d="M3 19h8"></path><path d="m15 5 3 3 3-3"></path><path d="m15 19 3-3 3 3"></path></svg></button>
@@ -1553,7 +1581,7 @@ svg[data-lucide] {
     return `<${tag} class="${classes(own, a.class)}"${isButton ? ' type="button"' : ""}${attributes(all)}${flags(a)}>${a.html ?? ""}</${tag}>`;
   }
   var CARD_TONES = Object.freeze({
-    quran: { tile: "bg-quran-soft text-quran", text: "text-quran" },
+    quran: { tile: "bg-quran-bg text-quran", text: "text-quran" },
     hadith: { tile: "bg-hadith-bg text-hadith", text: "text-hadith" },
     prayer: { tile: "bg-prayer-bg text-prayer", text: "text-prayer" },
     converter: { tile: "bg-converter-bg text-converter", text: "text-converter" },
@@ -1619,6 +1647,15 @@ svg[data-lucide] {
   }
   function setPressed(control, on) {
     control.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+  function setStatus(line, { text = "", retry = null, error = false } = {}) {
+    const words = line.querySelector("[data-status-text]"), button2 = line.querySelector("[data-retry]");
+    words.replaceChildren(text);
+    line.classList.toggle(CLASS.banner, error);
+    button2.hidden = !retry;
+    button2.textContent = retry ? retry.label : "";
+    button2.onclick = retry ? retry.onClick : null;
+    if (!line.hasAttribute("data-status-keep")) line.hidden = !text && !retry;
   }
 
   // src/locales.js
@@ -1701,14 +1738,8 @@ svg[data-lucide] {
     b.addEventListener("click", onClick);
     return b;
   }
-  function setStatus(text, { error = false, retry = null } = {}) {
-    statusEl.textContent = "";
-    statusEl.classList.toggle("error", error);
-    statusEl.classList.toggle(CLASS.banner, error);
-    if (text) statusEl.append(fmt(text));
-    if (retry) {
-      statusEl.append(smallButton("retry", T.retry, retry));
-    }
+  function setStatus2(text, { error = false, retry = null } = {}) {
+    setStatus(statusEl, { text: text ? fmt(text) : "", error, retry: retry && { label: T.retry, onClick: retry } });
   }
   var BuildGone = class extends Error {
   };
@@ -1766,22 +1797,22 @@ svg[data-lucide] {
     setRobots(q);
     document.title = q ? `${q} — البحث في ${BRAND}` : `البحث في ${BRAND}`;
     if (!q) {
-      setStatus("");
+      setStatus2("");
       aboutEl.hidden = false;
       return;
     }
     aboutEl.hidden = true;
     if (normalizeQuery(q, false).length < MIN_QUERY) {
-      setStatus(T.tooShort(MIN_QUERY));
+      setStatus2(T.tooShort(MIN_QUERY));
       return;
     }
     try {
       if (!state.catalog) {
-        setStatus(T.loadingIndex);
+        setStatus2(T.loadingIndex);
         await loadCatalog();
       }
       if (run !== state.run) return;
-      setStatus(T.searching);
+      setStatus2(T.searching);
       await runSearch(run, q);
     } catch (err) {
       if (run !== state.run) return;
@@ -1795,7 +1826,7 @@ svg[data-lucide] {
         }
       }
       resultsEl.textContent = "";
-      setStatus(state.catalog ? T.searchError : T.loadError, { error: true, retry: () => search(input.value) });
+      setStatus2(state.catalog ? T.searchError : T.loadError, { error: true, retry: () => search(input.value) });
     }
   }
   async function runSearch(run, q) {
@@ -1805,7 +1836,7 @@ svg[data-lucide] {
     if (run !== state.run) return;
     resultsEl.textContent = "";
     if (gps.length === 0) {
-      setStatus(T.noResults);
+      setStatus2(T.noResults);
       return;
     }
     const hits = /* @__PURE__ */ new Map();
@@ -1892,10 +1923,10 @@ svg[data-lucide] {
     if (exact) {
       let n = 0;
       for (const gp of pages) if (ctx.confirmed && ctx.confirmed.has(gp)) n++;
-      setStatus(n ? T.summary(fmtNum(n), fmtNum(ctx.groups.filter((g) => g.shown).length), true) : T.noResults);
+      setStatus2(n ? T.summary(fmtNum(n), fmtNum(ctx.groups.filter((g) => g.shown).length), true) : T.noResults);
       if (!n) barEl.hidden = true;
     } else {
-      setStatus(T.summary(fmtNum(pages.size), fmtNum(ctx.groups.length), false));
+      setStatus2(T.summary(fmtNum(pages.size), fmtNum(ctx.groups.length), false));
     }
   }
   function confirmPage(ctx, gp) {

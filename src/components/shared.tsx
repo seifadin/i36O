@@ -70,6 +70,11 @@ export function Toast({ className, children, ...rest }: BoxProps) {
   return <div className={cx('i360-toast', className)} role="status" aria-live="polite" {...rest}>{children}</div>
 }
 
+// A hidden announcer (hub: announcer): words for screen readers only.
+export function Announcer({ className, children, ...rest }: BoxProps) {
+  return <span className={cx('sr-only', className)} role="status" aria-live="polite" {...rest}>{children}</span>
+}
+
 // A toolbar (hub: box('toolbar')): the app's is the bottom one (variant 'bottom'); its parts below.
 export function Toolbar({ variant, className, children, ...rest }: BoxProps & { variant?: 'sticky' | 'bottom' }) {
   return <div className={cx(variant ? `toolbar toolbar-${variant}` : 'toolbar', className)} {...rest}>{children}</div>

@@ -7,7 +7,7 @@ import { computeUseHuawei } from '@/hooks/usePlatform'
 import { tryOpenNewTab } from '@/lib/openTab'
 import { openResource } from '@/lib/openResource'
 import { i360Theme } from '@/lib/theme'
-import { FieldBox, IconButton } from '@/components/shared'
+import { Announcer, FieldBox, IconButton } from '@/components/shared'
 import { APP } from '@i360/locales'
 
 const T = APP.ar
@@ -233,7 +233,7 @@ export default function SearchBar() {
           of which element currently has focus. role="status" + explicit
           aria-live="polite" together for the broadest, most reliable
           screen-reader support. */}
-      <span className="sr-only" role="status" aria-live="polite">{liveMessage}</span>
+      <Announcer>{liveMessage}</Announcer>
 
       {/* Search input with SearchIcon (right) + Search-execute icon (left) */}
       <FieldBox className="flex flex-1 min-w-0 items-center px-sm py-xs gap-sm">

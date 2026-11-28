@@ -175,7 +175,7 @@ function box(kind, a = {}) {
 // Each colour's classes are written out whole, so Tailwind (src/day.tailwind.js, which reads this
 // file) builds them. `class` places it (a margin).
 const CARD_TONES = Object.freeze({
-  quran: { tile: 'bg-quran-soft text-quran', text: 'text-quran' },
+  quran: { tile: 'bg-quran-bg text-quran', text: 'text-quran' },
   hadith: { tile: 'bg-hadith-bg text-hadith', text: 'text-hadith' },
   prayer: { tile: 'bg-prayer-bg text-prayer', text: 'text-prayer' },
   converter: { tile: 'bg-converter-bg text-converter', text: 'text-converter' },
@@ -190,12 +190,26 @@ function cardHeader(a = {}) {
   return `<div class="${classes('flex items-center gap-sm', a.class)}"><span class="${tone.tile} p-sm rounded-lg">${icon}</span>${name}</div>`;
 }
 
-// A part's status (Daily Reflection): its words while loading or after a failure, and a retry
-// button; hidden until its script shows it. `part` names it; `class` places it.
+// A status line: its words (loading, a summary, a failure) and a retry button, both shown and filled
+// by setStatus() (page-chrome.js); a failure takes the notice's look. Hidden while empty, unless
+// `keep` (it then holds its place: the CSE's, under its search box). `part` names it for its page
+// script (Daily Reflection's three), or `id`; `class` places it.
 function statusLine(a = {}) {
-  if (!a.part) throw new Error('a status line needs its part');
-  return `<div data-status="${escapeAttr(a.part)}" class="${classes('hidden items-center gap-sm text-sm text-custom-secondary', a.class)}">`
-    + `<span data-status-text></span>${button({ small: true, 'data-retry': true })}</div>`;
+  if (!a.part && !a.id) throw new Error('a status line needs its part or id');
+  return `<div class="${classes('i360-status', a.class)}"${attributes({ id: a.id, role: 'status', 'aria-live': 'polite', 'data-status': a.part, 'data-status-keep': a.keep })}${a.keep ? '' : ' hidden'}>`
+    + `<span data-status-text></span>${button({ small: true, 'data-retry': true, hidden: true })}</div>`;
+}
+
+// A hidden announcer: words for screen readers only, set by its script (the quran page's «تفسير»
+// failures; the app's search states, by its React twin). `id`: how its script finds it.
+function announcer(a = {}) {
+  return `<span class="${classes('sr-only', a.class)}"${attributes({ id: a.id, role: 'status', 'aria-live': 'polite' })}></span>`;
+}
+
+// A message where there is nothing to show (the Reader's "open a file", an empty list): its text, or
+// what its script writes. `class` places it.
+function emptyState(a = {}) {
+  return `<div class="${classes('i360-empty', a.class)}"${attributes(a)}${flags(a)}>${escapeText(a.text ?? '')}</div>`;
 }
 
 // A card's footer (Daily Reflection): under one divider, in the card's colour, its rows 0.25 rem
@@ -236,4 +250,4 @@ const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LA
 // BOXES and CARD_TONES are exported for the components' inventory and catalogue
 // (scripts/list-components.js, tools/catalogue/), which list every container and card colour.
 export { toolbarButton, labelButton, menuButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box,
-  cardHeader, cardFooter, statusLine, CLASS, BOXES, CARD_TONES };
+  cardHeader, cardFooter, statusLine, announcer, emptyState, CLASS, BOXES, CARD_TONES };

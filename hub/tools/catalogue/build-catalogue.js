@@ -55,9 +55,7 @@ const CATALOGUE_CSS = `
   .cat-example-name { font-size: var(--i360-text-size-sm); color: var(--i360-muted); margin-block-end: var(--i360-space-xs); }
   .cat-example { position: relative; }
   .cat-example .toolbar, .cat-example .toolbar-menu { position: static; }   /* in place, not floating */
-  /* What a page sets for itself, as Daily Reflection (src/day.src.html) does: icon sizes (and the app's search bar's), and no
-     letter spacing in Arabic. */
-  svg.icon, .i360-field svg { width: var(--i360-icon-size); height: var(--i360-icon-size); display: block; }
+  /* What a page sets for itself, as Daily Reflection (src/day.src.html) does: no letter spacing in Arabic. */
   [dir="rtl"] .tracking-widest { letter-spacing: normal !important; }
 `;
 
