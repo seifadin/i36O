@@ -423,7 +423,7 @@
       cursor: pointer;
     }
     .panel-tab[aria-selected="true"] { background: var(--i360-active); color: var(--i360-heading); }
-    /* Its close and remove buttons: .toolbar-btn. */
+    /* Its close and remove buttons: ghost buttons (.i360-btn-ghost). */
     .panel-body { flex: 1; overflow-y: auto; padding: var(--i360-space-xs) 0; }
     .panel-list { list-style: none; }
     .panel-item { display: flex; align-items: baseline; gap: var(--i360-space-sm); padding: var(--i360-space-sm) var(--i360-space-md); }   /* its look: .i360-list-item */
@@ -494,26 +494,26 @@
        src/reader/panel.js. -->
   <!--@@TOOLBAR id="toolbar"@@-->
     <!--@@TOOLBAR_START@@-->
-      <!--@@TOOLBAR_BUTTON id="btn-more" icon="menu" aria-controls="more-menu" aria-expanded="false"@@-->
+      <!--@@GHOST_BUTTON id="btn-more" icon="menu" aria-controls="more-menu" aria-expanded="false"@@-->
       <!--@@SETTINGS_BUTTONS@@-->
       <!--@@DIVIDER@@-->
       <span class="status-icon" id="status-icon" role="img"></span>
-      <!--@@LABEL_BUTTON id="btn-open-file" icon="openFile" text="Open file" label-id="open-file-label"@@-->
+      <!--@@BUTTON id="btn-open-file" icon="openFile" text="Open file" text-id="open-file-label"@@-->
     <!--@@/TOOLBAR_START@@-->
 
     <!--@@TOOLBAR_MAIN@@-->
       <!--@@TOOLBAR_GROUP id="group-text"@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-text-smaller" class="text-size-btn" dir="ltr"@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-text-larger" class="text-size-btn" dir="ltr"@@-->
+        <!--@@GHOST_BUTTON id="btn-text-smaller" class="text-size-btn" dir="ltr" drawn@@-->
+        <!--@@GHOST_BUTTON id="btn-text-larger" class="text-size-btn" dir="ltr" drawn@@-->
       <!--@@/TOOLBAR_GROUP@@-->
       <!--@@TOOLBAR_GROUP id="group-zoom"@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-zoom-out" icon="zoomOut"@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-zoom-in" icon="zoomIn"@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-fit-width" icon="fitWidth"@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-fit-page" icon="fitPage"@@-->
+        <!--@@GHOST_BUTTON id="btn-zoom-out" icon="zoomOut"@@-->
+        <!--@@GHOST_BUTTON id="btn-zoom-in" icon="zoomIn"@@-->
+        <!--@@GHOST_BUTTON id="btn-fit-width" icon="fitWidth"@@-->
+        <!--@@GHOST_BUTTON id="btn-fit-page" icon="fitPage"@@-->
       <!--@@/TOOLBAR_GROUP@@-->
       <!--@@TOOLBAR_GROUP id="group-nav"@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-nav-left" icon="pageLeft"@@-->
+        <!--@@GHOST_BUTTON id="btn-nav-left" icon="pageLeft"@@-->
         <div class="page-counter">
           <!--@@FIELD kind="select" id="vol-select" class="vol-select" hidden@@-->
           <!--@@FIELD kind="number" id="page-num-input" class="page-input"@@-->
@@ -521,25 +521,25 @@
           <span id="total-pages">0</span>
           <span id="page-pos" class="page-pos"></span>
         </div>
-        <!--@@TOOLBAR_BUTTON id="btn-nav-right" icon="pageRight"@@-->
+        <!--@@GHOST_BUTTON id="btn-nav-right" icon="pageRight"@@-->
       <!--@@/TOOLBAR_GROUP@@-->
       <!--@@DIVIDER@@-->
-      <!--@@TOOLBAR_BUTTON id="btn-copy-link" icon="copyLink" hidden@@-->
+      <!--@@GHOST_BUTTON id="btn-copy-link" icon="copyLink" hidden@@-->
       <!--@@TOOLBAR_GROUP id="group-mark"@@-->
         <template data-slot="copy-link"></template>
-        <!--@@TOOLBAR_BUTTON id="btn-bookmark" icon="bookmark" aria-pressed="false"@@-->
+        <!--@@GHOST_BUTTON id="btn-bookmark" icon="bookmark" aria-pressed="false"@@-->
       <!--@@/TOOLBAR_GROUP@@-->
       <!--@@TOOLBAR_GROUP id="group-acts"@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-scan" icon="originalPage" hidden@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-reading" icon="readingMode"@@-->
+        <!--@@GHOST_BUTTON id="btn-scan" icon="originalPage" hidden@@-->
+        <!--@@GHOST_BUTTON id="btn-reading" icon="readingMode"@@-->
       <!--@@/TOOLBAR_GROUP@@-->
     <!--@@/TOOLBAR_MAIN@@-->
 
     <!--@@TOOLBAR_END@@-->
-      <!--@@TOOLBAR_BUTTON id="btn-search-toggle" icon="search" aria-controls="search-popup" aria-expanded="false"@@-->
-      <!--@@TOOLBAR_BUTTON id="btn-panel" icon="contents" aria-controls="side-panel" aria-expanded="false"@@-->
+      <!--@@GHOST_BUTTON id="btn-search-toggle" icon="search" aria-controls="search-popup" aria-expanded="false"@@-->
+      <!--@@GHOST_BUTTON id="btn-panel" icon="contents" aria-controls="side-panel" aria-expanded="false"@@-->
       <!--@@TOOLBAR_TITLE id="tb-title"@@--><!--@@/TOOLBAR_TITLE@@-->
-      <!--@@TOOLBAR_BUTTON id="btn-close" icon="close" hidden@@-->
+      <!--@@GHOST_BUTTON id="btn-close" icon="close" hidden@@-->
     <!--@@/TOOLBAR_END@@-->
 
     <!-- The ⋮ menu: what doesn't fit on the bar folds into its slots (fittingToolbar, src/page-chrome.js). -->
@@ -550,7 +550,7 @@
       <template data-slot="text"></template>
       <template data-slot="actions"></template>
       <!--@@TOOLBAR_GROUP id="group-view"@@-->
-        <!--@@TOOLBAR_BUTTON id="btn-dir-toggle"@@-->
+        <!--@@GHOST_BUTTON id="btn-dir-toggle" drawn@@-->
       <!--@@/TOOLBAR_GROUP@@-->
     <!--@@/TOOLBAR_MENU@@-->
   <!--@@/TOOLBAR@@-->
@@ -565,12 +565,12 @@
   <!-- Search -->
   <!--@@POPUP id="search-popup" class="search-popup" role="search"@@-->
     <div class="search-row">
-      <!--@@FIELD kind="search" id="search-input" class="search-input"@@-->
+      <!--@@FIELD_BOX class="search-input"@@--><!--@@FIELD kind="search" id="search-input" in-box@@--><!--@@/FIELD_BOX@@-->
       <span class="search-count" id="search-count" aria-live="polite">0 of 0</span>
-      <!--@@TOOLBAR_BUTTON id="btn-search-prev" icon="resultPrevious"@@-->
-      <!--@@TOOLBAR_BUTTON id="btn-search-next" icon="resultNext"@@-->
-      <!--@@TOOLBAR_BUTTON id="btn-search-list" icon="searchResults" aria-controls="search-results" aria-pressed="false"@@-->
-      <!--@@TOOLBAR_BUTTON id="btn-search-close" icon="close"@@-->
+      <!--@@GHOST_BUTTON id="btn-search-prev" icon="resultPrevious"@@-->
+      <!--@@GHOST_BUTTON id="btn-search-next" icon="resultNext"@@-->
+      <!--@@GHOST_BUTTON id="btn-search-list" icon="searchResults" aria-controls="search-results" aria-pressed="false"@@-->
+      <!--@@GHOST_BUTTON id="btn-search-close" icon="close"@@-->
     </div>
     <div class="search-row">
       <!--@@CHIP id="opt-diacritics"@@-->
@@ -584,7 +584,7 @@
     <div class="panel-head" role="tablist">
       <button class="panel-tab" id="tab-contents" type="button" role="tab" aria-selected="true"></button>
       <button class="panel-tab" id="tab-bookmarks" type="button" role="tab" aria-selected="false"></button>
-      <!--@@TOOLBAR_BUTTON id="btn-panel-close" icon="close"@@-->
+      <!--@@GHOST_BUTTON id="btn-panel-close" icon="close"@@-->
     </div>
     <div class="panel-body" id="panel-body"></div>
   </aside>

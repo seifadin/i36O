@@ -13,7 +13,7 @@ import { fetchIcon, iconLoaded, loadedIcon } from '@/lib/iconsLoader'
 import { APP } from '@i360/locales'
 import Dialog from '@/components/Dialog'
 import ReportNotice from '@/components/ReportNotice'
-import { Banner, IconButton, Toast } from '@/components/shared'
+import { Banner, GhostButton, Toast } from '@/components/shared'
 
 const T = APP.ar
 
@@ -113,13 +113,12 @@ function MinorButton({
         <span className="flex-1">{science.ScienceMinor_Ar}</span>
       </button>
       {science.WebAppendix && (
-        <IconButton
+        <GhostButton
           // stopPropagation isn't actually needed here — this is a sibling
           // of the row button, not nested inside it, so there's no bubbling
           // "row tap" to prevent — but kept explicit anyway since it costs
           // nothing and removes any doubt for a future reader.
           onClick={e => { e.stopPropagation(); onAppendixTap(science) }}
-          className="px-sm py-xs"
           label={T.attachment}
           icon={<ICON.attachment />}
         />

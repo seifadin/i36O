@@ -7,7 +7,7 @@ import { computeUseHuawei } from '@/hooks/usePlatform'
 import { tryOpenNewTab } from '@/lib/openTab'
 import { openResource } from '@/lib/openResource'
 import { i360Theme } from '@/lib/theme'
-import { Announcer, FieldBox, IconButton } from '@/components/shared'
+import { Announcer, FieldBox, GhostButton, SearchField } from '@/components/shared'
 import { APP } from '@i360/locales'
 
 const T = APP.ar
@@ -236,7 +236,7 @@ export default function SearchBar() {
       <Announcer>{liveMessage}</Announcer>
 
       {/* Search input with SearchIcon (right) + Search-execute icon (left) */}
-      <FieldBox className="flex flex-1 min-w-0 items-center px-sm py-xs gap-sm">
+      <FieldBox className="flex-1 min-w-0 px-sm py-xs gap-sm">
         {/* SearchIcon — live 3-state indicator + one-shot override control.
             searchAuto: auto-detect, input doesn't match (resting/default,
             including empty input). Tapping while empty flashes invalid.
@@ -244,7 +244,7 @@ export default function SearchBar() {
             translating: custom search translating a non-Arabic term (in flight).
             searchOnly: forced search-only override armed (tap to arm/disarm).
             loading: custom search opening the resolved URL (in flight). */}
-        <IconButton
+        <GhostButton
           onClick={handleSearchIconTap}
           label={searchIconLabel}
           icon={<>
@@ -261,8 +261,7 @@ export default function SearchBar() {
           </>}
         />
 
-        <input
-          type="text"
+        <SearchField
           id="i360-search"
           name="search"
           value={EntityQueryTerm}
@@ -275,18 +274,17 @@ export default function SearchBar() {
           // true. Only ever true for the same brief 500ms window the
           // invalid-input flash shows, then clears itself with it.
           aria-invalid={flash === 'invalid'}
-          className="min-w-0 flex-1 bg-transparent text-right text-base text-brand-blue outline-none placeholder-brand-muted"
           dir="rtl"
         />
         {/* Search icon inside input on LEFT (last in RTL flex = leftmost) */}
-        <IconButton onClick={handleSubmit} label={T.search} icon={<ICON.search />} />
+        <GhostButton onClick={handleSubmit} label={T.search} icon={<ICON.search />} />
       </FieldBox>
 
       {/* Bot — outside input LEFT */}
-      <IconButton onClick={handleBot} className="p-xs" disabled={!botUrl} label={T.assistant} icon={botFailed ? <ICON.openFailed /> : <ICON.assistant />} />
+      <GhostButton onClick={handleBot} disabled={!botUrl} label={T.assistant} icon={botFailed ? <ICON.openFailed /> : <ICON.assistant />} />
 
       {/* Keyboard — leftmost */}
-      <IconButton onClick={handleKeyboard} className="p-xs" disabled={!keyboardUrl} label={T.keyboard} icon={keyboardFailed ? <ICON.openFailed /> : <ICON.keyboard />} />
+      <GhostButton onClick={handleKeyboard} disabled={!keyboardUrl} label={T.keyboard} icon={keyboardFailed ? <ICON.openFailed /> : <ICON.keyboard />} />
     </div>
   )
 }

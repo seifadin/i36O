@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, CSSProperties } from 'react'
 import { ICON, THEME_ICON } from '@/lib/icons'
-import { Popup, Toolbar, ToolbarButton, ToolbarStart } from '@/components/shared'
+import { Popup, Toolbar, GhostButton, ToolbarStart } from '@/components/shared'
 import type { Numerals, ThemeChoice } from '@i360/theme-loader'
 import { dayFirstToNumeric } from '@i360/dates'
 import { getOtaBuild } from '@/lib/feedbackReport'
@@ -236,11 +236,11 @@ export default function OSRow() {
           height, widths, tap areas, colours, focus ring; the simulator keeps
           its own highlight. */}
       <ToolbarStart>
-        <ToolbarButton icon={<ICON.menu />} label={T.versionInfo} onClick={() => setVersionOpen(true)} />
-        <ToolbarButton icon={<ThemeIcon />} label={i360Theme.themeLabel(choice)} onClick={() => { i360Theme.cycle() }} />
-        <ToolbarButton className="numerals-btn" label={i360Theme.numeralsLabel(numerals)} data-i360-digits="keep" onClick={() => { i360Theme.cycleNumerals() }}>
+        <GhostButton icon={<ICON.menu />} label={T.versionInfo} onClick={() => setVersionOpen(true)} />
+        <GhostButton icon={<ThemeIcon />} label={i360Theme.themeLabel(choice)} onClick={() => { i360Theme.cycle() }} />
+        <GhostButton className="numerals-btn" label={i360Theme.numeralsLabel(numerals)} data-i360-digits="keep" onClick={() => { i360Theme.cycleNumerals() }}>
           {i360Theme.NUMERALS_SAMPLE[numerals]}
-        </ToolbarButton>
+        </GhostButton>
       </ToolbarStart>
 
       {/* Middle — real Android: the original binary Google/Huawei switch */}

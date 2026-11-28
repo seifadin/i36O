@@ -62,7 +62,7 @@ test('the built page: only its own address, tanzil\'s banner and frame, and tanz
   assert.match(csp, /connect-src https:\/\/theme\.i36o\.workers\.dev 'self'/);
   assert.match(csp, /img-src 'self'/);
   assert.match(csp, /frame-src 'self' https:\/\/tanzil\.net/);
-  assert.match(html, /<button class="toolbar-btn toolbar-btn-label" type="button" id="btn-exegesis"/);
+  assert.match(html, /<button class="i360-btn" type="button" id="btn-exegesis"/);
   assert.match(html, /<img src="\/img\/header\.png"/);
   assert.doesNotMatch(html, /id="btn-close"/);   // opened in the overlay, which has its own close
 });

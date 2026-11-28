@@ -156,7 +156,7 @@ export function fittingToolbar({ bar, fold = [] }) {
   // Every button narrower than the bar is high widens to one width, as far as the room allows:
   // the buttons' widths at their narrowest, filled up evenly from the narrowest one.
   const widen = (room) => {
-    const buttons = [...bar.querySelectorAll(`.${CLASS.toolbarButton}`)].filter((b) => b.offsetParent && !b.closest(`.${CLASS.toolbarMenu}`));
+    const buttons = [...bar.querySelectorAll(`.${CLASS.ghostButton}`)].filter((b) => b.offsetParent && !b.closest(`.${CLASS.toolbarMenu}`));
     if (!buttons.length || room <= 0) return;
     const narrow = buttons.map((b) => b.getBoundingClientRect().width).sort((a, b) => a - b);
     setWidth('var(--toolbar-h)');

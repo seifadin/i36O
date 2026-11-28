@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, type ButtonHTMLAttributes, type HTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react'
 
 // The app's shared components (their look: hub/src/page-chrome.css). Each writes exactly the
 // structure of its hub builder in hub/src/components.js — the same element, own classes and fixed
@@ -11,14 +11,15 @@ const cx = (own: string, extra?: string) => (extra ? `${own} ${extra}` : own)
 
 type ButtonBase = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'type' | 'title' | 'aria-label'>
 
-// A toolbar button (hub: toolbarButton): its icon, or its own content (the numerals sample).
-// `label` names it — the tooltip and the screen readers' name.
-export function ToolbarButton({ icon, label, className, children, ...rest }: ButtonBase & {
-  icon?: ReactNode; label?: string; className?: string; children?: ReactNode
+// A ghost button (hub: ghostButton): no pill and no outline, a fill when hovered or on — the bottom
+// bar's buttons and the search bar's. Its icon and/or its `text`, icon first; or its own content
+// (the numerals sample). `label` names it — the tooltip and the screen readers' name.
+export function GhostButton({ icon, text, label, className, children, ...rest }: ButtonBase & {
+  icon?: ReactNode; text?: string; label?: string; className?: string; children?: ReactNode
 }) {
   return (
-    <button className={cx('toolbar-btn', className)} type="button" title={label} aria-label={label} {...rest}>
-      {icon}{children}
+    <button className={cx('i360-btn-ghost', className)} type="button" title={label} aria-label={label} {...rest}>
+      {icon}{text !== undefined && <span>{text}</span>}{children}
     </button>
   )
 }
@@ -36,19 +37,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonBase & {
     </button>
   )
 })
-
-// A bare icon button beside a field or inside one (the search bar's mode, search, assistant and
-// keyboard buttons): app-only, no hub twin. `label` names it (tooltip and screen readers); disabled
-// shows the disabled colour.
-export function IconButton({ icon, label, disabled, className, ...rest }: ButtonBase & {
-  icon: ReactNode; label: string; className?: string
-}) {
-  return (
-    <button className={cx(`shrink-0 ${disabled ? 'text-brand-disabled' : 'text-brand-blue'}`, className)} type="button" title={label} aria-label={label} disabled={disabled} {...rest}>
-      {icon}
-    </button>
-  )
-}
 
 type BoxProps = Omit<HTMLAttributes<HTMLElement>, 'className'> & { className?: string; children?: ReactNode }
 
@@ -68,6 +56,13 @@ export function Banner({ className, children, onClick, ...rest }: BoxProps & { o
 // A short message that comes and goes (hub: box('toast')).
 export function Toast({ className, children, ...rest }: BoxProps) {
   return <div className={cx('i360-toast', className)} role="status" aria-live="polite" {...rest}>{children}</div>
+}
+
+// A search field inside a field box (hub: field) — kind search, in-box: the box gives its look; the
+// standard search-box behaviour (a search key on the keyboard, no remembered entries, corrections or
+// spelling marks), as every search box of the encyclopedia.
+export function SearchField({ className, ...rest }: Omit<InputHTMLAttributes<HTMLInputElement>, 'className' | 'type'> & { className?: string }) {
+  return <input className={cx('i360-field-input', className)} type="search" enterKeyHint="search" autoComplete="off" autoCorrect="off" autoCapitalize="none" spellCheck={false} {...rest} />
 }
 
 // A hidden announcer (hub: announcer): words for screen readers only.

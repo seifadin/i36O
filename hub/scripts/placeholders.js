@@ -4,18 +4,18 @@
 // drawn here from the pinned Lucide. Attributes the builders take: id, label, dir, aria-controls,
 // aria-expanded, aria-pressed, data-i18n, class (a page's own placement class), disabled, hidden.
 //
-//   <!--@@TOOLBAR_BUTTON id="btn-zoom-in" icon="zoomIn"@@-->        (no icon: its script draws it)
-//   <!--@@LABEL_BUTTON id="btn-exegesis" icon="exegesis" text="تفسير" label-id="exegesis-label" disabled@@-->
-//   <!--@@MENU_BUTTON id="btn-lang" icon="dropdown" text-id="lang-short" aria-controls="lang-list"@@-->
+//   <!--@@GHOST_BUTTON id="btn-zoom-in" icon="zoomIn"@@-->          (drawn: its script draws it all)
+//   <!--@@GHOST_BUTTON id="btn-lang" menu icon="dropdown" text-id="lang-short" aria-controls="lang-list"@@-->
 //   <!--@@SETTINGS_BUTTONS@@-->
 //   <!--@@DIVIDER@@-->
 //   <!--@@TOOLBAR_TITLE data-i18n="title"@@-->Daily Reflection<!--@@/TOOLBAR_TITLE@@-->
 //   <!--@@CHIP id="opt-word" text="كلمة كاملة" title="…"@@-->       (label-i18n: the label's words)
-//   <!--@@FIELD kind="search" id="q" name="q" aria-label="…"@@-->  (kind: search, number or select)
-//   <!--@@BUTTON id="btn-expand" icon="expandAll" label="…" small@@-->  (or text="…"; primary; type="submit")
+//   <!--@@FIELD kind="search" id="q" name="q" aria-label="…"@@-->  (kind: search, number or select; in-box: inside a FIELD_BOX)
+//   <!--@@BUTTON id="btn-expand" icon="expandAll" label="…" small@@-->  (icon and/or text="…" or text-id; primary; type="submit")
+//   <!--@@BUTTON id="btn-exegesis" icon="exegesis" text="تفسير" text-id="exegesis-label" disabled@@-->
 //   <!--@@LIST_ITEM id="lang-ar" lang="ar" data-lang="ar" text="العربية"@@-->
 //   <!--@@CARD id="quran-card" class="…"@@--> …the page's own contents… <!--@@/CARD@@-->
-//   (likewise INSET, POPUP, BANNER, TOAST and the toolbar's: TOOLBAR variant="sticky", TOOLBAR_START,
+//   (likewise INSET, POPUP, BANNER, TOAST, FIELD_BOX and the toolbar's: TOOLBAR variant="sticky", TOOLBAR_START,
 //   TOOLBAR_MAIN, TOOLBAR_END, TOOLBAR_GROUP, TOOLBAR_MENU; tag="…" where the container allows another element)
 //   <!--@@CARD_HEADER tone="quran" icon="verse" data-i18n="quranLabel" text="Quranic Verse" class="mb-md"@@-->
 //   <!--@@CARD_FOOTER tone="hadith" part="hadith" citation reference="details" reference-i18n="refsLabel" source="link" source-text="HadeethEnc.com" source-href="https://hadeethenc.com/" class="mt-md"@@-->
@@ -39,6 +39,7 @@ const PAIRED = Object.freeze({
   POPUP: (a, inner) => C.box('popup', { ...a, html: inner }),
   BANNER: (a, inner) => C.box('banner', { ...a, html: inner }),
   TOAST: (a, inner) => C.box('toast', { ...a, html: inner }),
+  FIELD_BOX: (a, inner) => C.box('fieldBox', { ...a, html: inner }),
   TOOLBAR: (a, inner) => C.box('toolbar', { ...a, html: inner }),
   TOOLBAR_START: (a, inner) => C.box('toolbarStart', { ...a, html: inner }),
   TOOLBAR_MAIN: (a, inner) => C.box('toolbarMain', { ...a, html: inner }),
@@ -56,12 +57,7 @@ function parse(text) {
 }
 
 const COMPONENTS = Object.freeze({
-  TOOLBAR_BUTTON: (a, draw) => C.toolbarButton({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
-  LABEL_BUTTON: (a, draw) => {
-    if (!a.id || !a.icon || !a.text) throw new Error('LABEL_BUTTON needs id, icon and text');
-    return C.labelButton({ ...a, icon: draw(a.icon), labelId: a['label-id'] });
-  },
-  MENU_BUTTON: (a, draw) => C.menuButton({ ...a, icon: a.icon ? draw(a.icon) : undefined, textId: a['text-id'] }),
+  GHOST_BUTTON: (a, draw) => C.ghostButton({ ...a, icon: a.icon ? draw(a.icon) : undefined }),
   SETTINGS_BUTTONS: () => C.settingsButtons(),
   DIVIDER: (a) => C.divider(a),
   CHIP: (a) => C.chip(a),

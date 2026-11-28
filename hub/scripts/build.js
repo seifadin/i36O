@@ -25,7 +25,7 @@
 //                        against another one)
 //   /*@@TAILWIND@@*/     Daily Reflection's Tailwind CSS (src/day.tailwind.js)
 //   /*@@EXEGESIS@@*/, /*@@TANZIL@@*/  the quran page's words (src/locales.js QURAN)
-//   <!--@@LABEL_BUTTON …@@-->  a shared component, written by scripts/placeholders.js (any number)
+//   <!--@@GHOST_BUTTON …@@-->  a shared component, written by scripts/placeholders.js (any number)
 //   <!--@@CSP@@-->       a Content-Security-Policy allowing only the page's
 //                        own inline scripts (by hash), so it must be made
 //                        after everything else is in place

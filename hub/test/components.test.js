@@ -18,7 +18,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const markup = (html) => html.replace(/<(style|script)\b[^>]*>[\s\S]*?<\/\1>/g, '');
 
 // Every shared component's own class: only its builder writes it.
-const COMPONENT_CLASS = /(?<![\w-])(toolbar-btn|toolbar-menu|tb-(?:title|start|main|end|group)|divider|sr-only|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast|status|empty))(?![\w-])/;
+const COMPONENT_CLASS = /(?<![\w-])(toolbar-menu|tb-(?:title|start|main|end|group)|divider|sr-only|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast|status|empty))(?![\w-])/;
 // The bar itself, in a page's HTML (in a script, "toolbar" is also the Reader's id for it).
 const BAR_CLASS = /(?<![\w-])toolbar(?![\w-])/;
 
@@ -56,41 +56,43 @@ test('components: no page script writes a shared component\'s class itself — i
 });
 
 test('components: every built page\'s toolbar buttons, titles and dividers have the builders\' structure', () => {
-  const BUTTON = /<button class="toolbar-btn(?: [a-z-]+)*" type="button"(?: (?:id|title|aria-label|dir|aria-controls|aria-haspopup|aria-expanded|aria-pressed)="[^"]*")*(?: disabled)?(?: hidden)?>((?:<svg data-icon="[A-Za-z.]+" data-lucide="[a-z0-9-]+" viewBox="0 0 24 24" aria-hidden="true">[\s\S]*?<\/svg>)?(?:<span(?: id="[^"]*")?>[^<]*<\/span>)?(?:<svg[\s\S]*?<\/svg>)?)<\/button>/g;
+  const BUTTON = /<button class="i360-btn-ghost(?: [a-z0-9-]+)*" type="button"(?: (?:id|title|aria-label|dir|aria-controls|aria-haspopup|aria-expanded|aria-pressed)="[^"]*")*(?: disabled)?(?: hidden)?>((?:<svg data-icon="[A-Za-z.]+" data-lucide="[a-z0-9-]+" viewBox="0 0 24 24" aria-hidden="true">[\s\S]*?<\/svg>)?(?:<span(?: id="[^"]*")?>[^<]*<\/span>)?(?:<svg[\s\S]*?<\/svg>)?)<\/button>/g;
   let buttons = 0;
   for (const rel of BUILT) {
     const html = markup(read(rel));
-    const all = html.match(/<button class="toolbar-btn[\s\S]*?<\/button>/g) || [];
+    const all = html.match(/<button class="i360-btn-ghost[\s\S]*?<\/button>/g) || [];
     const shaped = html.match(BUTTON) || [];
-    assert.equal(shaped.length, all.length, `${rel}: a toolbar button in another shape`);
+    assert.equal(shaped.length, all.length, `${rel}: a ghost button in another shape`);
     buttons += all.length;
     assert.equal((html.match(/class="tb-title"/g) || []).length, (html.match(/<h1 class="tb-title"/g) || []).length, `${rel}: a toolbar title that isn't the builder's <h1>`);
     assert.equal((html.match(/class="divider"/g) || []).length, (html.match(/<span class="divider" aria-hidden="true"><\/span>/g) || []).length, `${rel}: a divider in another shape`);
     assert.doesNotMatch(html, /<!--@@/, `${rel}: a placeholder left unfilled`);
-    for (const m of html.matchAll(/<(\w+) class="((?:[^"]* )?i360-(chip|field|btn|list-item|card|inset|popup|banner|toast)(?: [^"]*)?)"([^>]*)>/g)) {
+    for (const m of html.matchAll(/<(\w+) class="((?:[^"]* )?i360-(chip|field-input|field|btn-ghost|btn|list-item|card|inset|popup|banner|toast)(?: [^"]*)?)"([^>]*)>/g)) {
       const [, tag, cls, kind, rest] = m;
       const where = `${rel}: ${m[0].slice(0, 100)}`;
       assert.ok(cls.startsWith(`i360-${kind}`), `${where} — the component's own class comes first`);
       if (kind === 'chip') assert.match(rest, /^ type="button"/, where);
-      if (kind === 'btn') assert.match(rest, /^ type="(button|submit)"/, where);
-      if (kind === 'field' && tag === 'input') assert.match(rest, /^ (type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"|type="text" inputmode="numeric" autocomplete="off")/, `${where} — a field kind's behaviour`);
+      if (kind.startsWith('btn')) assert.match(rest, /^ type="(button|submit)"/, where);
+      if (kind.startsWith('field') && tag === 'input') assert.match(rest, /^ (type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"|type="text" inputmode="numeric" autocomplete="off")/, `${where} — a field kind's behaviour`);
     }
     for (const m of html.matchAll(/<button class="i360-chip[^"]*"[^>]*>([\s\S]*?)<\/button>/g)) {
       assert.match(m[1], /^<span class="i360-chip-box"><\/span><span class="i360-chip-label"(?: data-i18n="[^"]+")?>[^<]*<\/span>$/, `${rel}: a chip in another shape`);
     }
   }
-  assert.ok(buttons >= 35, `the pages' toolbar buttons are found (${buttons})`);
+  assert.ok(buttons >= 30, `the pages' ghost buttons are found (${buttons})`);
 });
 
 test('components: each builder writes one fixed structure, attributes in one order, text escaped', () => {
-  assert.equal(C.toolbarButton({ hidden: true, 'aria-pressed': 'false', id: 'b', icon: SVG('close'), label: 'إغلاق "x"', class: 'extra' }),
-    `<button class="toolbar-btn extra" type="button" id="b" title="إغلاق &quot;x&quot;" aria-label="إغلاق &quot;x&quot;" aria-pressed="false" hidden>${SVG('close')}</button>`);
-  assert.equal(C.toolbarButton({ id: 'e', dir: 'ltr' }), '<button class="toolbar-btn" type="button" id="e" dir="ltr"></button>');
-  assert.equal(C.labelButton({ id: 'l', icon: SVG('exegesis'), text: 'تفسير <و>', labelId: 'll', disabled: true }),
-    `<button class="toolbar-btn toolbar-btn-label" type="button" id="l" disabled>${SVG('exegesis')}<span id="ll">تفسير &lt;و></span></button>`);
-  assert.equal(C.menuButton({ id: 'm', icon: SVG('dropdown'), textId: 't', 'aria-controls': 'list' }),
-    `<button class="toolbar-btn toolbar-btn-menu" type="button" id="m" aria-controls="list" aria-haspopup="true" aria-expanded="false"><span id="t"></span>${SVG('dropdown')}</button>`);
-  assert.equal(C.settingsButtons(), '<button class="toolbar-btn" type="button" id="btn-theme"></button><button class="toolbar-btn numerals-btn" type="button" id="btn-numerals"></button>');
+  assert.equal(C.ghostButton({ hidden: true, 'aria-pressed': 'false', id: 'b', icon: SVG('close'), label: 'إغلاق "x"', class: 'extra' }),
+    `<button class="i360-btn-ghost extra" type="button" id="b" title="إغلاق &quot;x&quot;" aria-label="إغلاق &quot;x&quot;" aria-pressed="false" hidden>${SVG('close')}</button>`);
+  assert.equal(C.ghostButton({ id: 'e', dir: 'ltr', drawn: true }), '<button class="i360-btn-ghost" type="button" id="e" dir="ltr"></button>');
+  assert.equal(C.ghostButton({ id: 'w', icon: SVG('openFile'), text: 'فتح <ملف>' }), `<button class="i360-btn-ghost" type="button" id="w">${SVG('openFile')}<span>فتح &lt;ملف></span></button>`);
+  assert.equal(C.ghostButton({ id: 'm', menu: true, icon: SVG('dropdown'), 'text-id': 't', 'aria-controls': 'list' }),
+    `<button class="i360-btn-ghost i360-btn-ghost-menu" type="button" id="m" aria-controls="list" aria-haspopup="true" aria-expanded="false"><span id="t"></span>${SVG('dropdown')}</button>`);
+  assert.equal(C.button({ id: 'l', icon: SVG('exegesis'), text: 'تفسير <و>', 'text-id': 'll', disabled: true }),
+    `<button class="i360-btn" type="button" id="l" disabled>${SVG('exegesis')}<span id="ll">تفسير &lt;و></span></button>`);
+  assert.equal(C.button({ id: 's', icon: SVG('swap'), 'text-id': 'd' }), `<button class="i360-btn" type="button" id="s">${SVG('swap')}<span id="d"></span></button>`);
+  assert.equal(C.settingsButtons(), '<button class="i360-btn-ghost" type="button" id="btn-theme"></button><button class="i360-btn-ghost numerals-btn" type="button" id="btn-numerals"></button>');
   assert.equal(C.toolbarTitle({ 'data-i18n': 'title', html: 'البحث في <bdi dir="ltr">i360</bdi>' }), '<h1 class="tb-title" data-i18n="title">البحث في <bdi dir="ltr">i360</bdi></h1>');
   assert.equal(C.divider(), '<span class="divider" aria-hidden="true"></span>');
   assert.equal(C.chip({ id: 'c', text: 'كلمة كاملة', title: 'تلميح', 'data-school': '1' }),
@@ -102,8 +104,7 @@ test('components: each builder writes one fixed structure, attributes in one ord
   assert.equal(C.field({ kind: 'select', id: 's', hidden: true }), '<select class="i360-field" id="s" hidden></select>');
   assert.equal(C.button({ text: 'بحث', primary: true, type: 'submit', class: 'search-btn' }), '<button class="i360-btn i360-btn-primary search-btn" type="submit">بحث</button>');
   assert.equal(C.button({ id: 'e', icon: SVG('expandAll'), label: 'توسيع', small: true }), `<button class="i360-btn i360-btn-sm i360-btn-icon" type="button" id="e" title="توسيع" aria-label="توسيع">${SVG('expandAll')}</button>`);
-  assert.equal(C.button({ id: 's', icon: SVG('swap'), 'text-target': 'dir' }), `<button class="i360-btn" type="button" id="s">${SVG('swap')}<span data-target="dir"></span></button>`);
-  assert.equal(C.button({ small: true, 'data-retry': true }), '<button class="i360-btn i360-btn-sm" type="button" data-retry></button>');
+  assert.equal(C.button({ small: true, text: '', 'data-retry': true }), '<button class="i360-btn i360-btn-sm" type="button" data-retry></button>');
   assert.equal(C.listItem({ id: 'l', lang: 'ur', 'data-lang': 'ur', text: 'اردو' }), '<button class="i360-list-item" type="button" id="l" lang="ur" data-lang="ur">اردو</button>');
   assert.equal(C.listItem({ href: '/md/?file=x&p=1', class: 'hit' }), '<a class="i360-list-item hit" href="/md/?file=x&amp;p=1"></a>');
   assert.equal(C.box('card', { tag: 'details', class: 'major' }), '<details class="i360-card major"></details>');
@@ -148,30 +149,34 @@ test('components: the toolbar and its parts — a header (the app\'s: a div), it
   assert.equal(C.box('toolbarMenu', { id: 'm', hidden: true }), '<div class="toolbar-menu" id="m" hidden></div>');
   assert.equal(writeComponents('<!--@@TOOLBAR variant="sticky"@@--><!--@@TOOLBAR_START@@-->s<!--@@/TOOLBAR_START@@--><!--@@TOOLBAR_MENU id="m" hidden@@--><!--@@TOOLBAR_GROUP id="g"@@-->x<!--@@/TOOLBAR_GROUP@@--><!--@@/TOOLBAR_MENU@@--><!--@@/TOOLBAR@@-->'),
     '<header class="toolbar toolbar-sticky"><div class="tb-start">s</div><div class="toolbar-menu" id="m" hidden><div class="tb-group" id="g">x</div></div></header>');
-  assert.throws(() => C.labelButton({ id: 'l', text: 't' }), /needs icon and text/);
-  assert.throws(() => C.menuButton({ id: 'm', icon: SVG('x') }), /needs icon, textId and aria-controls/);
+  assert.throws(() => C.ghostButton({ id: 'g' }), /needs an icon, a text or both/);
+  assert.throws(() => C.button({ id: 'b' }), /needs an icon, a text or both/);
+  assert.throws(() => C.ghostButton({ id: 'm', menu: true, icon: SVG('x') }), /needs its text and aria-controls/);
+  assert.equal(C.field({ kind: 'search', id: 'q', 'in-box': true }).slice(0, 34), '<input class="i360-field-input" ty');
+  assert.equal(C.box('fieldBox', { class: 'search-input', html: 'x' }), '<div class="i360-field i360-field-search search-input">x</div>');
 });
 
 test('components: placeholders are written by the builders; build.js\'s own are left; mistakes stop the build', () => {
-  const page = '<!--@@SETTINGS_BUTTONS@@--><!--@@DIVIDER@@--><!--@@TOOLBAR_BUTTON id="b" icon="close" hidden@@--><!--@@TOOLBAR_TITLE id="t"@@--> اسم <!--@@/TOOLBAR_TITLE@@--><!--@@CSP@@-->';
+  const page = '<!--@@SETTINGS_BUTTONS@@--><!--@@DIVIDER@@--><!--@@GHOST_BUTTON id="b" icon="close" hidden@@--><!--@@TOOLBAR_TITLE id="t"@@--> اسم <!--@@/TOOLBAR_TITLE@@--><!--@@CSP@@-->';
   assert.equal(writeComponents(page, SVG),
-    C.settingsButtons() + C.divider() + C.toolbarButton({ id: 'b', icon: SVG('close'), hidden: true }) + '<h1 class="tb-title" id="t">اسم</h1><!--@@CSP@@-->');
-  assert.equal(writeComponents('<!--@@LABEL_BUTTON id="b" icon="openFile" text="Open file" label-id="l"@@-->', SVG), C.labelButton({ id: 'b', icon: SVG('openFile'), text: 'Open file', labelId: 'l' }));
+    C.settingsButtons() + C.divider() + C.ghostButton({ id: 'b', icon: SVG('close'), hidden: true }) + '<h1 class="tb-title" id="t">اسم</h1><!--@@CSP@@-->');
+  assert.equal(writeComponents('<!--@@BUTTON id="b" icon="openFile" text="Open file" text-id="l"@@-->', SVG), C.button({ id: 'b', icon: SVG('openFile'), text: 'Open file', 'text-id': 'l' }));
+  assert.equal(writeComponents('<!--@@FIELD_BOX class="s"@@--><!--@@FIELD kind="search" id="q" in-box@@--><!--@@/FIELD_BOX@@-->', SVG), C.box('fieldBox', { class: 's', html: C.field({ kind: 'search', id: 'q', 'in-box': true }) }));
   assert.equal(writeComponents('<!--@@CARD id="c" class="glass"@@--><p><!--@@INSET@@--><!--@@CHIP id="o" text="t"@@--><!--@@/INSET@@--></p><!--@@/CARD@@-->', SVG),
     `<section class="i360-card glass" id="c"><p><div class="i360-inset">${C.chip({ id: 'o', text: 't' })}</div></p></section>`);
   assert.equal(writeComponents('<!--@@INSET@@-->a<!--@@INSET@@-->b<!--@@/INSET@@--><!--@@/INSET@@-->', SVG), '<div class="i360-inset">a<div class="i360-inset">b</div></div>');
   assert.equal(writeComponents('<!--@@BUTTON id="p" icon="pickDate"@@-->', SVG), C.button({ id: 'p', icon: SVG('pickDate') }));
-  assert.throws(() => writeComponents('<!--@@TOOLBAR_BUTON id="b"@@-->', SVG), /unknown component/);
+  assert.throws(() => writeComponents('<!--@@GHOST_BUTON id="b"@@-->', SVG), /unknown component/);
   assert.throws(() => writeComponents('<!--@@CARD id="c"@@-->no end', SVG), /unknown component/);
-  assert.throws(() => writeComponents('<!--@@LABEL_BUTTON id="b" text="y"@@-->', SVG), /needs id, icon and text/);
+  assert.throws(() => writeComponents('<!--@@GHOST_BUTTON id="b"@@-->', SVG), /needs an icon, a text or both/);
   assert.throws(() => writeComponents('<!--@@TOOLBAR_TITLE@@-->no end'), /unknown component/);
-  assert.throws(() => writeComponents('<!--@@TOOLBAR_BUTTON id="b" icon="noSuchMeaning"@@-->'), /not a meaning in src\/icons\.js/);
+  assert.throws(() => writeComponents('<!--@@GHOST_BUTTON id="b" icon="noSuchMeaning"@@-->'), /not a meaning in src\/icons\.js/);
 });
 
-test('components: page-chrome.css has every comment closed, and the label button\'s rule is live (not inside a comment)', () => {
+test('components: page-chrome.css has every comment closed, and the ghost button\'s rule is live (not inside a comment)', () => {
   const css = fs.readFileSync(path.join(SRC, 'page-chrome.css'), 'utf8');
   assert.equal((css.match(/\/\*/g) || []).length, (css.match(/\*\//g) || []).length, 'a comment is never closed');
-  assert.match(css.replace(/\/\*[\s\S]*?\*\//g, ''), /\.toolbar-btn-label\s*\{/, '.toolbar-btn-label { … } is missing or commented out');
+  assert.match(css.replace(/\/\*[\s\S]*?\*\//g, ''), /\.i360-btn-ghost\s*\{/, '.i360-btn-ghost { … } is missing or commented out');
 });
 
 test('components: Daily Reflection\'s verse, hadith and converter cards end with the shared footer, nothing hand-written', () => {

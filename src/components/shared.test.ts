@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import * as Hub from '@i360/components'
-import { Announcer, Banner, Button, FieldBox, Popup, Toast, Toolbar, ToolbarButton, ToolbarStart } from './shared'
+import { Announcer, Banner, Button, FieldBox, GhostButton, Popup, SearchField, Toast, Toolbar, ToolbarStart } from './shared'
 
 // The app's shared components (shared.tsx) against the hub builders (hub/src/components.js): the
 // same element, classes and attributes for the same inputs. An icon's drawing is left out (each
@@ -17,8 +17,10 @@ const icon = h('svg', { 'data-icon': 'x' })
 function normal(html: string): string {
   return html
     .replace(/<svg\b[\s\S]*?<\/svg>/g, '<svg/>')
-    .replace(/<([a-z0-9]+)((?:\s+[a-zA-Z-]+(?:="[^"]*")?)*)\s*>/g, (_, tag: string, attrs: string) => {
-      const list = [...attrs.matchAll(/([a-zA-Z-]+)(?:="([^"]*)")?/g)].map((m) => (m[2] === undefined || m[2] === '' ? m[1] : `${m[1]}="${m[2]}"`))
+    // Attribute names compared lower-case, as HTML reads them (React writes enterKeyHint), and an
+    // empty element's "/>" as ">".
+    .replace(/<([a-z0-9]+)((?:\s+[a-zA-Z-]+(?:="[^"]*")?)*)\s*\/?>/g, (_, tag: string, attrs: string) => {
+      const list = [...attrs.matchAll(/([a-zA-Z-]+)(?:="([^"]*)")?/g)].map((m) => { const name = m[1]!.toLowerCase(); return m[2] === undefined || m[2] === '' ? name : `${name}="${m[2]}"` })
       return `<${tag}${list.sort().map((a) => ` ${a}`).join('')}>`
     })
 }
@@ -26,8 +28,9 @@ const app = (el: ReactElement) => normal(renderToStaticMarkup(el))
 
 describe('the app\'s shared components write the hub builders\' structure', () => {
   const cases: [string, ReactElement, string][] = [
-    ['toolbar button with icon', h(ToolbarButton, { icon, label: 'معلومات الإصدار' }), Hub.toolbarButton({ icon: ICON, label: 'معلومات الإصدار' })],
-    ['toolbar button, own class, no icon', h(ToolbarButton, { className: 'numerals-btn', label: 'الأرقام' }), Hub.toolbarButton({ class: 'numerals-btn', label: 'الأرقام' })],
+    ['ghost button with icon', h(GhostButton, { icon, label: 'معلومات الإصدار' }), Hub.ghostButton({ icon: ICON, label: 'معلومات الإصدار' })],
+    ['ghost button with icon and text', h(GhostButton, { icon, text: 'فتح ملف' }), Hub.ghostButton({ icon: ICON, text: 'فتح ملف' })],
+    ['ghost button, own class, drawn by its script', h(GhostButton, { className: 'numerals-btn', label: 'الأرقام' }), Hub.ghostButton({ class: 'numerals-btn', label: 'الأرقام', drawn: true })],
     ['button, primary, words', h(Button, { primary: true }, 'موافق'), Hub.button({ primary: true, text: 'موافق' })],
     ['button, words, placement', h(Button, { className: 'w-full' }, 'إعادة'), Hub.button({ class: 'w-full', text: 'إعادة' })],
     ['button, small, icon only', h(Button, { small: true, icon, label: 'توسيع' }), Hub.button({ small: true, icon: ICON, label: 'توسيع' })],
@@ -40,6 +43,7 @@ describe('the app\'s shared components write the hub builders\' structure', () =
     ['a toolbar\'s start', h(ToolbarStart), Hub.box('toolbarStart')],
     ['field box', h(FieldBox, { className: 'flex' }), Hub.box('fieldBox', { class: 'flex' })],
     ['hidden announcer', h(Announcer), Hub.announcer()],
+    ['search field in a field box', h(SearchField, { id: 'q', placeholder: 'ابحث…' }), Hub.field({ kind: 'search', 'in-box': true, id: 'q', placeholder: 'ابحث…' })],
   ]
   it.each(cases)('%s', (_, el, hub) => {
     expect(app(el)).toBe(normal(hub))
@@ -51,7 +55,7 @@ describe('the app\'s shared components write the hub builders\' structure', () =
 })
 
 describe('no app component writes a shared component\'s class itself', () => {
-  const COMPONENT_CLASS = /(?<![\w-])(toolbar|toolbar-btn|toolbar-menu|tb-(?:title|start|main|end|group)|sr-only|i360-(?:chip|field|btn|list-item|card|inset|popup|banner|toast|status|empty))(?![\w-])/
+  const COMPONENT_CLASS = /(?<![\w-])(toolbar|toolbar-menu|tb-(?:title|start|main|end|group)|sr-only|i360-(?:chip|field|field-input|btn|btn-ghost|list-item|card|inset|popup|banner|toast|status|empty))(?![\w-])/
   const dir = join(process.cwd(), 'src')
   const files = (readdirSync(dir, { recursive: true }) as string[])
     .filter((f) => f.endsWith('.tsx') && !f.endsWith('shared.tsx'))

@@ -2,7 +2,7 @@
 // measurement, and keyboard shortcuts.
 import { oncePerFrame } from '../frame.js';
 import { el, fittingToolbar, fromMarkup, setLabel, setPressed } from '../page-chrome.js';
-import { emptyState, listItem, toolbarButton } from '../components.js';
+import { emptyState, ghostButton, listItem } from '../components.js';
 import { READER_FOLD } from './fold.js';
 import { PANEL_COVERS, ZOOM_STEP } from './constants.js';
 import * as ICON from 'i360:icons';
@@ -98,7 +98,7 @@ function renderPanel() {
       const li = el('li', 'bm-row');
       const label = state.format === 'plain' ? fmtNum(idx + 1) : pageLabelText(state.pages[idx], tr);
       li.appendChild(panelItem(pageSummary(idx) || label, label, () => jumpToElement(idx, null)));
-      const del = fromMarkup(toolbarButton({ icon: ICON.delete }));
+      const del = fromMarkup(ghostButton({ icon: ICON.delete }));
       setLabel(del, tr.removeBookmark);
       del.addEventListener('click', () => removeBookmarkAt(idx));
       li.appendChild(del);

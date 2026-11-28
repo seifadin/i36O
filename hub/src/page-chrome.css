@@ -23,7 +23,7 @@
    camera notch in landscape, the iPhone Duo's status-bar strip down one side — by each side's inset, as
    the device reports it (env(), 0 where there is none), plus one gap, the same on every page, from the
    room there is: closer on a phone, wider on a big screen. Padding inside a control is not this gap
-   (it follows the text: .toolbar-btn, the pages' own fields).
+   (it follows the text: the buttons, the pages' own fields).
      safe-area          a page's content area: all four sides
      safe-area-top-bar  …with a toolbar above it, which already clears the top (.toolbar)
      safe-sides         a full-width row whose background reaches the edges: its content clears the
@@ -111,7 +111,9 @@
 .toolbar > .tb-title { flex: 1; text-align: end; }
 
 /* ---------- Its buttons ---------- */
-.toolbar-btn {
+/* Ghost buttons (ghostButton()): no pill and no outline, a fill only when hovered or on — every bar's
+   buttons, and any bare button beside a field or in a row. Pill buttons: .i360-btn, below. */
+.i360-btn-ghost {
   position: relative;       /* for the tap area below */
   box-sizing: border-box;
   height: var(--toolbar-btn-h);
@@ -131,22 +133,22 @@
   font-family: inherit;
   transition: background-color var(--i360-speed-quick, 0.15s), color var(--i360-speed-quick, 0.15s);
 }
-.toolbar .toolbar-btn { min-width: var(--toolbar-btn-w); }
-.toolbar-menu .toolbar-btn { min-width: var(--toolbar-btn-min); }
-.toolbar-btn:hover:not(:disabled), .toolbar-btn[aria-expanded="true"] { background-color: var(--toolbar-hover); color: var(--toolbar-icon-hover); }
-.toolbar-btn[aria-pressed="true"] { background-color: var(--toolbar-active); color: var(--toolbar-icon-hover); }
+.toolbar .i360-btn-ghost { min-width: var(--toolbar-btn-w); }
+.toolbar-menu .i360-btn-ghost { min-width: var(--toolbar-btn-min); }
+.i360-btn-ghost:hover:not(:disabled), .i360-btn-ghost[aria-expanded="true"] { background-color: var(--toolbar-hover); color: var(--toolbar-icon-hover); }
+.i360-btn-ghost[aria-pressed="true"] { background-color: var(--toolbar-active); color: var(--toolbar-icon-hover); }
 /* Keyboard focus: one ring, shown only when a control is reached by keyboard — a thin gap in the
    page colour, then the focus colour, so it shows on a filled button too (a ring, not an outline:
    some WebViews draw outlines square on rounded buttons). On every toolbar button, and on every
    control of the hub pages (<body class="i360-page">) and on the shared components below in the
    app too (text boxes show the field focus instead). */
-.toolbar-btn:focus-visible,
+.i360-btn-ghost:focus-visible,
 :is(.i360-btn, .i360-chip, .i360-list-item):focus-visible,
 .i360-page :is(button, a, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline: none;
   box-shadow: 0 0 0 var(--i360-line-width-strong, 2px) var(--i360-bg, #FAF7F2), 0 0 0 calc(2 * var(--i360-line-width-strong, 2px)) var(--toolbar-focus);
 }
-.toolbar-btn:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
+.i360-btn-ghost:disabled { opacity: var(--i360-disabled-opacity, 0.4); cursor: default; }
 
 /* Icons: Lucide (lucide.dev, ISC licence), drawn inline and tagged data-lucide on every page;
    checked by scripts/icons.js. Their drawing style, for every icon on every page (each page sets
@@ -160,7 +162,7 @@ svg[data-lucide] {
   fill: none;
   flex-shrink: 0;
 }
-.toolbar-btn svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
+.i360-btn-ghost svg { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); }
 /* An icon's size anywhere else: .icon (a card's, a status, a floating button), .icon-inline (beside
    text, as tall as it). */
 .icon { width: var(--i360-icon-size, 1.25rem); height: var(--i360-icon-size, 1.25rem); display: block; }
@@ -169,30 +171,24 @@ svg[data-lucide] {
 /* The numerals button shows digits (٣ / 3). */
 .numerals-btn { font-weight: 700; font-variant-numeric: tabular-nums; }
 
-/* A button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»): set off
-   from the icon-only buttons by a box and bold text. Its markup, like every shared component's, is
-   written once (src/components.js): the icon's <svg> then the label, both direct children, centred
-   on one line by .toolbar-btn. A script changing the icon swaps the <svg> itself. */
-/* A button that opens a list (src/components.js menuButton): its short text, bold, then a small
+/* A ghost button that opens a list (ghostButton's `menu`): its short text, bold, then a small
    dropdown icon. */
-.toolbar-btn-menu { gap: var(--i360-space-xs, 0.25rem); font-weight: 700; line-height: 1; }
-.toolbar-btn-menu > svg { width: var(--i360-text-size-sm, 0.875rem); height: var(--i360-text-size-sm, 0.875rem); }
+.i360-btn-ghost-menu { gap: var(--i360-space-xs, 0.25rem); font-weight: 700; line-height: 1; }
+.i360-btn-ghost-menu > svg { width: var(--i360-text-size-sm, 0.875rem); height: var(--i360-text-size-sm, 0.875rem); }
 
-.toolbar-btn-label {
-  background-color: var(--i360-input, #FAF7F2);
-  border: var(--i360-line-width, 1px) solid var(--toolbar-line);
-  font-weight: 700;
-}
+/* A pill button in a bar (the Reader's «فتح ملف», the quran page's «تفسير»): as tall as the bar's
+   other buttons. */
+.toolbar .i360-btn { height: var(--toolbar-btn-h); padding: 0 var(--i360-space-sm, 0.5rem); }
 
 /* The tap area, not drawn: each button in the bar reaches from the bar's top edge to its bottom, so
    it stays the bar's full height whatever the two heights above are. Sideways it is the button's
    own width (the buttons sit close together). Not in the menu, whose rows are close together. */
-.toolbar .toolbar-btn::after {
+.toolbar .i360-btn-ghost::after {
   content: '';
   position: absolute;
   inset: calc((var(--toolbar-btn-h) - var(--toolbar-h)) / 2) 0;
 }
-.toolbar-menu .toolbar-btn::after { content: none; }
+.toolbar-menu .i360-btn-ghost::after { content: none; }
 
 /* ---------- The ⋮ menu: under the bar, its groups boxed; what folds out of the bar goes here ---------- */
 .toolbar-menu {
@@ -220,9 +216,9 @@ svg[data-lucide] {
 .toolbar-dense { --toolbar-btn-min: 1.85rem; gap: 0; }
 .toolbar-dense :is(.tb-start, .tb-end, .tb-main) { gap: 0; }
 .toolbar-dense .tb-start > .divider { margin: 0; }
-.toolbar-dense .toolbar-btn { padding: 0 var(--i360-space-xs, 0.25rem); }
+.toolbar-dense .i360-btn-ghost { padding: 0 var(--i360-space-xs, 0.25rem); }
 .toolbar-densest { --toolbar-btn-min: 1.6rem; --toolbar-pad: var(--i360-space-xs, 0.25rem); }
-.toolbar-densest .toolbar-btn { padding: 0; }
+.toolbar-densest .i360-btn-ghost { padding: 0; }
 .toolbar-densest .tb-start > .divider { display: none; }
 
 /* ---------- Shared components (i360-hub.md §10 "Components") ----------
@@ -242,6 +238,12 @@ svg[data-lucide] {
   outline: none;
 }
 .i360-field-search { border-radius: var(--i360-radius-full, 999px); }
+/* A field box (box('fieldBox')): the field's look round a field and its buttons, in one row; the
+   field inside (field() in-box) takes the box's look and the room left. */
+div.i360-field { display: flex; align-items: center; }
+.i360-field-input { flex: 1; min-width: 0; border: 0; background: transparent; color: inherit; font: inherit; line-height: normal; outline: none; padding: 0; }
+/* A ghost button inside a field box: no taller than the field's line, its fill close round its icon. */
+div.i360-field > .i360-btn-ghost { height: auto; min-width: 0; padding: var(--i360-space-xs, 0.25rem); }
 .i360-field::placeholder, .i360-field ::placeholder { color: var(--i360-muted, #5A62C9); }
 .i360-field:focus, .i360-field:focus-within { border-color: var(--i360-focus, #0010CF); box-shadow: var(--i360-focus-ring, 0 0 0 3px rgba(0, 16, 207, 0.25)); }
 

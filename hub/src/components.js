@@ -1,9 +1,9 @@
 // The shared components' markup, written once (their style: src/page-chrome.css). Every page gets
 // exactly this structure and differs only in its own id, words and icon:
 // - in a page's HTML, a placeholder the build writes out (scripts/placeholders.js):
-//     <!--@@TOOLBAR_BUTTON id="btn-zoom-in" icon="zoomIn"@@-->
+//     <!--@@GHOST_BUTTON id="btn-zoom-in" icon="zoomIn"@@-->
 // - in a page's script, the same function, its markup made an element (fromMarkup in page-chrome.js):
-//     fromMarkup(toolbarButton({ icon: ICON.delete }))
+//     fromMarkup(ghostButton({ icon: ICON.delete }))
 // Pure functions of their inputs (no browser needed), so the build and the pages share them. An icon
 // is passed drawn (an <svg> string: the build draws it from its meaning, a page script imports it
 // from 'i360:icons', drawn the same way by scripts/icons.js); every icon is hidden from screen readers, as each
@@ -30,36 +30,38 @@ function attributes(a) {
   for (const name of Object.keys(a).filter((k) => k.startsWith('data-') && k !== 'data-i18n').sort()) write(name, a[name]);
   return out;
 }
-const TOOLBAR_BUTTON = 'toolbar-btn';
+const GHOST_BUTTON = 'i360-btn-ghost';
 const TITLE = 'tb-title';
 const flags = (a) => `${a.disabled ? ' disabled' : ''}${a.hidden ? ' hidden' : ''}`;
 const classes = (own, extra) => (extra ? `${own} ${extra}` : own);
 
-// A toolbar button: its icon, or empty when its script draws it (the text-size and book-direction
-// buttons).
-function toolbarButton(a = {}) {
-  return `<button class="${classes(TOOLBAR_BUTTON, a.class)}" type="button"${attributes(a)}${flags(a)}>${a.icon || ''}</button>`;
+// The inside of a button: its icon and/or its text, icon first — `text` fixed, `text-id` naming the
+// <span> its script fills, or data-i18n (its words by language, filled by its page). A button with
+// none of these is refused, unless `drawn` (its script draws it all: the numerals sample, the
+// text-size buttons).
+function buttonInside(a, what) {
+  const words = a.text !== undefined || a['text-id'] || a['data-i18n'];
+  if (!a.icon && !words && !a.drawn) throw new Error(`${what} needs an icon, a text or both (or drawn, when its script draws it)`);
+  const span = words ? `<span${a['text-id'] ? ` id="${escapeAttr(a['text-id'])}"` : ''}>${escapeText(a.text ?? '')}</span>` : '';
+  return { icon: a.icon || '', span, iconOnly: !!a.icon && !words };
 }
 
-// A toolbar button with a word beside its icon (the Reader's «فتح ملف», the quran page's «تفسير»):
-// the icon, then the label (labelId names it, for a script that changes its text).
-function labelButton(a = {}) {
-  if (!a.icon || !a.text) throw new Error('a label button needs icon and text');
-  const span = `<span${a.labelId ? ` id="${escapeAttr(a.labelId)}"` : ''}>${escapeText(a.text)}</span>`;
-  return `<button class="${classes('toolbar-btn toolbar-btn-label', a.class)}" type="button"${attributes(a)}${flags(a)}>${a.icon}${span}</button>`;
-}
-
-// A toolbar button that opens a list (Daily Reflection's languages): its short text, then the
-// dropdown icon (its look: .toolbar-btn-menu).
-function menuButton(a = {}) {
-  if (!a.icon || !a.textId || !a['aria-controls']) throw new Error('a menu button needs icon, textId and aria-controls');
-  return `<button class="${classes('toolbar-btn toolbar-btn-menu', a.class)}" type="button"${attributes({ ...a, 'aria-haspopup': 'true', 'aria-expanded': 'false' })}${flags(a)}>`
-    + `<span id="${escapeAttr(a.textId)}"></span>${a.icon}</button>`;
+// A ghost button: no pill and no outline, a fill only when hovered or on — the toolbars' buttons, and
+// any bare button beside a field or in a row. Its icon and/or text (buttonInside, above). `menu`:
+// it opens a list (aria-controls names it) — its text, then the small dropdown icon, which is then
+// its `icon` (Daily Reflection's languages).
+function ghostButton(a = {}) {
+  const { icon, span } = buttonInside(a, 'a ghost button');
+  if (a.menu) {
+    if (!a['aria-controls'] || !span) throw new Error('a menu button needs its text and aria-controls');
+    return `<button class="${classes(`${GHOST_BUTTON} ${GHOST_BUTTON}-menu`, a.class)}" type="button"${attributes({ ...a, 'aria-haspopup': 'true', 'aria-expanded': 'false' })}${flags(a)}>${span}${icon}</button>`;
+  }
+  return `<button class="${classes(GHOST_BUTTON, a.class)}" type="button"${attributes(a)}${flags(a)}>${icon}${span}</button>`;
 }
 
 // The theme and numerals buttons, in the order of every i360 page (drawn by drawSettingsButtons).
 function settingsButtons() {
-  return toolbarButton({ id: 'btn-theme' }) + toolbarButton({ id: 'btn-numerals', class: 'numerals-btn' });
+  return ghostButton({ id: 'btn-theme', drawn: true }) + ghostButton({ id: 'btn-numerals', class: 'numerals-btn', drawn: true });
 }
 
 // The page's name on its toolbar: its one heading. `html` is the page's own fixed markup (the CSE
@@ -92,24 +94,23 @@ const FIELD_KINDS = Object.freeze({
   number: ' type="text" inputmode="numeric" autocomplete="off"',
 });
 
-// A field: a search box, a number box or a list (its kind, above).
+// A field: a search box, a number box or a list (its kind, above). `in-box`: it sits in a field box
+// (box('fieldBox')) with its buttons, which gives it its look — every search box with buttons.
 function field(a = {}) {
   if (a.kind === 'select') return `<select class="${classes('i360-field', a.class)}"${attributes(a)}${flags(a)}></select>`;
   const kind = FIELD_KINDS[a.kind];
   if (!kind) throw new Error(`a field's kind is search, number or select, not "${a.kind}"`);
-  const own = a.kind === 'search' ? 'i360-field i360-field-search' : 'i360-field';
+  const own = a['in-box'] ? 'i360-field-input' : a.kind === 'search' ? 'i360-field i360-field-search' : 'i360-field';
   return `<input class="${classes(own, a.class)}"${kind}${attributes(a)}${flags(a)}>`;
 }
 
-// A button: its text (`text`, or empty for a script to fill), its icon alone (an icon-only
-// button, its look .i360-btn-icon), or its icon then a text its script fills (`text-target`
-// names it, data-target). `primary` fills it, `small` makes it smaller; type submit in a form.
+// A button: a pill, outlined, or filled for the main action (`primary`); `small` makes it smaller.
+// Its icon and/or text (buttonInside, above) — an icon alone takes .i360-btn-icon. type submit in a
+// form.
 function button(a = {}) {
-  const iconOnly = a.icon && !a['text-target'];
+  const { icon, span, iconOnly } = buttonInside(a, 'a button');
   const own = ['i360-btn', a.primary && 'i360-btn-primary', a.small && 'i360-btn-sm', iconOnly && 'i360-btn-icon'].filter(Boolean).join(' ');
-  const inner = a.icon
-    ? a.icon + (a['text-target'] ? `<span data-target="${escapeAttr(a['text-target'])}"></span>` : '')
-    : escapeText(a.text ?? '');
+  const inner = icon ? icon + span : span.replace(/^<span>|<\/span>$/g, '');
   return `<button class="${classes(own, a.class)}" type="${a.type === 'submit' ? 'submit' : 'button'}"${attributes(a)}${flags(a)}>${inner}</button>`;
 }
 
@@ -197,7 +198,7 @@ function cardHeader(a = {}) {
 function statusLine(a = {}) {
   if (!a.part && !a.id) throw new Error('a status line needs its part or id');
   return `<div class="${classes('i360-status', a.class)}"${attributes({ id: a.id, role: 'status', 'aria-live': 'polite', 'data-status': a.part, 'data-status-keep': a.keep })}${a.keep ? '' : ' hidden'}>`
-    + `<span data-status-text></span>${button({ small: true, 'data-retry': true, hidden: true })}</div>`;
+    + `<span data-status-text></span>${button({ small: true, text: '', 'data-retry': true, hidden: true })}</div>`;
 }
 
 // A hidden announcer: words for screen readers only, set by its script (the quran page's «تفسير»
@@ -244,10 +245,10 @@ function cardFooter(a = {}) {
 // The component classes a script needs — to turn a component's look on and off (the CSE's status
 // line becomes a banner on an error) or to find components (a toolbar's buttons) — never written
 // out by hand.
-const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, toolbarButton: TOOLBAR_BUTTON,
+const CLASS = Object.freeze({ banner: BOXES.banner.cls, chipLabel: CLASS_CHIP_LABEL, title: TITLE, ghostButton: GHOST_BUTTON,
   toolbarEnd: BOXES.toolbarEnd.cls, toolbarMenu: BOXES.toolbarMenu.cls });
 
 // BOXES and CARD_TONES are exported for the components' inventory and catalogue
 // (scripts/list-components.js, tools/catalogue/), which list every container and card colour.
-export { toolbarButton, labelButton, menuButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box,
+export { ghostButton, settingsButtons, toolbarTitle, divider, chip, field, button, listItem, box,
   cardHeader, cardFooter, statusLine, announcer, emptyState, CLASS, BOXES, CARD_TONES };

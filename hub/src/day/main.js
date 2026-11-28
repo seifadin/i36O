@@ -500,7 +500,7 @@ const Conv = {
   render(fields = true) {
     if (!this.el) return;
     const L = this.L, lang = App.lang, box = this.el, num = i360Theme.getNumerals();
-    UI.set('conv-dir', this.g ? L.convG2H : L.convH2G);
+    $('conv-dir').textContent = this.g ? L.convG2H : L.convH2G;
     const sw = $('conv-swap'); sw.title = L.convSwap; sw.setAttribute('aria-label', `${L.convSwap}: ${this.g ? L.convG2H : L.convH2G}`);
     $('conv-fields').setAttribute('aria-label', this.g ? L.convG2H : L.convH2G);
     const option = (value, text, placeholder) => { const o = el('option', '', text); o.value = value; if (placeholder) { o.disabled = true; } return o; };

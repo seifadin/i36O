@@ -33,7 +33,7 @@ const state = () => {
     settings: ['btn-theme', 'btn-numerals'].map((id) => { const b = document.getElementById(id); return [b.querySelector('svg')?.dataset.lucide || b.textContent.trim(), b.title, b.getAttribute('aria-label')]; }),
     madhab: [0, 1].map((i) => document.getElementById('school-' + i).getAttribute('aria-pressed') === 'true'),
     conv: {
-      dir: text('conv-dir'), d: document.getElementById('conv-d').value, m: document.getElementById('conv-m').value, y: document.getElementById('conv-y').value,
+      dir: text('conv-dir') ?? (document.getElementById('conv-dir')?.textContent.trim() || null),   // a data-target before the shared button text d: document.getElementById('conv-d').value, m: document.getElementById('conv-m').value, y: document.getElementById('conv-y').value,
       days: document.getElementById('conv-d').options.length - 1, alpha: text('conv-alpha'), iso: text('conv-iso'),
       error: document.querySelector('[data-target="conv-error"]').hidden ? null : text('conv-error'), label: text('conv-source') ?? text('conv-label')
     },

@@ -18,28 +18,25 @@ a file = calls in that script or React uses in that app file.
 | `box('popup')` | A pop-up: a list, a dialog or a tooltip | `POPUP` | `.i360-popup` | `Popup` | day page ×1; reader page ×1; src/components/Dialog.tsx ×1; src/components/OSRow.tsx ×1 |
 | `box('banner')` | A notice | `BANNER` | `.i360-banner` | `Banner` | reader page ×1; src/components/ScienceGrid.tsx ×1 |
 | `box('toast')` | A short message that comes and goes | `TOAST` | `.i360-toast` | `Toast` | reader page ×1; src/components/ScienceGrid.tsx ×1 |
-| `box('fieldBox')` | A field's look round a field and its buttons | — | `.i360-field` `.i360-field-search` | `FieldBox` | src/components/SearchBar.tsx ×1 |
+| `box('fieldBox')` | A field's look round a field and its buttons | `FIELD_BOX` | `.i360-field` `.i360-field-search` | `FieldBox` | cse page ×1; reader page ×1; src/components/SearchBar.tsx ×1 |
 | `box('toolbar')` | A toolbar | `TOOLBAR` | `.toolbar` | `Toolbar` | cse page ×1; day page ×1; quran page ×1; reader page ×1; src/components/OSRow.tsx ×1 |
 | `box('toolbarStart')` | A toolbar's start (its settings) | `TOOLBAR_START` | `.tb-start` | `ToolbarStart` | cse page ×1; day page ×1; quran page ×1; reader page ×1; src/components/OSRow.tsx ×1 |
 | `box('toolbarMain')` | A toolbar's middle | `TOOLBAR_MAIN` | `.tb-main` | — | reader page ×1 |
 | `box('toolbarEnd')` | A toolbar's end | `TOOLBAR_END` | `.tb-end` | — | reader page ×1 |
 | `box('toolbarGroup')` | A group of toolbar buttons | `TOOLBAR_GROUP` | `.tb-group` | — | reader page ×7 |
 | `box('toolbarMenu')` | A toolbar's ⋮ menu | `TOOLBAR_MENU` | `.toolbar-menu` | — | reader page ×1 |
-| `button` | A button | `BUTTON` | `.i360-btn` | `Button` | cse page ×3; day page ×3; hub/src/cse/main.js ×1; src/components/Dialog.tsx ×2; src/components/ErrorBoundary.tsx ×2 |
+| `button` | A button | `BUTTON` | `.i360-btn` | `Button` | cse page ×3; day page ×3; quran page ×1; reader page ×1; hub/src/cse/main.js ×1; src/components/Dialog.tsx ×2; src/components/ErrorBoundary.tsx ×2 |
 | `cardFooter` | A card's footer | `CARD_FOOTER` | — (Tailwind) | — | day page ×3 |
 | `cardHeader` | A card's header | `CARD_HEADER` | — (Tailwind) | — | day page ×5 |
 | `chip` | An option that is on or off | `CHIP` | `.i360-chip` | — | cse page ×2; day page ×2; reader page ×2 |
 | `divider` | A thin line between groups of toolbar buttons | `DIVIDER` | `.divider` | — | quran page ×1; reader page ×2 |
 | `emptyState` | A message where there is nothing to show | `EMPTY_STATE` | `.i360-empty` | — | reader page ×1; hub/src/reader/panel.js ×1 |
-| `field` | A field | `FIELD` | `.i360-field` `.i360-field-search` | — | cse page ×1; day page ×4; reader page ×3 |
-| `labelButton` | A toolbar button with a word beside its icon | `LABEL_BUTTON` | `.toolbar-btn` `.toolbar-btn-label` | — | quran page ×1; reader page ×1 |
+| `field` | A field | `FIELD` | `.i360-field` `.i360-field-search` | `SearchField` | cse page ×1; day page ×4; reader page ×3; src/components/SearchBar.tsx ×1 |
+| `ghostButton` | A ghost button | `GHOST_BUTTON` | `.i360-btn-ghost` | `GhostButton` | cse page ×1; day page ×2; reader page ×22; hub/src/reader/panel.js ×1; src/components/OSRow.tsx ×3; src/components/ScienceGrid.tsx ×1; src/components/SearchBar.tsx ×4 |
 | `listItem` | One row of a list | `LIST_ITEM` | `.i360-list-item` | — | day page ×5; hub/src/cse/main.js ×1; hub/src/day/main.js ×1; hub/src/reader/panel.js ×1; hub/src/reader/search.js ×1 |
-| `menuButton` | A toolbar button that opens a list | `MENU_BUTTON` | `.toolbar-btn` `.toolbar-btn-menu` | — | day page ×1 |
-| `settingsButtons` | The theme and numerals buttons | `SETTINGS_BUTTONS` | `.toolbar-btn` | — | cse page ×1; day page ×1; quran page ×1; reader page ×1 |
+| `settingsButtons` | The theme and numerals buttons | `SETTINGS_BUTTONS` | `.i360-btn-ghost` | — | cse page ×1; day page ×1; quran page ×1; reader page ×1 |
 | `statusLine` | A status line | `STATUS_LINE` | `.i360-status` | — | cse page ×1; day page ×3 |
-| `toolbarButton` | A toolbar button | `TOOLBAR_BUTTON` | `.toolbar-btn` | `ToolbarButton` | cse page ×1; day page ×1; reader page ×22; hub/src/reader/panel.js ×1; src/components/OSRow.tsx ×3 |
 | `toolbarTitle` | The page's name on its toolbar | `TOOLBAR_TITLE` | `.tb-title` | — | cse page ×1; day page ×1; quran page ×1; reader page ×1 |
-| — | app-only | — | — | `IconButton` | src/components/ScienceGrid.tsx ×1; src/components/SearchBar.tsx ×4 |
 
 ## 2. The app's own components
 

@@ -19,7 +19,7 @@ const fill = (html, texts) => Object.entries(texts).reduce(
   (out, [target, text]) => out.replace(new RegExp(`(data-target="${target}"[^>]*>)(?=</)`), `$1${text}`), html);
 // Placed in a toolbar, with a button on each side where it sits between buttons.
 const inBar = (html) => C.box('toolbar', { html: C.box('toolbarStart', { html }) });
-const sampleButton = () => C.toolbarButton({ icon: icon('search'), label: 'بحث' });
+const sampleButton = () => C.ghostButton({ icon: icon('search'), label: 'بحث' });
 // Placed in a card, as on Daily Reflection.
 const inCard = (html) => C.box('card', { tag: 'div', class: 'p-md', html });
 const status = (html, text, retry) => html.replace(/ hidden>/, '>').replace('<span data-status-text></span>', `<span data-status-text>${text}</span>`)
@@ -27,23 +27,20 @@ const status = (html, text, retry) => html.replace(/ hidden>/, '>').replace('<sp
   .replace('class="i360-status', retry ? 'class="i360-status i360-banner' : 'class="i360-status');
 
 const SAMPLES = Object.freeze({
-  toolbarButton: [
-    { name: 'عادي', args: { icon: icon('zoomIn'), label: 'تكبير' }, display: inBar },
+  ghostButton: [
+    { name: 'أيقونة', args: { icon: icon('zoomIn'), label: 'تكبير' }, display: inBar },
     { name: 'مفعّل', args: { icon: icon('bookmark'), label: 'علامة', 'aria-pressed': 'true' }, display: inBar },
     { name: 'معطّل', args: { icon: icon('zoomOut'), label: 'تصغير', disabled: true }, display: inBar },
-  ],
-  labelButton: [
-    { name: 'عادي', args: { icon: icon('exegesis'), text: 'تفسير', label: 'تفسير الآية' }, display: inBar },
-    { name: 'معطّل', args: { icon: icon('exegesis'), text: 'تفسير', label: 'تفسير الآية', disabled: true }, display: inBar },
-  ],
-  menuButton: [
-    { name: 'عادي', args: { icon: icon('dropdown'), textId: 'cat-lang-short', 'aria-controls': 'cat-lang-list', label: 'اللغة' },
+    { name: 'أيقونة ونص', args: { icon: icon('openFile'), text: 'فتح ملف' }, display: inBar },
+    { name: 'يفتح قائمة', args: { menu: true, icon: icon('dropdown'), 'text-id': 'cat-lang-short', 'aria-controls': 'cat-lang-list', label: 'اللغة' },
       display: (html) => inBar(html.replace('id="cat-lang-short"></span>', 'id="cat-lang-short">ع</span>')) },
+    { name: 'بجانب حقل', args: { icon: icon('resultNext'), label: 'التالي' },
+      display: (html) => C.box('fieldBox', { class: 'px-md', html: C.field({ kind: 'search', 'in-box': true, placeholder: 'ابحث…' }) + html }) },
   ],
   settingsButtons: [
     { name: 'السمة والأرقام', args: {},
       display: (html) => inBar(html.replace('id="btn-theme"></button>', `id="btn-theme">${icon('theme.light')}</button>`)
-        .replace('id="btn-numerals" class="toolbar-btn numerals-btn"></button>', 'id="btn-numerals" class="toolbar-btn numerals-btn">٤٥٦</button>')
+        .replace('id="btn-numerals" class="i360-btn-ghost numerals-btn"></button>', 'id="btn-numerals" class="i360-btn-ghost numerals-btn">٤٥٦</button>')
         .replace(/ id="btn-(theme|numerals)"/g, '')) },
   ],
   toolbarTitle: [
@@ -59,6 +56,7 @@ const SAMPLES = Object.freeze({
   ],
   field: [
     { name: 'بحث', args: { kind: 'search', 'aria-label': 'بحث', placeholder: 'ابحث…' } },
+    { name: 'داخل صندوق حقل', args: { kind: 'search', 'in-box': true, placeholder: 'ابحث…' }, display: (html) => C.box('fieldBox', { class: 'px-md py-sm', html }) },
     { name: 'رقم', args: { kind: 'number', 'aria-label': 'السنة', placeholder: 'مثل 1448' } },
     { name: 'قائمة', args: { kind: 'select', 'aria-label': 'الشهر' },
       display: (html) => html.replace('></select>', '><option>1. محرم</option><option>2. صفر</option></select>') },
@@ -68,6 +66,8 @@ const SAMPLES = Object.freeze({
     { name: 'أساسي', args: { text: 'بحث', primary: true } },
     { name: 'صغير', args: { text: 'إعادة المحاولة', small: true } },
     { name: 'أيقونة فقط', args: { icon: icon('expandAll'), label: 'فتح الكل' } },
+    { name: 'أيقونة ونص', args: { icon: icon('search'), text: 'بحث', primary: true } },
+    { name: 'في شريط', args: { icon: icon('exegesis'), text: 'تفسير' }, display: inBar },
     { name: 'معطّل', args: { text: 'المزيد', disabled: true } },
   ],
   listItem: [
@@ -80,7 +80,7 @@ const SAMPLES = Object.freeze({
   'box:popup': [{ name: 'قائمة منبثقة', args: { class: 'p-sm', html: C.listItem({ text: 'العربية' }) + C.listItem({ text: 'English' }) } }],
   'box:banner': [{ name: 'تنبيه', args: { class: 'p-sm', html: 'تعذّر تحميل البيانات' } }],
   'box:toast': [{ name: 'رسالة عابرة', args: { class: 'px-md py-sm', html: 'تم النسخ' } }],
-  'box:fieldBox': [{ name: 'شريط البحث', args: { class: 'flex items-center gap-sm px-md py-sm', html: `<span>ابحث…</span>${icon('search').replace('<svg ', '<svg class="icon" ')}` } }],
+  'box:fieldBox': [{ name: 'حقل وأزراره', args: { class: 'gap-sm px-sm', html: C.ghostButton({ icon: icon('searchAuto'), label: 'وضع البحث' }) + C.field({ kind: 'search', 'in-box': true, placeholder: 'ابحث…' }) + C.ghostButton({ icon: icon('search'), label: 'بحث' }) } }],
   'box:toolbar': [
     { name: 'عادي', args: { html: C.box('toolbarStart', { html: sampleButton() }) } },
     { name: 'أعلى الصفحة', args: { variant: 'sticky', html: C.box('toolbarStart', { html: sampleButton() }) + C.toolbarTitle({ html: 'العنوان' }) } },
